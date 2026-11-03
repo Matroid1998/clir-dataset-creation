@@ -1,0 +1,494 @@
+[
+  {
+    "answer": "shall remain in the database for at least 2 years from the time of the expiry of the period of withdrawal, in the case of temporary withdrawal, or from the date of withdrawal, in the case of permanent withdrawal",
+    "candidate_id": "q_9bbfc40c40a6e1083a7fe3d8",
+    "candidate_rank": 1,
+    "claim": "",
+    "claim_status": "",
+    "document_id": "32009R1073",
+    "document_text": "Article 24 — Entry in the national electronic registers\nEntry in the national electronic registers\nMember States shall ensure that serious infringements of Community road transport legislation attributable to carriers established in their territory, which have led to the imposition of a penalty by any Member State, as well as any temporary or permanent withdrawal of the Community licence or of the certified true copy thereof are recorded in the national electronic register of road transport undertakings. Entries in the register which concern a temporary or permanent withdrawal of a Community licence shall remain in the database for at least 2 years from the time of the expiry of the period of withdrawal, in the case of temporary withdrawal, or from the date of withdrawal, in the case of permanent withdrawal.",
+    "mode": "lookup",
+    "question": "What is the minimum period that entries concerning withdrawal of a Community licence must remain in the national electronic register of road transport undertakings?",
+    "question_language": "en",
+    "question_type": "deadline_or_duration",
+    "source_article": "",
+    "target_article_number": "24",
+    "task": "9ae1ad1c9ddfbd9eb56c5daab32dcd48f18fa5885c1cd8c2bdcc7de1c765f8fd",
+    "outcome_index": 0,
+    "database": "data/legal/qac/generation_600_20261008_model_comparison/eurlex/run.sqlite",
+    "teaching_id": "L1",
+    "faithfulness_verifier_prompt_sha256": "c1ee252ec8130595d0962db3799fc652ef6ef47395a788b8a13cadd592013569",
+    "quality_verifier_prompt_sha256": "54cdd5ab749cfa9d6961d6d4db03ea5dc4ad3826dc3c478322d76ea735f794ec",
+    "source_payload_sha256": "9b4d76a9216014880af47f11c6710f1bc26bee8715d6602741a8e2a87f190896",
+    "answer_is_translation": "",
+    "articles_involved": "24",
+    "source_identifier": "",
+    "target_article_id": "http://data.europa.eu/eli/reg/2009/1073/art_24/oj",
+    "target_id": "http://data.europa.eu/eli/reg/2009/1073/art_24/oj",
+    "document_text_scope": "target_article",
+    "source_excerpts": [
+      {
+        "role": "permitted_target",
+        "text": "shall remain in the database for at least 2 years from the time of the expiry of the period of withdrawal, in the case of temporary withdrawal, or from the date of withdrawal, in the case of permanent withdrawal"
+      }
+    ],
+    "assessment_status": "Author-proposed teaching judgment, not human gold; original machine grades are metadata only.",
+    "teaching_scores": {
+      "precision": 4
+    },
+    "saved_prompt_verification": {
+      "faithfulness_verifier_prompt": {
+        "sha256_computed": "c1ee252ec8130595d0962db3799fc652ef6ef47395a788b8a13cadd592013569",
+        "sha256_recorded": "c1ee252ec8130595d0962db3799fc652ef6ef47395a788b8a13cadd592013569",
+        "match": true
+      },
+      "quality_verifier_prompt": {
+        "sha256_computed": "54cdd5ab749cfa9d6961d6d4db03ea5dc4ad3826dc3c478322d76ea735f794ec",
+        "sha256_recorded": "54cdd5ab749cfa9d6961d6d4db03ea5dc4ad3826dc3c478322d76ea735f794ec",
+        "match": true
+      }
+    },
+    "teaching_scores_rubric": "unified_annotation_v1",
+    "previous_teaching_scores": {
+      "grounding": 4,
+      "precision": 4,
+      "numerical_fidelity": 4,
+      "focus_and_formulation": 4
+    },
+    "guideline_criterion": 2,
+    "displayed_in_guideline": true,
+    "displayed_question": "What is the minimum period that entries concerning withdrawal of a Community licence must remain in the national electronic register of road transport undertakings?",
+    "displayed_answer": "shall remain in the database for at least 2 years from the time of the expiry of the period of withdrawal, in the case of temporary withdrawal, or from the date of withdrawal, in the case of permanent withdrawal"
+  },
+  {
+    "answer": "Subject to different provisions of this Directive, the resolution objectives are of equal significance, and resolution authorities shall balance them as appropriate to the nature and circumstances of each case.",
+    "candidate_id": "q_3885878e20a7076da987022b",
+    "candidate_rank": 1,
+    "claim": "Is it certain that, under the EU bank recovery and resolution framework, resolution authorities must give priority to protecting public funds over all other resolution objectives when applying resolution tools",
+    "claim_status": "contradicted",
+    "document_id": "32014L0059",
+    "document_text": "Article 31 — Resolution objectives\nResolution objectives\n\n1. When applying the resolution tools and exercising the resolution powers, resolution authorities shall have regard to the resolution objectives, and choose the tools and powers that best achieve the objectives that are relevant in the circumstances of the case.\n\n2. The resolution objectives referred to in paragraph 1 are:\n\n(a)\nto ensure the continuity of critical functions;\n\n(b)\nto avoid a significant adverse effect on the financial system, in particular by preventing contagion, including to market infrastructures, and by maintaining market discipline;\n\n(c)\nto protect public funds by minimising reliance on extraordinary public financial support;\n\n(d)\nto protect depositors covered by Directive 2014/49/EU and investors covered by Directive 97/9/EC;\n\n(e)\nto protect client funds and client assets.\n\nWhen pursuing the above objectives, the resolution authority shall seek to minimise the cost of resolution and avoid destruction of value unless necessary to achieve the resolution objectives.\n3. Subject to different provisions of this Directive, the resolution objectives are of equal significance, and resolution authorities shall balance them as appropriate to the nature and circumstances of each case.",
+    "mode": "claim_verification",
+    "question": "Is it certain that, under the EU bank recovery and resolution framework, resolution authorities must give priority to protecting public funds over all other resolution objectives when applying resolution tools?",
+    "question_language": "en",
+    "question_type": "scope_or_applicability",
+    "source_article": "",
+    "target_article_number": "31",
+    "task": "a0cdc49d990a99dc7ef1cb92dd78aa13d792c370660e9b54e0117c60625febc6",
+    "outcome_index": 0,
+    "database": "data/legal/qac/generation_600_20261008_model_comparison/eurlex/run.sqlite",
+    "teaching_id": "L2",
+    "faithfulness_verifier_prompt_sha256": "c1ee252ec8130595d0962db3799fc652ef6ef47395a788b8a13cadd592013569",
+    "quality_verifier_prompt_sha256": "0cda861222d8c12a089a131f973ad81dd0fba92a490b5993c456656a1caa1ebd",
+    "source_payload_sha256": "04e440c73cfdbdb9b07d7be201dd808bc725d8fa7e4ad60a2b7618eecaea2230",
+    "answer_is_translation": false,
+    "articles_involved": "31",
+    "source_identifier": "",
+    "target_article_id": "http://data.europa.eu/eli/dir/2014/59/art_31/oj",
+    "target_id": "http://data.europa.eu/eli/dir/2014/59/art_31/oj",
+    "document_text_scope": "target_article",
+    "source_excerpts": [
+      {
+        "role": "permitted_target",
+        "text": "Subject to different provisions of this Directive, the resolution objectives are of equal significance, and resolution authorities shall balance them as appropriate to the nature and circumstances of each case."
+      }
+    ],
+    "assessment_status": "Author-proposed teaching judgment, not human gold; original machine grades are metadata only.",
+    "teaching_scores": {
+      "focus_and_formulation": 4
+    },
+    "saved_prompt_verification": {
+      "faithfulness_verifier_prompt": {
+        "sha256_computed": "c1ee252ec8130595d0962db3799fc652ef6ef47395a788b8a13cadd592013569",
+        "sha256_recorded": "c1ee252ec8130595d0962db3799fc652ef6ef47395a788b8a13cadd592013569",
+        "match": true
+      },
+      "quality_verifier_prompt": {
+        "sha256_computed": "0cda861222d8c12a089a131f973ad81dd0fba92a490b5993c456656a1caa1ebd",
+        "sha256_recorded": "0cda861222d8c12a089a131f973ad81dd0fba92a490b5993c456656a1caa1ebd",
+        "match": true
+      }
+    },
+    "numerical_fidelity_applicability": "not_applicable",
+    "teaching_scores_rubric": "unified_annotation_v1",
+    "previous_teaching_scores": {
+      "grounding": 4,
+      "precision": 4,
+      "information_value": 4,
+      "numerical_fidelity": 4
+    },
+    "guideline_criterion": 7,
+    "displayed_in_guideline": true,
+    "displayed_question": "Is it certain that, under the EU bank recovery and resolution framework, resolution authorities must give priority to protecting public funds over all other resolution objectives when applying resolution tools?",
+    "displayed_answer": null
+  },
+  {
+    "answer": "detailed justifications in cases where recommendations of the Office are not accepted",
+    "block_id": "2012/a/res/66/236#4",
+    "candidate_id": "q_6ef8267eb6466c6b9267625c",
+    "candidate_rank": 1,
+    "claim": "",
+    "claim_status": "",
+    "document_id": "2012/a/res/66/236",
+    "document_text": "[EN] Document: A/RES/66/236\n  Title: Resolution adopted by the General Assembly on 24 December 2011\n15. Also requests the Secretary-General to ensure the full implementation of the accepted recommendations of the Office of Internal Oversight Services, including those relating to cost avoidance, recovery of overpayments, efficiency gains and other improvements, in a prompt and timely manner and to provide detailed justifications in cases where recommendations of the Office are not accepted;\n16. Notes the role of the Management Committee in monitoring closely the implementation of the recommendations of oversight bodies, and stresses the importance of follow-up with programme managers to ensure the full implementation of those recommendations in a prompt and timely manner;\n17. Welcomes the efforts undertaken to reduce the high number of vacant posts in the Office of Internal Oversight Services, in particular at the senior levels;\n18. Reaffirms its concern over the continuing vacancies in the Office of Internal Oversight Services, and in this regard reiterates its requests to the Secretary-General to make every effort to fill vacancies in the Office at all levels as a matter of priority, in accordance with the relevant provisions governing recruitment in the United Nations;",
+    "mode": "lookup",
+    "question": "In its December 2011 resolution on the Office of Internal Oversight Services, what did the General Assembly request the Secretary-General to provide in cases where recommendations of the Office are not accepted?",
+    "question_language": "en",
+    "question_type": "operative_action",
+    "source_article": "",
+    "task": "b8b1e792dada53b58f05b463a76db869beafc2081e92658a054d7cf9668e3bc1",
+    "outcome_index": 0,
+    "database": "data/legal/qac/generation_600_20261008_model_comparison/un_parallel/run.sqlite",
+    "teaching_id": "L3a",
+    "faithfulness_verifier_prompt_sha256": "84a4db50d71693e9f9861068c4a1854bc06556722501204b17c86d4aa13cfb5a",
+    "quality_verifier_prompt_sha256": "41af5acb1ae18233b53a363d71f16ac12538403fb0efd32954585ff3ae1f703a",
+    "source_payload_sha256": "f203063145071c7762d2bf46c53ea2e3b3a4d366bd074caa2d5e582f3985dff2",
+    "answer_is_translation": "",
+    "articles_involved": null,
+    "source_identifier": "",
+    "target_article_id": null,
+    "target_id": "2012/a/res/66/236#4",
+    "document_text_scope": "target_block",
+    "source_excerpts": [
+      {
+        "role": "permitted_target",
+        "text": "detailed justifications in cases where recommendations of the Office are not accepted"
+      }
+    ],
+    "assessment_status": "Author-proposed teaching judgment, not human gold; original machine grades are metadata only.",
+    "teaching_scores": {
+      "search_realism": 4
+    },
+    "saved_prompt_verification": {
+      "faithfulness_verifier_prompt": {
+        "sha256_computed": "84a4db50d71693e9f9861068c4a1854bc06556722501204b17c86d4aa13cfb5a",
+        "sha256_recorded": "84a4db50d71693e9f9861068c4a1854bc06556722501204b17c86d4aa13cfb5a",
+        "match": true
+      },
+      "quality_verifier_prompt": {
+        "sha256_computed": "41af5acb1ae18233b53a363d71f16ac12538403fb0efd32954585ff3ae1f703a",
+        "sha256_recorded": "41af5acb1ae18233b53a363d71f16ac12538403fb0efd32954585ff3ae1f703a",
+        "match": true
+      }
+    },
+    "teaching_scores_rubric": "unified_annotation_v1",
+    "previous_teaching_scores": {
+      "grounding": 4,
+      "precision": 4,
+      "information_value": 4
+    },
+    "guideline_criterion": 4,
+    "displayed_in_guideline": true,
+    "displayed_question": "In its December 2011 resolution on the Office of Internal Oversight Services, what did the General Assembly request the Secretary-General to provide in cases where recommendations of the Office are not accepted?",
+    "displayed_answer": null
+  },
+  {
+    "answer": "until 30 June 2013",
+    "block_id": "2012/s/res/2053__2012_#10",
+    "candidate_id": "q_465639aa298f97c8050fd620",
+    "candidate_rank": 2,
+    "claim": "",
+    "claim_status": "",
+    "document_id": "2012/s/res/2053__2012_",
+    "document_text": "[EN] Document: S/RES/2053(2012)\n  Title: Resolution 2053 (2012)\n8. Urges the Government of the Democratic Republic of the Congo, which bears the primary responsibility regarding the reform of its security sector, to operationalize and implement, with the support of MONUSCO, a national and comprehensive vision and strategy for the security and justice sectors, including in the area of transitional justice, in order to establish democratic, accountable and professional national security and judicial institutions;\n9. Underlines the need for an overall Congolese SSR strategy that focuses on the professionalization of security sector institutions, including oversight bodies, and that helps to ensure coherence and efficiency and avoid duplications or gaps, encourages at the same time the Government of the Democratic Republic of the Congo, to engage in a new strategic partnership with MONUSCO in the area of SSR in order to identify the priorities of each component of the security sector and possible new approaches for MONUSCO to support Congolese authorities in the area of SSR to build the capacity of the military, police, justice and other security institutions to consolidate Congolese State authority, and requests the Secretary-General to report on these priorities and approaches in an annex to his report in November;",
+    "mode": "practitioners",
+    "question": "Resolution S/RES/2053(2012) extends the MONUSCO mandate. What deadline does it set?",
+    "question_language": "en",
+    "question_type": "date_deadline_or_mandate",
+    "source_article": "",
+    "task": "fa5a7c3c621c9d70a808f9717102f839b3e4d20da12fe7b38d87ddc80355fb9b",
+    "outcome_index": 1,
+    "database": "data/legal/qac/generation_600_20261008_model_comparison/un_parallel/run.sqlite",
+    "teaching_id": "L4",
+    "faithfulness_verifier_prompt_sha256": "84a4db50d71693e9f9861068c4a1854bc06556722501204b17c86d4aa13cfb5a",
+    "quality_verifier_prompt_sha256": "a0403a28d40c7a3c457f166221ea1850ac0f3be8b850b8545d03d63543e1fe88",
+    "source_payload_sha256": "dc05ab726e93f40fc1cf82000bddeee8612d470cab420cdb7a2778fea12f60b3",
+    "answer_is_translation": "",
+    "articles_involved": null,
+    "source_identifier": "",
+    "target_article_id": null,
+    "target_id": "2012/s/res/2053__2012_#10",
+    "document_text_scope": "target_block",
+    "source_excerpts": [
+      {
+        "role": "document_context_not_answer_evidence",
+        "text": "Decides to extend until 30 June 2013 the mandate of MONUSCO",
+        "paragraph": "1"
+      },
+      {
+        "role": "permitted_target",
+        "text": "requests the Secretary-General to report on these priorities and approaches in an annex to his report in November;",
+        "paragraph": "9"
+      }
+    ],
+    "generation_user_payload_file": "L4_generation_user_payload.txt",
+    "assessment_status": "Author-proposed teaching judgment, not human gold; original machine grades are metadata only.",
+    "teaching_scores": {
+      "grounding": 1
+    },
+    "saved_prompt_verification": {
+      "faithfulness_verifier_prompt": {
+        "sha256_computed": "84a4db50d71693e9f9861068c4a1854bc06556722501204b17c86d4aa13cfb5a",
+        "sha256_recorded": "84a4db50d71693e9f9861068c4a1854bc06556722501204b17c86d4aa13cfb5a",
+        "match": true
+      },
+      "quality_verifier_prompt": {
+        "sha256_computed": "a0403a28d40c7a3c457f166221ea1850ac0f3be8b850b8545d03d63543e1fe88",
+        "sha256_recorded": "a0403a28d40c7a3c457f166221ea1850ac0f3be8b850b8545d03d63543e1fe88",
+        "match": true
+      }
+    },
+    "teaching_scores_rubric": "unified_annotation_v1",
+    "previous_teaching_scores": {
+      "grounding": 1
+    },
+    "guideline_criterion": 1,
+    "displayed_in_guideline": true,
+    "displayed_question": "Resolution S/RES/2053(2012) extends the MONUSCO mandate. What deadline does it set?",
+    "displayed_answer": "until 30 June 2013"
+  },
+  {
+    "answer": "detailed justifications in cases where recommendations of the Office are not accepted",
+    "block_id": "2012/a/res/66/236#4",
+    "candidate_id": "q_219b0b2c58ebdc66a0ec890c",
+    "candidate_rank": 1,
+    "claim": "",
+    "claim_status": "",
+    "document_id": "2012/a/res/66/236",
+    "document_text": "[EN] Document: A/RES/66/236\n  Title: Resolution adopted by the General Assembly on 24 December 2011\n15. Also requests the Secretary-General to ensure the full implementation of the accepted recommendations of the Office of Internal Oversight Services, including those relating to cost avoidance, recovery of overpayments, efficiency gains and other improvements, in a prompt and timely manner and to provide detailed justifications in cases where recommendations of the Office are not accepted;\n16. Notes the role of the Management Committee in monitoring closely the implementation of the recommendations of oversight bodies, and stresses the importance of follow-up with programme managers to ensure the full implementation of those recommendations in a prompt and timely manner;\n17. Welcomes the efforts undertaken to reduce the high number of vacant posts in the Office of Internal Oversight Services, in particular at the senior levels;\n18. Reaffirms its concern over the continuing vacancies in the Office of Internal Oversight Services, and in this regard reiterates its requests to the Secretary-General to make every effort to fill vacancies in the Office at all levels as a matter of priority, in accordance with the relevant provisions governing recruitment in the United Nations;",
+    "mode": "lookup",
+    "question": "What detailed justifications must the Secretary-General provide in cases where recommendations of the Office of Internal Oversight Services are not accepted, as requested in its resolution adopted on 24 December 2011?",
+    "question_language": "en",
+    "question_type": "operative_action",
+    "source_article": "",
+    "task": "159f31047c9ae30a0dcebfb18669fd7de6dcb1ba66ca014145e0ce7b26dbd9a9",
+    "outcome_index": 0,
+    "database": "data/legal/qac/generation_600_20261008_model_comparison/un_parallel/run.sqlite",
+    "teaching_id": "L3b",
+    "faithfulness_verifier_prompt_sha256": "84a4db50d71693e9f9861068c4a1854bc06556722501204b17c86d4aa13cfb5a",
+    "quality_verifier_prompt_sha256": "41af5acb1ae18233b53a363d71f16ac12538403fb0efd32954585ff3ae1f703a",
+    "source_payload_sha256": "f203063145071c7762d2bf46c53ea2e3b3a4d366bd074caa2d5e582f3985dff2",
+    "answer_is_translation": "",
+    "articles_involved": null,
+    "source_identifier": "",
+    "target_article_id": null,
+    "target_id": "2012/a/res/66/236#4",
+    "document_text_scope": "target_block",
+    "source_excerpts": [
+      {
+        "role": "permitted_target",
+        "text": "detailed justifications in cases where recommendations of the Office are not accepted"
+      }
+    ],
+    "assessment_status": "Author-proposed teaching judgment, not human gold; original machine grades are metadata only.",
+    "teaching_scores": {
+      "information_value": 1
+    },
+    "saved_prompt_verification": {
+      "faithfulness_verifier_prompt": {
+        "sha256_computed": "84a4db50d71693e9f9861068c4a1854bc06556722501204b17c86d4aa13cfb5a",
+        "sha256_recorded": "84a4db50d71693e9f9861068c4a1854bc06556722501204b17c86d4aa13cfb5a",
+        "match": true
+      },
+      "quality_verifier_prompt": {
+        "sha256_computed": "41af5acb1ae18233b53a363d71f16ac12538403fb0efd32954585ff3ae1f703a",
+        "sha256_recorded": "41af5acb1ae18233b53a363d71f16ac12538403fb0efd32954585ff3ae1f703a",
+        "match": true
+      }
+    },
+    "teaching_score_interpretation": "Natural reading asks for the contents of the justifications; the source supplies only a request for them.",
+    "teaching_scores_rubric": "unified_annotation_v1",
+    "previous_teaching_scores": {
+      "grounding": 1,
+      "precision": 1,
+      "information_value": 1
+    },
+    "guideline_criterion": 6,
+    "displayed_in_guideline": true,
+    "displayed_question": "What detailed justifications must the Secretary-General provide in cases where recommendations of the Office of Internal Oversight Services are not accepted, as requested in its resolution adopted on 24 December 2011?",
+    "displayed_answer": "detailed justifications in cases where recommendations of the Office are not accepted"
+  },
+  {
+    "answer": "the volume of water to be used for the supply of drinking water represents more than 20 % of the total volume of water made available by such projects or irrigation or drainage installations",
+    "candidate_id": "q_0dd1171969a60408f03bed81",
+    "candidate_rank": 1,
+    "claim": "",
+    "claim_status": "",
+    "document_id": "32014L0023",
+    "document_text": "Article 12 — Specific exclusions in the field of water\nSpecific exclusions in the field of water\n\n1. This Directive shall not apply to concessions awarded to:\n\n(a)\nprovide or operate fixed networks intended to provide a service to the public in connection with the production, transport or distribution of drinking water;\n\n(b)\nsupply drinking water to such networks.\n\n2. This Directive shall also not apply to concessions with one, or both of the following subject-matters when they are connected with an activity referred to in paragraph 1:\n\n(a)\nhydraulic engineering projects, irrigation or land drainage, provided that the volume of water to be used for the supply of drinking water represents more than 20 % of the total volume of water made available by such projects or irrigation or drainage installations; or\n\n(b)\nthe disposal or treatment of sewage.",
+    "mode": "lookup",
+    "question": "What drinking-water threshold excludes connected concessions for hydraulic engineering, irrigation or land drainage from the EU concession-contract regime?",
+    "question_language": "en",
+    "question_type": "amount_or_threshold",
+    "source_article": "",
+    "target_article_number": "12",
+    "faithfulness_verifier_prompt_sha256": "c1ee252ec8130595d0962db3799fc652ef6ef47395a788b8a13cadd592013569",
+    "quality_verifier_prompt_sha256": "54cdd5ab749cfa9d6961d6d4db03ea5dc4ad3826dc3c478322d76ea735f794ec",
+    "source_payload_sha256": "8deb1b63561aadf7d6da8dfc0646d80b7aad80d8430284630c8768bb96b41404",
+    "answer_is_translation": "",
+    "articles_involved": "12",
+    "source_identifier": "",
+    "target_article_id": "http://data.europa.eu/eli/dir/2014/23/art_12/oj",
+    "document_text_scope": "target_article",
+    "task": "9be07308b067a9cbe27bde0c4b803ace037fa40460a63e8e2ecee941935b0ebc",
+    "outcome_index": 0,
+    "database": "data/legal/qac/generation_600_20261008_model_comparison/eurlex/run.sqlite",
+    "teaching_id": "L5",
+    "target_id": "http://data.europa.eu/eli/dir/2014/23/art_12/oj",
+    "source_excerpts": [
+      {
+        "role": "permitted_target",
+        "text": "the volume of water to be used for the supply of drinking water represents more than 20 % of the total volume of water made available by such projects or irrigation or drainage installations"
+      }
+    ],
+    "assessment_status": "Author-proposed teaching judgment, not human gold; original machine grades are metadata only.",
+    "saved_prompt_verification": {
+      "faithfulness_verifier_prompt": {
+        "sha256_computed": "c1ee252ec8130595d0962db3799fc652ef6ef47395a788b8a13cadd592013569",
+        "sha256_recorded": "c1ee252ec8130595d0962db3799fc652ef6ef47395a788b8a13cadd592013569",
+        "match": true
+      },
+      "quality_verifier_prompt": {
+        "sha256_computed": "54cdd5ab749cfa9d6961d6d4db03ea5dc4ad3826dc3c478322d76ea735f794ec",
+        "sha256_recorded": "54cdd5ab749cfa9d6961d6d4db03ea5dc4ad3826dc3c478322d76ea735f794ec",
+        "match": true
+      }
+    },
+    "teaching_scores_rubric": "unified_annotation_v1",
+    "original_record_verification": {
+      "question_matches_saved_outcome": true,
+      "answer_matches_saved_outcome": true,
+      "source_matches_saved_outcome": true,
+      "answer_is_contiguous_in_target": true
+    },
+    "guideline_criterion": 3,
+    "displayed_in_guideline": true,
+    "displayed_question": "What drinking-water threshold excludes connected concessions for hydraulic engineering, irrigation or land drainage from the EU concession-contract regime?",
+    "displayed_answer": "the volume of water to be used for the supply of drinking water represents more than 20 % of the total volume of water made available by such projects or irrigation or drainage installations",
+    "teaching_scores": {
+      "numerical_fidelity": 4
+    }
+  },
+  {
+    "answer": "from 1 January 2014 to 31 December 2020",
+    "candidate_id": "q_dc0dedf64f1cf83d19a64f23",
+    "candidate_rank": 2,
+    "claim": "",
+    "claim_status": "",
+    "document_id": "32014R0513",
+    "document_text": "Article 1 — Purpose and scope\nPurpose and scope\n\n1. This Regulation establishes the instrument for financial support for police cooperation, preventing and combating crime, and crisis management (‘the Instrument’), as part of the Internal Security Fund (‘the Fund’).Jointly with Regulation (EU) No 515/2014, this Regulation establishes the Fund for the period from 1 January 2014 to 31 December 2020.\n\n2. This Regulation lays down:\n\n(a)\nthe objectives, eligible actions and strategic priorities for financial support to be provided under the Instrument;\n\n(b)\nthe general framework for the implementation of the eligible actions;\n\n(c)\nthe resources made available under the Instrument from 1 January 2014 to 31 December 2020 and their distribution.\n\n3. This Regulation provides for the application of the rules set out in Regulation (EU) No 514/2014.\n\n4. The Instrument shall not apply to matters that are covered by the Justice programme, as set out in Regulation (EU) No 1382/2013 of the European Parliament and of the Council. However the Instrument may cover actions which aim at encouraging cooperation between judicial authorities and law enforcement authorities.\n\n5. Synergies, consistency and complementarity shall be sought with other relevant financial instruments of the Union, such as the Union Civil Protection Mechanism, established by Decision No 1313/2013/EU of the European Parliament and of the Council, Horizon 2020, established by Regulation (EU) No 1291/2013 of the European Parliament and of the Council, the third multiannual programme of Union action in the field of health, established by Regulation (EU) No 282/2014 of the European Parliament and of the Council, the European Union Solidarity Fund and the external aid instruments, namely the Instrument for Pre-accession Assistance (IPA II) established by Regulation (EU) No 231/2014 of the European Parliament and of the Council, the European Neighbourhood Instrument established by Regulation (EU) No 232/2014 of the European Parliament and of the Council, the Development Cooperation Instrument established by Regulation (EU) No 233/2014 of the European Parliament and of the Council, the Partnership Instrument for cooperation with third countries established by Regulation (EU) No 234/2014 of the European Parliament and of the Council, the European Instrument for Democracy and Human Rights established by Regulation (EU) No 235/2014 of the European Parliament and of the Council and the Instrument contributing to Stability and Peace established by Regulation (EU) No 230/2014 of the European Parliament and of the Council. Actions financed under this Regulation shall not receive financial support for the same purpose from other Union financial instruments.",
+    "mode": "lookup",
+    "question": "For what period does this Regulation, jointly with Regulation (EU) No 515/2014, establish the Fund?",
+    "question_language": "en",
+    "question_type": "deadline_or_duration",
+    "source_article": "",
+    "target_article_number": "1",
+    "faithfulness_verifier_prompt_sha256": "c1ee252ec8130595d0962db3799fc652ef6ef47395a788b8a13cadd592013569",
+    "quality_verifier_prompt_sha256": "54cdd5ab749cfa9d6961d6d4db03ea5dc4ad3826dc3c478322d76ea735f794ec",
+    "source_payload_sha256": "3bc93271d49e709795f41a2325d4eef8355bdabddf78990c803f449c18920aad",
+    "answer_is_translation": "",
+    "articles_involved": "1",
+    "source_identifier": "",
+    "target_article_id": "http://data.europa.eu/eli/reg/2014/513/art_1/oj",
+    "document_text_scope": "target_article",
+    "task": "a311d405fb9d268b0149fd939006fd1b97fe43a8c92f7e54a89280067977586c",
+    "outcome_index": 1,
+    "database": "data/legal/qac/generation_600_20261008_model_comparison/eurlex/run.sqlite",
+    "teaching_id": "L6",
+    "target_id": "http://data.europa.eu/eli/reg/2014/513/art_1/oj",
+    "source_excerpts": [
+      {
+        "role": "permitted_target",
+        "text": "from 1 January 2014 to 31 December 2020"
+      }
+    ],
+    "assessment_status": "Author-proposed teaching judgment, not human gold; original machine grades are metadata only.",
+    "saved_prompt_verification": {
+      "faithfulness_verifier_prompt": {
+        "sha256_computed": "c1ee252ec8130595d0962db3799fc652ef6ef47395a788b8a13cadd592013569",
+        "sha256_recorded": "c1ee252ec8130595d0962db3799fc652ef6ef47395a788b8a13cadd592013569",
+        "match": true
+      },
+      "quality_verifier_prompt": {
+        "sha256_computed": "54cdd5ab749cfa9d6961d6d4db03ea5dc4ad3826dc3c478322d76ea735f794ec",
+        "sha256_recorded": "54cdd5ab749cfa9d6961d6d4db03ea5dc4ad3826dc3c478322d76ea735f794ec",
+        "match": true
+      }
+    },
+    "teaching_scores_rubric": "unified_annotation_v1",
+    "original_record_verification": {
+      "question_matches_saved_outcome": true,
+      "answer_matches_saved_outcome": true,
+      "source_matches_saved_outcome": true,
+      "answer_is_contiguous_in_target": true
+    },
+    "guideline_criterion": 5,
+    "displayed_in_guideline": true,
+    "displayed_question": "For what period does this Regulation, jointly with Regulation (EU) No 515/2014, establish the Fund?",
+    "displayed_answer": null,
+    "teaching_scores": {
+      "standalone_clarity": 2
+    }
+  },
+  {
+    "answer": "if the relevant information is available on the company’s Internet site in a question and answer format",
+    "candidate_id": "q_35609183b2d78f60d09205e1",
+    "candidate_rank": 3,
+    "claim": "",
+    "claim_status": "",
+    "document_id": "32007L0036",
+    "document_text": "Article 9 — Right to ask questions\nRight to ask questions\n\n1. Every shareholder shall have the right to ask questions related to items on the agenda of the general meeting. The company shall answer the questions put to it by shareholders.\n\n2. The right to ask questions and the obligation to answer are subject to the measures which Member States may take, or allow companies to take, to ensure the identification of shareholders, the good order of general meetings and their preparation and the protection of confidentiality and business interests of companies. Member States may allow companies to provide one overall answer to questions having the same content.Member States may provide that an answer shall be deemed to be given if the relevant information is available on the company’s Internet site in a question and answer format.",
+    "mode": "lookup",
+    "question": "What condition may a Member State establish regarding an answer deemed given if the information is available on the Internet site?",
+    "question_language": "en",
+    "question_type": "condition_or_prerequisite",
+    "source_article": "",
+    "target_article_number": "9",
+    "faithfulness_verifier_prompt_sha256": "c1ee252ec8130595d0962db3799fc652ef6ef47395a788b8a13cadd592013569",
+    "quality_verifier_prompt_sha256": "54cdd5ab749cfa9d6961d6d4db03ea5dc4ad3826dc3c478322d76ea735f794ec",
+    "source_payload_sha256": "2acf0b2758347b3ec983714f588bfeb24b198d69e209ae88be84b84d1f946dbe",
+    "answer_is_translation": "",
+    "articles_involved": "9",
+    "source_identifier": "",
+    "target_article_id": "http://data.europa.eu/eli/dir/2007/36/art_9/oj",
+    "document_text_scope": "target_article",
+    "task": "6873b053cce40f1cad55e4e57ffbd861b9fc2c7aab73d80c72e06c15f4a1f8ca",
+    "outcome_index": 2,
+    "database": "data/legal/qac/generation_600_20261008_model_comparison/eurlex/run.sqlite",
+    "teaching_id": "L7",
+    "target_id": "http://data.europa.eu/eli/dir/2007/36/art_9/oj",
+    "source_excerpts": [
+      {
+        "role": "permitted_target",
+        "text": "if the relevant information is available on the company’s Internet site in a question and answer format"
+      }
+    ],
+    "assessment_status": "Author-proposed teaching judgment, not human gold; original machine grades are metadata only.",
+    "saved_prompt_verification": {
+      "faithfulness_verifier_prompt": {
+        "sha256_computed": "c1ee252ec8130595d0962db3799fc652ef6ef47395a788b8a13cadd592013569",
+        "sha256_recorded": "c1ee252ec8130595d0962db3799fc652ef6ef47395a788b8a13cadd592013569",
+        "match": true
+      },
+      "quality_verifier_prompt": {
+        "sha256_computed": "54cdd5ab749cfa9d6961d6d4db03ea5dc4ad3826dc3c478322d76ea735f794ec",
+        "sha256_recorded": "54cdd5ab749cfa9d6961d6d4db03ea5dc4ad3826dc3c478322d76ea735f794ec",
+        "match": true
+      }
+    },
+    "teaching_scores_rubric": "unified_annotation_v1",
+    "original_record_verification": {
+      "question_matches_saved_outcome": true,
+      "answer_matches_saved_outcome": true,
+      "source_matches_saved_outcome": true,
+      "answer_is_contiguous_in_target": true
+    },
+    "guideline_criterion": 8,
+    "displayed_in_guideline": true,
+    "displayed_question": "What condition may a Member State establish regarding an answer deemed given if the information is available on the Internet site?",
+    "displayed_answer": null,
+    "teaching_scores": {
+      "linguistic_quality": 3
+    }
+  }
+]

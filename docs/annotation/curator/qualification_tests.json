@@ -1,0 +1,150 @@
+{
+  "version": "qualification_task_understanding_v4",
+  "scope": "Private answer key for the annotation-task and procedure test; do not distribute with annotator copies.",
+  "domains": [
+    "chemistry",
+    "legal"
+  ],
+  "question_count": 10,
+  "options_per_question": 4,
+  "correct_answers_per_question": 1,
+  "questions": [
+    {
+      "number": 1,
+      "category": "instruction",
+      "question": "For an item you can assess, what must you record?",
+      "options": {
+        "A": "One overall 1–5 score",
+        "B": "Eight scores without reasons",
+        "C": "Eight 1–5 scores, reasons and needed corrections",
+        "D": "A rewritten question and answer only"
+      },
+      "correct_option": "C",
+      "reason": "Record each of the eight criterion scores separately, with brief reasons and any needed corrections."
+    },
+    {
+      "number": 2,
+      "category": "instruction",
+      "question": "How should you distinguish scores 4 and 5?",
+      "options": {
+        "A": "4: fully successful; 5: an explained exceptional strength",
+        "B": "4: flawed; 5: error-free",
+        "C": "4: simple; 5: difficult",
+        "D": "4 and 5 mean the same thing"
+      },
+      "correct_option": "A",
+      "reason": "Fully successful ordinary work can receive 4. A 5 requires a specific strength beyond ordinary good work, with an explanation."
+    },
+    {
+      "number": 3,
+      "category": "instruction",
+      "question": "How should an important unsupported assertion affect scoring?",
+      "options": {
+        "A": "Give every criterion 1",
+        "B": "Give Grounding 3 and leave other scores unchanged",
+        "C": "Mark every criterion “cannot assess”",
+        "D": "Give Grounding at most 2; judge other criteria separately"
+      },
+      "correct_option": "D",
+      "reason": "An important unsupported assertion warrants at most 2 for Grounding. Other criteria are assessed independently; the factual flaw need not affect every score."
+    },
+    {
+      "number": 4,
+      "category": "instruction",
+      "question": "No relevant numbers or references apply. What do you record for Numerical fidelity?",
+      "options": {
+        "A": "1",
+        "B": "4 and “not applicable”",
+        "C": "5",
+        "D": "“Cannot assess”"
+      },
+      "correct_option": "B",
+      "reason": "The guide specifies score 4 with the notation “not applicable” when no relevant numerical or reference content applies."
+    },
+    {
+      "number": 5,
+      "category": "instruction",
+      "question": "When should you use “cannot assess”?",
+      "options": {
+        "A": "The answer is known to be unsupported",
+        "B": "The wording is poor",
+        "C": "Any score would be below 4",
+        "D": "Needed material or expertise is missing; explain why"
+      },
+      "correct_option": "D",
+      "reason": "Use cannot assess only when necessary material or expertise is missing, with a reason. Known lack of support or poor writing is a scoring problem."
+    },
+    {
+      "number": 6,
+      "category": "instruction",
+      "question": "What do you use to judge factual support and Linguistic quality, respectively?",
+      "options": {
+        "A": "Supplied text; the question’s original language",
+        "B": "Supplied text; an English translation only",
+        "C": "Outside sources; the original language",
+        "D": "Outside sources; an English translation only"
+      },
+      "correct_option": "A",
+      "reason": "Factual support must come from the supplied text. Assess language in the original question, rather than only its English translation."
+    },
+    {
+      "number": 7,
+      "category": "instruction",
+      "question": "When checking whether a question stands on its own, how should you handle missing context?",
+      "options": {
+        "A": "Fill it in from the document",
+        "B": "Assume the most likely subject",
+        "C": "Judge only the information in the question",
+        "D": "Ignore missing context if the grammar is correct"
+      },
+      "correct_option": "C",
+      "reason": "For the standalone-understanding check, judge the question without filling in details from the source. Continue to use the document for the other checks that require it."
+    },
+    {
+      "number": 8,
+      "category": "instruction",
+      "question": "Before lowering a score because an answer is too long, what should you check?",
+      "options": {
+        "A": "Whether it exceeds a fixed word limit",
+        "B": "Whether a shorter continuous passage preserves all needed information and qualifications",
+        "C": "Whether another answer is shorter",
+        "D": "Whether technical terms can be removed"
+      },
+      "correct_option": "B",
+      "reason": "Do not penalize length alone. Identify a shorter continuous passage that still contains the requested information and essential qualifications."
+    },
+    {
+      "number": 9,
+      "category": "instruction",
+      "question": "What should a useful explanation of a score include?",
+      "options": {
+        "A": "The score number repeated in words",
+        "B": "A general impression such as “good” or “bad”",
+        "C": "A specific strength or problem relevant to that criterion",
+        "D": "A comparison with the previous item"
+      },
+      "correct_option": "C",
+      "reason": "Explain a specific relevant strength or problem, using the question, answer or document as appropriate. Note a correction when needed."
+    },
+    {
+      "number": 10,
+      "category": "instruction",
+      "question": "What should you do when an answer provides only part of the requested information?",
+      "options": {
+        "A": "Give full marks because the supplied facts are correct",
+        "B": "Identify what is missing and lower the affected scores appropriately",
+        "C": "Give every criterion 1",
+        "D": "Use “cannot assess” for every criterion"
+      },
+      "correct_option": "B",
+      "reason": "Identify missing requested details and score affected criteria according to the importance of the omission. Do not automatically lower unrelated scores or treat a known omission as unassessable."
+    }
+  ],
+  "legal_note": "For item 6, supplied text is interpreted as defined in the guide, including its historical context and explicitly permitted supplied material. The test does not ask annotators to recall every EUR-Lex/UN exception.",
+  "chemistry_note": "Item 6 requires document support for factual claims. It does not prohibit using professional knowledge to interpret the supplied text.",
+  "review_rule": {
+    "ready_to_proceed": "All 10 answers are correct, after clarification if needed. Confirm understanding before annotation begins.",
+    "if_incomplete": "Explain missing or misunderstood points and ask the annotator to explain the rule in their own words before selecting an answer again. Corrected responses can satisfy the check.",
+    "grading_note": "Exactly one A–D choice is required for each question. Blank or multiple selections are incomplete. Use the correct option and reason to review understanding."
+  }
+}

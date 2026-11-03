@@ -1,0 +1,550 @@
+{
+  "verification_date": "2026-11-03",
+  "scope": "Current public guides use one genuine source each and Good/Bad Question–Answer pairs, each with a suggested criterion-specific score and reason. Verbatim pairs are verified saved outputs; adapted/new pairs are authorized teaching examples, not observed model errors. The earlier records list pertains to the preceding guideline layout.",
+  "records": [
+    {
+      "example": "C1",
+      "criterion": 3,
+      "question_answer_exact": true,
+      "source_verified": true,
+      "displayed_question_verified": true,
+      "displayed_answer_verified": true,
+      "recorded_prompt_hashes_verified": null
+    },
+    {
+      "example": "C2",
+      "criterion": 5,
+      "question_answer_exact": true,
+      "source_verified": true,
+      "displayed_question_verified": true,
+      "displayed_answer_verified": true,
+      "recorded_prompt_hashes_verified": null
+    },
+    {
+      "example": "C3",
+      "criterion": 1,
+      "question_answer_exact": true,
+      "source_verified": true,
+      "displayed_question_verified": true,
+      "displayed_answer_verified": true,
+      "recorded_prompt_hashes_verified": null
+    },
+    {
+      "example": "C4",
+      "criterion": 8,
+      "question_answer_exact": true,
+      "source_verified": true,
+      "displayed_question_verified": true,
+      "displayed_answer_verified": false,
+      "recorded_prompt_hashes_verified": null
+    },
+    {
+      "example": "C5",
+      "criterion": 2,
+      "question_answer_exact": true,
+      "source_verified": true,
+      "displayed_question_verified": true,
+      "displayed_answer_verified": true,
+      "recorded_prompt_hashes_verified": null
+    },
+    {
+      "example": "C6",
+      "criterion": 4,
+      "question_answer_exact": true,
+      "source_verified": true,
+      "displayed_question_verified": true,
+      "displayed_answer_verified": false,
+      "recorded_prompt_hashes_verified": null
+    },
+    {
+      "example": "C7",
+      "criterion": 6,
+      "question_answer_exact": true,
+      "source_verified": true,
+      "displayed_question_verified": true,
+      "displayed_answer_verified": true,
+      "recorded_prompt_hashes_verified": null
+    },
+    {
+      "example": "C8",
+      "criterion": 7,
+      "question_answer_exact": true,
+      "source_verified": true,
+      "displayed_question_verified": true,
+      "displayed_answer_verified": false,
+      "recorded_prompt_hashes_verified": null
+    },
+    {
+      "example": "L1",
+      "criterion": 2,
+      "question_answer_exact": true,
+      "source_verified": true,
+      "displayed_question_verified": true,
+      "displayed_answer_verified": true,
+      "recorded_prompt_hashes_verified": true
+    },
+    {
+      "example": "L2",
+      "criterion": 7,
+      "question_answer_exact": true,
+      "source_verified": true,
+      "displayed_question_verified": true,
+      "displayed_answer_verified": false,
+      "recorded_prompt_hashes_verified": true
+    },
+    {
+      "example": "L3a",
+      "criterion": 4,
+      "question_answer_exact": true,
+      "source_verified": true,
+      "displayed_question_verified": true,
+      "displayed_answer_verified": false,
+      "recorded_prompt_hashes_verified": true
+    },
+    {
+      "example": "L4",
+      "criterion": 1,
+      "question_answer_exact": true,
+      "source_verified": true,
+      "displayed_question_verified": true,
+      "displayed_answer_verified": true,
+      "recorded_prompt_hashes_verified": true
+    },
+    {
+      "example": "L3b",
+      "criterion": 6,
+      "question_answer_exact": true,
+      "source_verified": true,
+      "displayed_question_verified": true,
+      "displayed_answer_verified": true,
+      "recorded_prompt_hashes_verified": true
+    },
+    {
+      "example": "L5",
+      "criterion": 3,
+      "question_answer_exact": true,
+      "source_verified": true,
+      "displayed_question_verified": true,
+      "displayed_answer_verified": true,
+      "recorded_prompt_hashes_verified": true
+    },
+    {
+      "example": "L6",
+      "criterion": 5,
+      "question_answer_exact": true,
+      "source_verified": true,
+      "displayed_question_verified": true,
+      "displayed_answer_verified": false,
+      "recorded_prompt_hashes_verified": true
+    },
+    {
+      "example": "L7",
+      "criterion": 8,
+      "question_answer_exact": true,
+      "source_verified": true,
+      "displayed_question_verified": true,
+      "displayed_answer_verified": false,
+      "recorded_prompt_hashes_verified": true
+    }
+  ],
+  "document_validation": [
+    {
+      "domain": "chemistry",
+      "annotation_rubric": "unified_annotation_v1",
+      "presentation": "Three pages introduce a source document and eight definition-first criteria with Good/Bad pairs and suggested scores/reasons. Page 4 has 10 single-choice questions about the annotation task and scoring instructions, each with four options and one correct answer. The answer key and readiness rule remain in separate coordinator files.",
+      "pdf_pages": 4,
+      "criteria": 8,
+      "question_answer_pairs": 16,
+      "suggested_scores_and_reasons": 16,
+      "origins": {
+        "verbatim": 9,
+        "adapted": 6,
+        "new": 1
+      },
+      "source_before_criteria": true,
+      "source_and_all_pairs_verified_in_all_formats": true,
+      "scores_and_reasons_verified_in_all_formats": true,
+      "pdf_comparison_normalization": "Whitespace, hyphenation and typographic apostrophes normalized; Markdown/DOCX strings matched exactly.",
+      "docx_xml_valid": true,
+      "question_type_information_absent": true,
+      "separate_verdict_and_evidence_fields_absent": true,
+      "markdown_source_sha256": "d7e8b0674b60200084064a60175f3a6cceeea954472820f394440594c6a92249",
+      "criterion_names_in_parentheses_verified_in_all_formats": true,
+      "pdf_layout_visually_checked": true,
+      "all_eight_criteria_defined_before_instructions": true,
+      "guideline_pages": 3,
+      "qualification_test_pages": 1,
+      "teaching_question_answer_pairs": 16,
+      "qualification_answer_key_separate": true,
+      "qualification_record": "qualification_tests.json",
+      "qualification_instruction_questions": 10,
+      "qualification_test_has_no_example_pairs_to_rate": true,
+      "first_three_pages_unchanged_in_quiz_revision": true,
+      "qualification_definition_questions": 0,
+      "qualification_single_choice_questions": 10,
+      "qualification_options_per_question": 4,
+      "qualification_correct_options_per_question": 1,
+      "qualification_key_independently_reviewed": true
+    },
+    {
+      "domain": "legal",
+      "annotation_rubric": "unified_annotation_v1",
+      "presentation": "Three pages introduce a source document and eight definition-first criteria with Good/Bad pairs and suggested scores/reasons. Page 4 has 10 single-choice questions about the annotation task and scoring instructions, each with four options and one correct answer. The answer key and readiness rule remain in separate coordinator files.",
+      "pdf_pages": 4,
+      "criteria": 8,
+      "question_answer_pairs": 16,
+      "suggested_scores_and_reasons": 16,
+      "origins": {
+        "verbatim": 8,
+        "adapted": 6,
+        "new": 2
+      },
+      "source_before_criteria": true,
+      "source_and_all_pairs_verified_in_all_formats": true,
+      "scores_and_reasons_verified_in_all_formats": true,
+      "pdf_comparison_normalization": "Whitespace, hyphenation and typographic apostrophes normalized; Markdown/DOCX strings matched exactly.",
+      "docx_xml_valid": true,
+      "question_type_information_absent": true,
+      "separate_verdict_and_evidence_fields_absent": true,
+      "markdown_source_sha256": "87cb8b701ca83e27b4f8205db80c4fc17883017ba75c34aa8878a3290a677b0c",
+      "criterion_names_in_parentheses_verified_in_all_formats": true,
+      "pdf_layout_visually_checked": true,
+      "all_eight_criteria_defined_before_instructions": true,
+      "guideline_pages": 3,
+      "qualification_test_pages": 1,
+      "teaching_question_answer_pairs": 16,
+      "qualification_answer_key_separate": true,
+      "qualification_record": "qualification_tests.json",
+      "qualification_instruction_questions": 10,
+      "qualification_test_has_no_example_pairs_to_rate": true,
+      "first_three_pages_unchanged_in_quiz_revision": true,
+      "qualification_definition_questions": 0,
+      "qualification_single_choice_questions": 10,
+      "qualification_options_per_question": 4,
+      "qualification_correct_options_per_question": 1,
+      "qualification_key_independently_reviewed": true
+    }
+  ],
+  "current_paired_examples": [
+    {
+      "domain": "chemistry",
+      "criterion": 1,
+      "role": "good",
+      "origin": "verbatim",
+      "teaching_score": 4,
+      "score_reason": "All four components and their concentration ranges are directly supported by the document.",
+      "question_answer_score_and_reason_verified_in_all_formats": true,
+      "saved_output_verified": true
+    },
+    {
+      "domain": "chemistry",
+      "criterion": 1,
+      "role": "bad",
+      "origin": "adapted",
+      "teaching_score": 2,
+      "score_reason": "Zinc oxide is added to the answer without any support in the document.",
+      "question_answer_score_and_reason_verified_in_all_formats": true,
+      "saved_output_verified": false
+    },
+    {
+      "domain": "chemistry",
+      "criterion": 2,
+      "role": "good",
+      "origin": "verbatim",
+      "teaching_score": 4,
+      "score_reason": "All four requested components and their concentrations are included without unnecessary surrounding text.",
+      "question_answer_score_and_reason_verified_in_all_formats": true,
+      "saved_output_verified": true
+    },
+    {
+      "domain": "chemistry",
+      "criterion": 2,
+      "role": "bad",
+      "origin": "verbatim",
+      "teaching_score": 3,
+      "score_reason": "Only sodium hydroxide is asked for; the other three components are unnecessary.",
+      "question_answer_score_and_reason_verified_in_all_formats": true,
+      "saved_output_verified": true
+    },
+    {
+      "domain": "chemistry",
+      "criterion": 3,
+      "role": "good",
+      "origin": "verbatim",
+      "teaching_score": 4,
+      "score_reason": "Each concentration retains the correct range, unit and corresponding component from the document.",
+      "question_answer_score_and_reason_verified_in_all_formats": true,
+      "saved_output_verified": true
+    },
+    {
+      "domain": "chemistry",
+      "criterion": 3,
+      "role": "bad",
+      "origin": "adapted",
+      "teaching_score": 1,
+      "score_reason": "Changing g/L to mg/L makes the requested concentration 1,000 times too low.",
+      "question_answer_score_and_reason_verified_in_all_formats": true,
+      "saved_output_verified": false
+    },
+    {
+      "domain": "chemistry",
+      "criterion": 4,
+      "role": "good",
+      "origin": "verbatim",
+      "teaching_score": 4,
+      "score_reason": "The requested operating times and pressure are useful details for investigating the process.",
+      "question_answer_score_and_reason_verified_in_all_formats": true,
+      "saved_output_verified": true
+    },
+    {
+      "domain": "chemistry",
+      "criterion": 4,
+      "role": "bad",
+      "origin": "new",
+      "teaching_score": 1,
+      "score_reason": "The question already states the duration, so there is nothing to find out.",
+      "question_answer_score_and_reason_verified_in_all_formats": true,
+      "saved_output_verified": false
+    },
+    {
+      "domain": "chemistry",
+      "criterion": 5,
+      "role": "good",
+      "origin": "verbatim",
+      "teaching_score": 4,
+      "score_reason": "The question identifies the agent, its use and the relevant product.",
+      "question_answer_score_and_reason_verified_in_all_formats": true,
+      "saved_output_verified": true
+    },
+    {
+      "domain": "chemistry",
+      "criterion": 5,
+      "role": "bad",
+      "origin": "adapted",
+      "teaching_score": 1,
+      "score_reason": "“Its” gives no way to identify the material without reading the document.",
+      "question_answer_score_and_reason_verified_in_all_formats": true,
+      "saved_output_verified": false
+    },
+    {
+      "domain": "chemistry",
+      "criterion": 6,
+      "role": "good",
+      "origin": "verbatim",
+      "teaching_score": 4,
+      "score_reason": "Both requested durations and the spraying pressure are present, resolving the whole request.",
+      "question_answer_score_and_reason_verified_in_all_formats": true,
+      "saved_output_verified": true
+    },
+    {
+      "domain": "chemistry",
+      "criterion": 6,
+      "role": "bad",
+      "origin": "adapted",
+      "teaching_score": 2,
+      "score_reason": "The answer omits the degreasing duration and spraying pressure, both explicitly requested.",
+      "question_answer_score_and_reason_verified_in_all_formats": true,
+      "saved_output_verified": false
+    },
+    {
+      "domain": "chemistry",
+      "criterion": 7,
+      "role": "good",
+      "origin": "verbatim",
+      "teaching_score": 4,
+      "score_reason": "The question asks for one concentration range and gives the necessary process context.",
+      "question_answer_score_and_reason_verified_in_all_formats": true,
+      "saved_output_verified": true
+    },
+    {
+      "domain": "chemistry",
+      "criterion": 7,
+      "role": "bad",
+      "origin": "adapted",
+      "teaching_score": 3,
+      "score_reason": "Repeating the plastic-shell description adds words without clarifying the request.",
+      "question_answer_score_and_reason_verified_in_all_formats": true,
+      "saved_output_verified": false
+    },
+    {
+      "domain": "chemistry",
+      "criterion": 8,
+      "role": "good",
+      "origin": "verbatim",
+      "teaching_score": 4,
+      "score_reason": "The question is grammatical, natural and clear, with appropriate chemical terminology.",
+      "question_answer_score_and_reason_verified_in_all_formats": true,
+      "saved_output_verified": true
+    },
+    {
+      "domain": "chemistry",
+      "criterion": 8,
+      "role": "bad",
+      "origin": "adapted",
+      "teaching_score": 2,
+      "score_reason": "Broken word order and verb agreement make the question difficult to read.",
+      "question_answer_score_and_reason_verified_in_all_formats": true,
+      "saved_output_verified": false
+    },
+    {
+      "domain": "legal",
+      "criterion": 1,
+      "role": "good",
+      "origin": "verbatim",
+      "teaching_score": 4,
+      "score_reason": "The answer preserves every listed category and relevant condition.",
+      "question_answer_score_and_reason_verified_in_all_formats": true,
+      "saved_output_verified": true
+    },
+    {
+      "domain": "legal",
+      "criterion": 1,
+      "role": "bad",
+      "origin": "adapted",
+      "teaching_score": 2,
+      "score_reason": "It falsely excludes permanent withdrawals and omits serious infringements.",
+      "question_answer_score_and_reason_verified_in_all_formats": true,
+      "saved_output_verified": false
+    },
+    {
+      "domain": "legal",
+      "criterion": 2,
+      "role": "good",
+      "origin": "verbatim",
+      "teaching_score": 4,
+      "score_reason": "The passage includes the minimum duration and starting event.",
+      "question_answer_score_and_reason_verified_in_all_formats": true,
+      "saved_output_verified": true
+    },
+    {
+      "domain": "legal",
+      "criterion": 2,
+      "role": "bad",
+      "origin": "adapted",
+      "teaching_score": 2,
+      "score_reason": "The answer omits when the two-year period starts.",
+      "question_answer_score_and_reason_verified_in_all_formats": true,
+      "saved_output_verified": false
+    },
+    {
+      "domain": "legal",
+      "criterion": 3,
+      "role": "good",
+      "origin": "verbatim",
+      "teaching_score": 4,
+      "score_reason": "The two-year minimum and its starting event match exactly.",
+      "question_answer_score_and_reason_verified_in_all_formats": true,
+      "saved_output_verified": true
+    },
+    {
+      "domain": "legal",
+      "criterion": 3,
+      "role": "bad",
+      "origin": "adapted",
+      "teaching_score": 1,
+      "score_reason": "The document specifies a two-year minimum; the answer changes it to five years.",
+      "question_answer_score_and_reason_verified_in_all_formats": true,
+      "saved_output_verified": false
+    },
+    {
+      "domain": "legal",
+      "criterion": 4,
+      "role": "good",
+      "origin": "verbatim",
+      "teaching_score": 4,
+      "score_reason": "An expert could use this to check recording duties.",
+      "question_answer_score_and_reason_verified_in_all_formats": true,
+      "saved_output_verified": true
+    },
+    {
+      "domain": "legal",
+      "criterion": 4,
+      "role": "bad",
+      "origin": "new",
+      "teaching_score": 1,
+      "score_reason": "Finding a nearby word serves no legal information need.",
+      "question_answer_score_and_reason_verified_in_all_formats": true,
+      "saved_output_verified": false
+    },
+    {
+      "domain": "legal",
+      "criterion": 5,
+      "role": "good",
+      "origin": "verbatim",
+      "teaching_score": 4,
+      "score_reason": "The question identifies the licence, withdrawal type and register.",
+      "question_answer_score_and_reason_verified_in_all_formats": true,
+      "saved_output_verified": true
+    },
+    {
+      "domain": "legal",
+      "criterion": 5,
+      "role": "bad",
+      "origin": "adapted",
+      "teaching_score": 1,
+      "score_reason": "Neither “these entries” nor “there” identifies the subject independently.",
+      "question_answer_score_and_reason_verified_in_all_formats": true,
+      "saved_output_verified": false
+    },
+    {
+      "domain": "legal",
+      "criterion": 6,
+      "role": "good",
+      "origin": "verbatim",
+      "teaching_score": 4,
+      "score_reason": "It identifies all entries the text requires to be recorded.",
+      "question_answer_score_and_reason_verified_in_all_formats": true,
+      "saved_output_verified": true
+    },
+    {
+      "domain": "legal",
+      "criterion": 6,
+      "role": "bad",
+      "origin": "adapted",
+      "teaching_score": 1,
+      "score_reason": "It gives a duration, not the requested recording categories.",
+      "question_answer_score_and_reason_verified_in_all_formats": true,
+      "saved_output_verified": false
+    },
+    {
+      "domain": "legal",
+      "criterion": 7,
+      "role": "good",
+      "origin": "verbatim",
+      "teaching_score": 4,
+      "score_reason": "It asks only for the minimum retention period for entries concerning temporary withdrawal.",
+      "question_answer_score_and_reason_verified_in_all_formats": true,
+      "saved_output_verified": true
+    },
+    {
+      "domain": "legal",
+      "criterion": 7,
+      "role": "bad",
+      "origin": "new",
+      "teaching_score": 2,
+      "score_reason": "It lists several topics without specifying what information is sought.",
+      "question_answer_score_and_reason_verified_in_all_formats": true,
+      "saved_output_verified": false
+    },
+    {
+      "domain": "legal",
+      "criterion": 8,
+      "role": "good",
+      "origin": "verbatim",
+      "teaching_score": 4,
+      "score_reason": "The grammar and legal terminology are clear and natural.",
+      "question_answer_score_and_reason_verified_in_all_formats": true,
+      "saved_output_verified": true
+    },
+    {
+      "domain": "legal",
+      "criterion": 8,
+      "role": "bad",
+      "origin": "adapted",
+      "teaching_score": 2,
+      "score_reason": "Several grammatical errors make the sentence difficult to read.",
+      "question_answer_score_and_reason_verified_in_all_formats": true,
+      "saved_output_verified": false
+    }
+  ]
+}

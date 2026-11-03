@@ -1,0 +1,408 @@
+{
+  "scope": "Private provenance for a shared-source, paired-example legal annotation guideline. Public examples do not reveal generation history.",
+  "checked_date": "2026-11-02",
+  "source": {
+    "document_id": "32009R1073",
+    "target_article_number": "24",
+    "citation": "Regulation (EC) No 1073/2009, Article 24",
+    "original_document_text": "Article 24 — Entry in the national electronic registers\nEntry in the national electronic registers\nMember States shall ensure that serious infringements of Community road transport legislation attributable to carriers established in their territory, which have led to the imposition of a penalty by any Member State, as well as any temporary or permanent withdrawal of the Community licence or of the certified true copy thereof are recorded in the national electronic register of road transport undertakings. Entries in the register which concern a temporary or permanent withdrawal of a Community licence shall remain in the database for at least 2 years from the time of the expiry of the period of withdrawal, in the case of temporary withdrawal, or from the date of withdrawal, in the case of permanent withdrawal.",
+    "displayed_source_text": "Member States shall ensure that serious infringements of Community road transport legislation attributable to carriers established in their territory, which have led to the imposition of a penalty by any Member State, as well as any temporary or permanent withdrawal of the Community licence or of the certified true copy thereof are recorded in the national electronic register of road transport undertakings. Entries in the register which concern a temporary or permanent withdrawal of a Community licence shall remain in the database for at least 2 years from the time of the expiry of the period of withdrawal, in the case of temporary withdrawal, or from the date of withdrawal, in the case of permanent withdrawal.",
+    "displayed_source_description": "Complete article body, excluding repeated heading only.",
+    "database": "data/legal/qac/generation_600_20261008_model_comparison/eurlex/run.sqlite",
+    "task": "3116482358cdff017cc8ba45d04097a5ea8efd5a46962f1c8e1e5e7ea2dfdb94",
+    "outcome_index": 0,
+    "original_source_sha256": "29d1c529b8514121e155c199bbc8718ad48a46e4f4e398a6f49de1c5a92305fa",
+    "displayed_source_sha256": "ea029d4e376b6bfca3e7810b32ceeab1be4ab320e98c136a2cfd43e040b93af6",
+    "verification": "All 15 saved English candidates for this article contain exactly this source text; displayed body matches after removing the two heading lines."
+  },
+  "selection_note": "Reviewed all 15 saved English question-answer pairs for this article. No unambiguously poor saved pair illustrated the eight requested dimensions. Good pairs are verbatim saved outputs. Bad pairs are adapted or newly authored teaching contrasts, not presented as saved generations. Reuse of genuine pairs is intentional.",
+  "reviewed_saved_candidates": [
+    {
+      "database": "data/legal/qac/generation_600_20261008_model_comparison/eurlex/run.sqlite",
+      "task": "3116482358cdff017cc8ba45d04097a5ea8efd5a46962f1c8e1e5e7ea2dfdb94",
+      "outcome_index": 0,
+      "candidate_id": "q_fdde3a163c77fae9b86ce2f1"
+    },
+    {
+      "database": "data/legal/qac/generation_600_20261008_model_comparison/eurlex/run.sqlite",
+      "task": "1ada31e3c6260208745452a6c32515cc4b3a8a3f16af41194cd697d8e339b018",
+      "outcome_index": 0,
+      "candidate_id": "q_5003a2e72bb6149a97be084d"
+    },
+    {
+      "database": "data/legal/qac/generation_600_20261008_model_comparison/eurlex/run.sqlite",
+      "task": "1ada31e3c6260208745452a6c32515cc4b3a8a3f16af41194cd697d8e339b018",
+      "outcome_index": 1,
+      "candidate_id": "q_3cfb593f9d91eff36937b7ff"
+    },
+    {
+      "database": "data/legal/qac/generation_600_20261008_model_comparison/eurlex/run.sqlite",
+      "task": "60170d0cecb7d269b7ab5bbeb5a7e647d90c219536544dea84a942780f3c862e",
+      "outcome_index": 0,
+      "candidate_id": "q_ba948c7e853f495422faddd0"
+    },
+    {
+      "database": "data/legal/qac/generation_600_20261008_model_comparison/eurlex/run.sqlite",
+      "task": "da4e04bc0c6c37a107fd1744e5cf6fb988e416189a3c357dd2fd7247650483f4",
+      "outcome_index": 0,
+      "candidate_id": "q_6c817d3e1b58900bd55831b8"
+    },
+    {
+      "database": "data/legal/qac/generation_600_20261008_model_comparison/eurlex/run.sqlite",
+      "task": "eb7c2c7f4f575cc438ca10ea0fae1f16822d7aaf55bbf244b23944ef408d4192",
+      "outcome_index": 0,
+      "candidate_id": "q_8e2bddae4b1f6b534debd688"
+    },
+    {
+      "database": "data/legal/qac/generation_600_20261008_model_comparison/eurlex/run.sqlite",
+      "task": "9ae1ad1c9ddfbd9eb56c5daab32dcd48f18fa5885c1cd8c2bdcc7de1c765f8fd",
+      "outcome_index": 0,
+      "candidate_id": "q_9bbfc40c40a6e1083a7fe3d8"
+    },
+    {
+      "database": "data/legal/qac/generation_600_20261008_model_comparison/eurlex/run.sqlite",
+      "task": "9ae1ad1c9ddfbd9eb56c5daab32dcd48f18fa5885c1cd8c2bdcc7de1c765f8fd",
+      "outcome_index": 1,
+      "candidate_id": "q_fa9404d43e60f10fe3687c95"
+    },
+    {
+      "database": "data/legal/qac/generation_600_20261008_model_comparison/eurlex/run.sqlite",
+      "task": "6da3b4124a1c33c49d205479d3487499c7a18069c56412ee3c21b0aaad63d409",
+      "outcome_index": 0,
+      "candidate_id": "q_1b10d168a79f2edd2ad0d2a8"
+    },
+    {
+      "database": "data/legal/qac/generation_600_20261008_model_comparison/eurlex/run.sqlite",
+      "task": "4b5e229c0ebb60f8005c8535bb15643a36a597ad5cfb69af2b979c332aa6ea8b",
+      "outcome_index": 0,
+      "candidate_id": "q_f6a90fdcb715fe2ff441735f"
+    },
+    {
+      "database": "data/legal/qac/generation_600_20261008_model_comparison/eurlex/run.sqlite",
+      "task": "4b5e229c0ebb60f8005c8535bb15643a36a597ad5cfb69af2b979c332aa6ea8b",
+      "outcome_index": 1,
+      "candidate_id": "q_4ff371b6e93382e6b9ed86ad"
+    },
+    {
+      "database": "data/legal/qac/generation_600_20261008_model_comparison/eurlex/run.sqlite",
+      "task": "4b5e229c0ebb60f8005c8535bb15643a36a597ad5cfb69af2b979c332aa6ea8b",
+      "outcome_index": 2,
+      "candidate_id": "q_eaf93802fb39ee4e7a17451a"
+    },
+    {
+      "database": "data/legal/qac/generation_600_20261008_model_comparison/eurlex/run.sqlite",
+      "task": "766fa72c9db42376091d0b4503c1c5ea91e1490adcae78ccf85a2ab844613903",
+      "outcome_index": 0,
+      "candidate_id": "q_0a7113d635dd2cd208149c14"
+    },
+    {
+      "database": "data/legal/qac/generation_600_20261008_model_comparison/eurlex/run.sqlite",
+      "task": "766fa72c9db42376091d0b4503c1c5ea91e1490adcae78ccf85a2ab844613903",
+      "outcome_index": 1,
+      "candidate_id": "q_33147aba81182144070093e4"
+    },
+    {
+      "database": "data/legal/qac/generation_600_20261008_model_comparison/eurlex/run.sqlite",
+      "task": "766fa72c9db42376091d0b4503c1c5ea91e1490adcae78ccf85a2ab844613903",
+      "outcome_index": 2,
+      "candidate_id": "q_0686834196571f81246777cd"
+    }
+  ],
+  "criteria": [
+    {
+      "criterion": 1,
+      "heading": "Are the question and answer supported by the text? (Grounding)",
+      "good": {
+        "question": "What must be recorded in the national electronic register of road transport undertakings regarding carriers established in a Member State's territory?",
+        "answer": "serious infringements of Community road transport legislation attributable to carriers established in their territory, which have led to the imposition of a penalty by any Member State, as well as any temporary or permanent withdrawal of the Community licence or of the certified true copy thereof",
+        "origin": "verbatim",
+        "saved_record": {
+          "database": "data/legal/qac/generation_600_20261008_model_comparison/eurlex/run.sqlite",
+          "task": "9ae1ad1c9ddfbd9eb56c5daab32dcd48f18fa5885c1cd8c2bdcc7de1c765f8fd",
+          "outcome_index": 1,
+          "candidate_id": "q_fa9404d43e60f10fe3687c95",
+          "generator_model_id": "qwen/qwen3.8-27b"
+        },
+        "question_matches_saved": true,
+        "answer_matches_saved": true,
+        "teaching_score": 4,
+        "score_reason": "The answer preserves every listed category and relevant condition."
+      },
+      "bad": {
+        "question": "What must be recorded in the national electronic register of road transport undertakings regarding carriers established in a Member State's territory?",
+        "answer": "Only temporary withdrawals of the Community licence are recorded; permanent withdrawals are excluded.",
+        "origin": "adapted",
+        "based_on_saved_record": {
+          "database": "data/legal/qac/generation_600_20261008_model_comparison/eurlex/run.sqlite",
+          "task": "9ae1ad1c9ddfbd9eb56c5daab32dcd48f18fa5885c1cd8c2bdcc7de1c765f8fd",
+          "outcome_index": 1,
+          "candidate_id": "q_fa9404d43e60f10fe3687c95",
+          "generator_model_id": "qwen/qwen3.8-27b"
+        },
+        "authored_changes": "Replace the genuine answer with a false exclusion of permanent withdrawals.",
+        "teaching_score": 2,
+        "score_reason": "It falsely excludes permanent withdrawals and omits serious infringements."
+      },
+      "definition": "Grounding means that the document supports the answer and the factual assumptions in the question. Preserve who must act, what is required or permitted, and conditions and exceptions. A proposal is not an adopted decision. A statement presented for checking need not be true, but its answer must resolve it correctly. An important unsupported assertion merits at most **2**; no support for the central answer merits **1**."
+    },
+    {
+      "criterion": 2,
+      "heading": "Does the answer include the right amount of evidence? (Precision)",
+      "good": {
+        "question": "How long must entries concerning a temporary withdrawal of a Community licence remain in the national electronic register of road transport undertakings?",
+        "answer": "at least 2 years from the time of the expiry of the period of withdrawal",
+        "origin": "verbatim",
+        "saved_record": {
+          "database": "data/legal/qac/generation_600_20261008_model_comparison/eurlex/run.sqlite",
+          "task": "60170d0cecb7d269b7ab5bbeb5a7e647d90c219536544dea84a942780f3c862e",
+          "outcome_index": 0,
+          "candidate_id": "q_ba948c7e853f495422faddd0",
+          "generator_model_id": "z-ai/glm-5.3-flashx"
+        },
+        "question_matches_saved": true,
+        "answer_matches_saved": true,
+        "teaching_score": 4,
+        "score_reason": "The passage includes the minimum duration and starting event."
+      },
+      "bad": {
+        "question": "How long must entries concerning a temporary withdrawal of a Community licence remain in the national electronic register of road transport undertakings?",
+        "answer": "at least 2 years",
+        "origin": "adapted",
+        "based_on_saved_record": {
+          "database": "data/legal/qac/generation_600_20261008_model_comparison/eurlex/run.sqlite",
+          "task": "60170d0cecb7d269b7ab5bbeb5a7e647d90c219536544dea84a942780f3c862e",
+          "outcome_index": 0,
+          "candidate_id": "q_ba948c7e853f495422faddd0",
+          "generator_model_id": "z-ai/glm-5.3-flashx"
+        },
+        "authored_changes": "Shorten the genuine answer to omit the event that starts the retention period.",
+        "teaching_score": 2,
+        "score_reason": "The answer omits when the two-year period starts."
+      },
+      "definition": "Precision means including the evidence needed to answer the question, with essential qualifications and no unnecessary material. Keep conditions and exceptions, even if they lengthen the answer. Use one unbroken passage; identify a shorter sufficient passage before penalizing excess. A missing essential qualification merits at most **2**; absence of the main information merits **1**. Judge this separately from factual correctness."
+    },
+    {
+      "criterion": 3,
+      "heading": "Are numbers and references accurate? (Numerical fidelity)",
+      "good": {
+        "question": "What is the minimum retention period for entries in the national electronic register concerning a temporary withdrawal of a Community licence?",
+        "answer": "for at least 2 years from the time of the expiry of the period of withdrawal",
+        "origin": "verbatim",
+        "saved_record": {
+          "database": "data/legal/qac/generation_600_20261008_model_comparison/eurlex/run.sqlite",
+          "task": "766fa72c9db42376091d0b4503c1c5ea91e1490adcae78ccf85a2ab844613903",
+          "outcome_index": 1,
+          "candidate_id": "q_33147aba81182144070093e4",
+          "generator_model_id": "upstage/solar-pro4"
+        },
+        "question_matches_saved": true,
+        "answer_matches_saved": true,
+        "teaching_score": 4,
+        "score_reason": "The two-year minimum and its starting event match exactly."
+      },
+      "bad": {
+        "question": "What is the minimum retention period for entries in the national electronic register concerning a temporary withdrawal of a Community licence?",
+        "answer": "for at least 5 years from the time of the expiry of the period of withdrawal",
+        "origin": "adapted",
+        "based_on_saved_record": {
+          "database": "data/legal/qac/generation_600_20261008_model_comparison/eurlex/run.sqlite",
+          "task": "766fa72c9db42376091d0b4503c1c5ea91e1490adcae78ccf85a2ab844613903",
+          "outcome_index": 1,
+          "candidate_id": "q_33147aba81182144070093e4",
+          "generator_model_id": "upstage/solar-pro4"
+        },
+        "authored_changes": "Change 2 years to 5 years; retain the original question and other answer wording.",
+        "teaching_score": 1,
+        "score_reason": "The document specifies a two-year minimum; the answer changes it to five years."
+      },
+      "definition": "Numerical fidelity means preserving numbers and references accurately, including their meaning in context. Check dates, units, percentages, limits and the event from which a period runs. A changed value or meaning merits at most **2**; an invented or contradicted central value merits **1**. Hypothetical values and values proposed for checking are not automatically errors. If no relevant number or reference occurs, record **4 and “not applicable”**."
+    },
+    {
+      "criterion": 4,
+      "heading": "Would an expert reasonably need this information? (Search realism)",
+      "good": {
+        "question": "What events must be recorded in the national electronic register of road transport undertakings?",
+        "answer": "serious infringements of Community road transport legislation attributable to carriers established in their territory, which have led to the imposition of a penalty by any Member State, as well as any temporary or permanent withdrawal of the Community licence or of the certified true copy thereof",
+        "origin": "verbatim",
+        "saved_record": {
+          "database": "data/legal/qac/generation_600_20261008_model_comparison/eurlex/run.sqlite",
+          "task": "766fa72c9db42376091d0b4503c1c5ea91e1490adcae78ccf85a2ab844613903",
+          "outcome_index": 0,
+          "candidate_id": "q_0a7113d635dd2cd208149c14",
+          "generator_model_id": "upstage/solar-pro4"
+        },
+        "question_matches_saved": true,
+        "answer_matches_saved": true,
+        "teaching_score": 4,
+        "score_reason": "An expert could use this to check recording duties."
+      },
+      "bad": {
+        "question": "Which word immediately precedes ‘licence’ in the first sentence?",
+        "answer": "Community",
+        "origin": "new",
+        "based_on_saved_record": {
+          "database": "data/legal/qac/generation_600_20261008_model_comparison/eurlex/run.sqlite",
+          "task": "766fa72c9db42376091d0b4503c1c5ea91e1490adcae78ccf85a2ab844613903",
+          "outcome_index": 0,
+          "candidate_id": "q_0a7113d635dd2cd208149c14",
+          "generator_model_id": "upstage/solar-pro4"
+        },
+        "authored_changes": "Create a word-recognition exercise that does not ask for legal information. The word answer is true of the displayed source.",
+        "teaching_score": 1,
+        "score_reason": "Finding a nearby word serves no legal information need."
+      },
+      "definition": "Search realism is the plausibility of a question as a real request for information. Judge whether it serves a recognizable legal need, rather than tests recognition of words. Simple requests can be useful; give no extra credit for length, difficulty or public importance. A plausible need merits **4**; a largely pointless request merits **1–2**."
+    },
+    {
+      "criterion": 5,
+      "heading": "Is the question understandable on its own? (Standalone clarity)",
+      "good": {
+        "question": "How long must entries concerning a temporary withdrawal of a Community licence remain in the national electronic register of road transport undertakings?",
+        "answer": "at least 2 years from the time of the expiry of the period of withdrawal",
+        "origin": "verbatim",
+        "saved_record": {
+          "database": "data/legal/qac/generation_600_20261008_model_comparison/eurlex/run.sqlite",
+          "task": "60170d0cecb7d269b7ab5bbeb5a7e647d90c219536544dea84a942780f3c862e",
+          "outcome_index": 0,
+          "candidate_id": "q_ba948c7e853f495422faddd0",
+          "generator_model_id": "z-ai/glm-5.3-flashx"
+        },
+        "question_matches_saved": true,
+        "answer_matches_saved": true,
+        "teaching_score": 4,
+        "score_reason": "The question identifies the licence, withdrawal type and register."
+      },
+      "bad": {
+        "question": "For how long must these entries remain there?",
+        "answer": "at least 2 years from the time of the expiry of the period of withdrawal",
+        "origin": "adapted",
+        "based_on_saved_record": {
+          "database": "data/legal/qac/generation_600_20261008_model_comparison/eurlex/run.sqlite",
+          "task": "60170d0cecb7d269b7ab5bbeb5a7e647d90c219536544dea84a942780f3c862e",
+          "outcome_index": 0,
+          "candidate_id": "q_ba948c7e853f495422faddd0",
+          "generator_model_id": "z-ai/glm-5.3-flashx"
+        },
+        "authored_changes": "Replace explicit legal subjects with unresolved references; retain the genuine answer.",
+        "teaching_score": 1,
+        "score_reason": "Neither “these entries” nor “there” identifies the subject independently."
+      },
+      "definition": "Standalone clarity means the question can be understood without seeing the source document. Check that it identifies the legal setting, actors and information sought. Require conditions, territory or time only when necessary. Sufficient context merits **4**; broad but usable context may merit **3**. Missing an essential distinction merits at most **2**; an unidentifiable subject merits **1**."
+    },
+    {
+      "criterion": 6,
+      "heading": "Does the answer provide the information asked for? (Information value)",
+      "good": {
+        "question": "Which entries must Member States ensure are recorded in the national electronic register of road transport undertakings?",
+        "answer": "serious infringements of Community road transport legislation attributable to carriers established in their territory, which have led to the imposition of a penalty by any Member State, as well as any temporary or permanent withdrawal of the Community licence or of the certified true copy thereof",
+        "origin": "verbatim",
+        "saved_record": {
+          "database": "data/legal/qac/generation_600_20261008_model_comparison/eurlex/run.sqlite",
+          "task": "1ada31e3c6260208745452a6c32515cc4b3a8a3f16af41194cd697d8e339b018",
+          "outcome_index": 0,
+          "candidate_id": "q_5003a2e72bb6149a97be084d",
+          "generator_model_id": "prism-ml/ternary-bonsai-2-27b"
+        },
+        "question_matches_saved": true,
+        "answer_matches_saved": true,
+        "teaching_score": 4,
+        "score_reason": "It identifies all entries the text requires to be recorded."
+      },
+      "bad": {
+        "question": "Which entries must Member States ensure are recorded in the national electronic register of road transport undertakings?",
+        "answer": "at least 2 years from the time of the expiry of the period of withdrawal",
+        "origin": "adapted",
+        "based_on_saved_record": {
+          "database": "data/legal/qac/generation_600_20261008_model_comparison/eurlex/run.sqlite",
+          "task": "1ada31e3c6260208745452a6c32515cc4b3a8a3f16af41194cd697d8e339b018",
+          "outcome_index": 0,
+          "candidate_id": "q_5003a2e72bb6149a97be084d",
+          "generator_model_id": "prism-ml/ternary-bonsai-2-27b"
+        },
+        "authored_changes": "Pair the genuine question about entries to record with a genuine answer about retention duration.",
+        "answer_saved_record": {
+          "database": "data/legal/qac/generation_600_20261008_model_comparison/eurlex/run.sqlite",
+          "task": "60170d0cecb7d269b7ab5bbeb5a7e647d90c219536544dea84a942780f3c862e",
+          "outcome_index": 0,
+          "candidate_id": "q_ba948c7e853f495422faddd0"
+        },
+        "teaching_score": 1,
+        "score_reason": "It gives a duration, not the requested recording categories."
+      },
+      "definition": "Information value is the extent to which the answer provides what the question asks for. Check that it addresses every requested part. A retention period does not identify which entries must be recorded. Repeating the question does not answer it. A complete response merits **4**; a useful answer with a small omission may merit **3**. A missing important part merits at most **2**; absent central information merits **1**."
+    },
+    {
+      "criterion": 7,
+      "heading": "Does the question make one clear, focused request? (Focus and formulation)",
+      "good": {
+        "question": "What is the minimum retention period for entries in the national electronic register concerning a temporary withdrawal of a Community licence?",
+        "answer": "for at least 2 years from the time of the expiry of the period of withdrawal",
+        "origin": "verbatim",
+        "saved_record": {
+          "database": "data/legal/qac/generation_600_20261008_model_comparison/eurlex/run.sqlite",
+          "task": "766fa72c9db42376091d0b4503c1c5ea91e1490adcae78ccf85a2ab844613903",
+          "outcome_index": 1,
+          "candidate_id": "q_33147aba81182144070093e4",
+          "generator_model_id": "upstage/solar-pro4"
+        },
+        "question_matches_saved": true,
+        "answer_matches_saved": true,
+        "teaching_score": 4,
+        "score_reason": "It asks only for the minimum retention period for entries concerning temporary withdrawal."
+      },
+      "bad": {
+        "question": "What about registers, carriers, penalties, licences and withdrawal?",
+        "answer": "Member States shall ensure that serious infringements of Community road transport legislation attributable to carriers established in their territory, which have led to the imposition of a penalty by any Member State, as well as any temporary or permanent withdrawal of the Community licence or of the certified true copy thereof are recorded in the national electronic register of road transport undertakings.",
+        "origin": "new",
+        "based_on_saved_record": {
+          "database": "data/legal/qac/generation_600_20261008_model_comparison/eurlex/run.sqlite",
+          "task": "766fa72c9db42376091d0b4503c1c5ea91e1490adcae78ccf85a2ab844613903",
+          "outcome_index": 1,
+          "candidate_id": "q_33147aba81182144070093e4",
+          "generator_model_id": "upstage/solar-pro4"
+        },
+        "authored_changes": "Create an unfocused request listing several subjects. The answer quotes the source first sentence exactly.",
+        "teaching_score": 2,
+        "score_reason": "It lists several topics without specifying what information is sought."
+      },
+      "definition": "Focus and formulation describe how clearly a question expresses one purpose, using only the wording needed. Allow connected parts, but require a clear request rather than a list of topics. Avoid unnecessary background and extensive copying of ordinary source wording. Keep necessary legal terms; do not penalize answers for quoting. A focused question merits **4**; loose wording may merit **3**; a diffuse request merits **1–2**."
+    },
+    {
+      "criterion": 8,
+      "heading": "Is the language clear and natural? (Linguistic quality)",
+      "good": {
+        "question": "How long must entries concerning temporary withdrawal of a Community licence remain in the national electronic register?",
+        "answer": "at least 2 years from the time of the expiry of the period of withdrawal",
+        "origin": "verbatim",
+        "saved_record": {
+          "database": "data/legal/qac/generation_600_20261008_model_comparison/eurlex/run.sqlite",
+          "task": "4b5e229c0ebb60f8005c8535bb15643a36a597ad5cfb69af2b979c332aa6ea8b",
+          "outcome_index": 0,
+          "candidate_id": "q_f6a90fdcb715fe2ff441735f",
+          "generator_model_id": "minimax/minimax-m2.7"
+        },
+        "question_matches_saved": true,
+        "answer_matches_saved": true,
+        "teaching_score": 4,
+        "score_reason": "The grammar and legal terminology are clear and natural."
+      },
+      "bad": {
+        "question": "How long entries of temporary withdraw a Community licence is must stay in national electronic register?",
+        "answer": "at least 2 years from the time of the expiry of the period of withdrawal",
+        "origin": "adapted",
+        "based_on_saved_record": {
+          "database": "data/legal/qac/generation_600_20261008_model_comparison/eurlex/run.sqlite",
+          "task": "4b5e229c0ebb60f8005c8535bb15643a36a597ad5cfb69af2b979c332aa6ea8b",
+          "outcome_index": 0,
+          "candidate_id": "q_f6a90fdcb715fe2ff441735f",
+          "generator_model_id": "minimax/minimax-m2.7"
+        },
+        "authored_changes": "Introduce grammatical errors into the genuine temporary-withdrawal question; retain its genuine answer.",
+        "teaching_score": 2,
+        "score_reason": "Several grammatical errors make the sentence difficult to read."
+      },
+      "definition": "Linguistic quality is the correctness and naturalness of the question’s language. Assess grammar, sentence structure and terminology in the original language for a reader with appropriate legal knowledge. Correct professional writing merits **4**; understandable but awkward wording may merit **3**; language that seriously hinders understanding merits **1–2**. Do not lower this score solely for a factual error or old-fashioned wording in a quoted source."
+    }
+  ],
+  "assessment_status": "Good/Bad labels, suggested scores and reasons are author-proposed teaching judgments, relative only to the current criterion. Each pair displays its score and brief reason; these are not completed expert annotations."
+}

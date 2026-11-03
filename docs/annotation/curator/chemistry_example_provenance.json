@@ -1,0 +1,351 @@
+{
+  "provenance_note": "Researcher audit companion; keep model filenames and existing machine judgments hidden during independent annotation. CSV row identifiers are parsed data-record numbers, not physical line numbers. Examples reproduce real generation outputs without correction.",
+  "rubric_references": [
+    "src/clir_bench/domains/chemistry/qac/prompts/README.md",
+    "src/clir_bench/domains/chemistry/qac/prompts/verifiers/faithfulness_batch.txt",
+    "src/clir_bench/domains/chemistry/qac/prompts/verifiers/lookup_batch.txt"
+  ],
+  "examples": [
+    {
+      "example_id": "C1",
+      "file": "data/chemistry/ai4chem_abstract_pairs/qac/chemistry_google_patents_model_comparison_generator/generator_compare_200_qwen_qwen3.8-27b_gemini38.csv",
+      "csv_data_row_1_based_excluding_header": 142,
+      "candidate_id": null,
+      "candidate_rank": "1",
+      "publication_number": "CN-105797934-A",
+      "source_document_id": "CN-105797934-A_en",
+      "question_language": "en",
+      "mode": "lookup",
+      "question": "What is the composition of the aqueous degreasing agent used in the degreasing step of the paint spraying method for a plastic shell of an electric bicycle?",
+      "answer": "the aqueous degreasing agent is composed of 50-70 g/L of sodium hydroxide, 20-30 g/L of sodium phosphate, 10-20 g/L of sodium carbonate, and 5-10 g/L of the surface active agent",
+      "evidence": "the aqueous degreasing agent is composed of 50-70 g/L of sodium hydroxide, 20-30 g/L of sodium phosphate, 10-20 g/L of sodium carbonate, and 5-10 g/L of the surface active agent",
+      "assertion_status": null,
+      "answer_is_translation": "false",
+      "rubric_versions": {
+        "quality": "chemistry-clir-exceptional-r2",
+        "faithfulness": "chemistry-clir-exceptional-r2"
+      },
+      "source_file": "data/chemistry/ai4chem_abstract_pairs/multilingual_corpus.csv",
+      "source_csv_data_row_1_based_excluding_header": 1041,
+      "source_context": "The invention provides a paint spraying method for a plastic shell of an electric bicycle. The paint spraying method comprises the steps that (1) degreasing is conducted, specifically, spraying and cleaning are conducted with an aqueous degreasing agent containing alkali liquor and a surface active agent, and oil dirt on the surface of plastic is removed through the saponification of alkali and animal and vegetable oil in a solution and the emulsion process of the surface active agent and mineral oil; degreasing comprises a pre-degreasing procedure and a degreasing procedure, the pre-degreasing procedure is conducted for 1-2 min, and the degreasing procedure is conducted for 2-3 min; and the spraying pressure is 0.1-0.2 MPa; and the aqueous degreasing agent is composed of 50-70 g/L of sodium hydroxide, 20-30 g/L of sodium phosphate, 10-20 g/L of sodium carbonate, and 5-10 g/L of the surface active agent; and (b) interface activation is conducted, specifically, treatment is conducted through an aqueous surface adjusting agent containing aqueous macromolecule, an indoor-temperature spraying is conducted for 1 min, and the spraying pressure is 0.05-0.1 MPa. The paint spraying method is applied to paint spraying of the plastic shell of the electric bicycle.",
+      "source_excerpts_for_guideline": [
+        "the aqueous degreasing agent is composed of 50-70 g/L of sodium hydroxide, 20-30 g/L of sodium phosphate, 10-20 g/L of sodium carbonate, and 5-10 g/L of the surface active agent"
+      ],
+      "source_context_sha256": "a96e5fc2826edc55a9a4263c15a0035a6ae61f6ed9090b2ecffa8d144e367cf4",
+      "all_displayed_source_excerpts_verified_exact": true,
+      "recommended_scores_status": "Author recommendations for annotator calibration; not human gold labels and not adopted from automated grades.",
+      "teaching_scores": {
+        "numerical_fidelity": 4
+      },
+      "teaching_scores_rubric": "unified_annotation_v1",
+      "guideline_criterion": 3,
+      "displayed_in_guideline": true,
+      "displayed_question": "What is the composition of the aqueous degreasing agent used in the degreasing step of the paint spraying method for a plastic shell of an electric bicycle?",
+      "displayed_answer": "the aqueous degreasing agent is composed of 50-70 g/L of sodium hydroxide, 20-30 g/L of sodium phosphate, 10-20 g/L of sodium carbonate, and 5-10 g/L of the surface active agent",
+      "displayed_source_excerpts": [
+        "the aqueous degreasing agent is composed of 50-70 g/L of sodium hydroxide, 20-30 g/L of sodium phosphate, 10-20 g/L of sodium carbonate, and 5-10 g/L of the surface active agent"
+      ]
+    },
+    {
+      "example_id": "C2",
+      "file": "data/chemistry/ai4chem_abstract_pairs/qac/chemistry_google_patents_model_comparison_generator/generator_compare_200_deepseek_deepseek-v4.1-flash_gemini38.csv",
+      "csv_data_row_1_based_excluding_header": 193,
+      "candidate_id": null,
+      "candidate_rank": "1",
+      "publication_number": "EP-0213571-A2",
+      "source_document_id": "EP-0213571-A2_en",
+      "question_language": "en",
+      "mode": "lookup",
+      "question": "In the compounds of formula I, what values does the index m denote?",
+      "answer": "m denotes the number 0, 1 or 2",
+      "evidence": "m denotes the number 0, 1 or 2",
+      "assertion_status": null,
+      "answer_is_translation": "false",
+      "rubric_versions": {
+        "quality": "chemistry-clir-exceptional-r2",
+        "faithfulness": "chemistry-clir-exceptional-r2"
+      },
+      "source_file": "data/chemistry/ai4chem_abstract_pairs/multilingual_corpus.csv",
+      "source_csv_data_row_1_based_excluding_header": 1744,
+      "source_context": "Compounds of the formula I <IMAGE> in which R<1> and R<2> independently of one another denote a hydrogen atom or a C1-C12-alkyl, C3-C12-alkenyl or C3-C12-cycloalkyl radical which can be substituted by a phenyl or naphthyl radical which, in turn, can be substituted by 1 or 2 C1-3-alkyl or C1-3-alkoxy groups or by 1 or 2 fluorine, chlorine or bromine atoms or by a trifluoromethyl, carboxyl, (C1-5-alkoxy)-carbonyl, cyano or C1-4-acylamido group, or by a 5-membered aromatic ring having 1 to 3 nitrogen atoms or an oxygen or sulphur atom and optionally 1-2 nitrogen atoms, or by a 6-membered aromatic ring having 1 to 3 nitrogen atoms, where these heteroaromatic rings optionally carry 1 to 3 C1-3-alkyl groups, or R<1> and R<2>, together with the nitrogen atom, form a saturated heterocyclic ring having 4 to 12 ring members which is substituted by a phenyl and/or a hydroxyl, C1-4-acyl, (C1-5-alkoxy)-carbonyl, nitrile, n-phenyl-n-(C1-4-acyl)amino or n-benzamido group or a benzimidazolin-2-on-1-yl radical and/or by 1 to 3 C1-4-alkyl groups or can carry a fused benzene ring, R<3>, R<4> and R<5> independently of one another denote hydrogen atoms or C1-3-alkyl groups, where R<4> and R<5>, together with the double bond, can also denote a benzene ring, A denotes a C2-8-alkylene radical, which can be olefinically or acetylenically monounsaturated and in which a carbon atom can be replaced by an oxygen atom, a sulphur atom or a phenylene group, B denotes one of the groups B<1> to B<6>: <IMAGE> in which E denotes S, CH-NO2 or N-CN, R<6> denotes a hydrogen atom or a C1-3-alkyl radical which can be substituted by a 5-membered aromatic ring having 1 to 3 nitrogen atoms or an oxygen or sulphur atom and optionally 1-2 nitrogen atoms or a 6-membered aromatic ring having 1 to 3 nitrogen atoms, where these heteroaromatic rings optionally carry 1 to 3 C1-3-alkyl groups, or can be substituted by a hydroxyl or C1-4-alkoxy group, R<7> denotes a hydrogen atom or a C1-3-alkyl radical, R<8> denotes an amino group or the radical CH2OR<1><2>, in which R<1><2> represents a hydrogen atom, a C1-3-alkyl radical, a C1-6-acyl group, the benzoyl group, or the tetrahydrofuran-2-yl or tetrahydropyran-2-yl radical, R<9> denotes a C1-6-alkyl radical or a phenyl group which can each be substituted by 1 or 2 C1-3-alkyl, or C1-3-alkoxy groups or chlorine or bromine atoms or by a methylenedioxo radical, or denotes a 5-membered aromatic ring having 1 to 3 nitrogen atoms or an oxygen or sulphur atom and optionally 1-2 nitrogen atoms or a 6-membered aromatic ring having 1 to 3 nitrogen atoms, where these heteroaromatic rings optionally carry 1 to 3 C1-3-alkyl groups, R<1><0> and R<1><1> denote hydrogen atoms or C1-3-alkyl radicals which can be substituted by a phenyl group which can each in turn be substituted by 1 or 2 C1-3-alkyl or C1-3-alkoxy groups or chlorine or bromine atoms, or by a 5-membered aromatic ring having 1 to 3 nitrogen atoms or an oxygen or sulphur atom and optionally 1-2 nitrogen atoms or a 6-membered aromatic ring having 1 to 3 nitrogen atoms, where these heteroaromatic rings optionally carry 1 to 3 C1-3-alkyl groups, or by a hydroxyl or C1-3-alkoxy group, m denotes the number 0, 1 or 2 and Ar represents a fused benzene or thiophene ring, and their physiologically tolerated salts, and the compounds or their salts as therapeutic agents containing active compound.",
+      "source_excerpts_for_guideline": [
+        "Compounds of the formula I <IMAGE>",
+        "m denotes the number 0, 1 or 2"
+      ],
+      "source_context_sha256": "eb999aec16f306b18d9c3c4ea65a5fb27d4f72e88e3df59ef5faf7bb9f5febc5",
+      "all_displayed_source_excerpts_verified_exact": true,
+      "recommended_scores_status": "Author recommendations for annotator calibration; not human gold labels and not adopted from automated grades.",
+      "teaching_scores": {
+        "standalone_clarity": 1
+      },
+      "teaching_scores_rubric": "unified_annotation_v1",
+      "guideline_criterion": 5,
+      "displayed_in_guideline": true,
+      "displayed_question": "In the compounds of formula I, what values does the index m denote?",
+      "displayed_answer": "m denotes the number 0, 1 or 2",
+      "displayed_source_excerpts": [
+        "m denotes the number 0, 1 or 2",
+        "Compounds of the formula I <IMAGE>"
+      ]
+    },
+    {
+      "example_id": "C3",
+      "file": "data/chemistry/ai4chem_abstract_pairs/qac/chemistry_google_patents_model_comparison_generator/generator_compare_200_mistralai_mistral-small-2603_gemini38.csv",
+      "csv_data_row_1_based_excluding_header": 49,
+      "candidate_id": null,
+      "candidate_rank": "1",
+      "publication_number": "ES-1255279-U",
+      "source_document_id": "ES-1255279-U_en",
+      "question_language": "en",
+      "mode": "assertion_verification",
+      "question": "Is the chocolate coating required to cover more than 50% of the food product's surface area?",
+      "answer": "Food product, according to claim 1, characterized by having a chocolate coating.",
+      "evidence": "Food product, according to claim 1, characterized by having a chocolate coating.",
+      "assertion_status": "contradicted",
+      "answer_is_translation": "false",
+      "rubric_versions": {
+        "quality": "chemistry-clir-exceptional-r2",
+        "faithfulness": "chemistry-clir-exceptional-r2"
+      },
+      "source_file": "data/chemistry/ai4chem_abstract_pairs/multilingual_corpus.csv",
+      "source_csv_data_row_1_based_excluding_header": 3594,
+      "source_context": "Food product characterized by being composed of a mixture of cheese and black garlic. 2 Food product, according to claim 1, characterized by having a chocolate coating. 3. Food product according to claim 1, characterized in that the cheese is made from sheep, goat or cow. 4. Food product according to claim 3 characterized in that the cheese used is tender. 5. Food product according to claim 3, characterized in that the cheese used is semi-cured. 6 Food product according to claim 3 characterized in that the cheese used is cured. 7. Food product according to claim 2, characterized in that the coating can be dark chocolate with a percentage of cocoa purity of between 50 and 100%. 8. Food product according to claim 2, characterized in that the coating can be milk chocolate with a cocoa purity percentage of between 30 and 100%. 9. Food product according to claim 2, characterized in that the coating can be white chocolate with a percentage of purity of cocoa butter between 30 and 100%. 10. Food product according to claim 1, characterized in that black garlic with a proportion of black garlic from 0.0001 to 50% of the mass and/or volume of the rest of the filling mixture is used on the filling material. (crushed, crushed, rolled, chopped, or even brought to a liquid or near liquid state) directly and/or dissolved and/or mixed in water or in any other substance. 11. Food product according to claim 1, characterized in that the black garlic acts by dissolving and/or suspending and/or grinding and/or mixing. and/or by injecting and/or inoculating black garlic into the filling material. 12 Food product according to the preceding claims, where the foods that can be mixed with cheese and black garlic are infusions, nuts, fruits, both fresh and dried, semi-processed, processed or cooked, in solid, viscous, pasty and/or brought to a liquid or almost liquid state. 13. Food product according to the preceding claims, where the beverages that can be mixed with the cheese and black garlic are water (pure or not), wines, beers, ciders, cavas, soft drinks or other beverages, even alcoholic such as brandy, cognac, whiskey, gin, rum, anise, vodka and others. 14. Food product according to the preceding claims, where other products used in gastronomy that can be mixed with cheese and black garlic are olive oils, virgin or extra virgin olive oils, sunflower oils, soybean oils, vinegar, salts, sugars, seasonings. 15. Food product according to the preceding claims, where elements and/or compounds and/or chemicals for preservation or of interest that can be mixed with cheese and black garlic are any of those commonly used in the food industry. Agri-food, gastronomic or cooking such as preservatives, additives. 16. Food product according to any of the preceding claims, characterized in that the previous mixtures, before and/or after making the black garlic act, will be subjected to a cooking process at a temperature of 1ºC or more up to 500ºC and for a time 0.1 s or more up to 240 h. 17. Food product according to any of claims 1 to 12, characterized in that the previous mixtures, before and/or after making the black garlic act, will be subjected to a cooling or freezing process at a temperature of 0ºC or less until - 500ºC and for a time of 0.1 s or more up to 240 h. 18. Food product according to claim 1 characterized in that it contains, part of a sheep, goat or cow cheese, as the main ingredient, in a percentage between 0.0001% and 90%, to which black garlic is added, in a percentage between 0.0001 to 50%. The following ingredients are added to the resulting product: cream, lactic ferments, rennet, hardener: calcium chloride, preservative egg lysozyme, common salt, flux salt E-452, E330, anti-caking milk protein E-341ii, E-341iii, stabilizers E-406, E-407, E-410, E-417, pea starch, aroma, pH corrector E-339, fiber, salt, preservative E-202, acidulant E-330, black garlic. (Machine-translation by Google Translate, not legally binding)",
+      "source_excerpts_for_guideline": [
+        "Food product, according to claim 1, characterized by having a chocolate coating.",
+        "Food product according to claim 2, characterized in that the coating can be dark chocolate with a percentage of cocoa purity of between 50 and 100%."
+      ],
+      "source_context_sha256": "c504908e5293c2cffc774bea536e84766330855e684bfa995f494b381672e1aa",
+      "all_displayed_source_excerpts_verified_exact": true,
+      "recommended_scores_status": "Author recommendations for annotator calibration; not human gold labels and not adopted from automated grades.",
+      "teaching_scores": {
+        "grounding": 2
+      },
+      "teaching_scores_rubric": "unified_annotation_v1",
+      "guideline_criterion": 1,
+      "displayed_in_guideline": true,
+      "displayed_question": "Is the chocolate coating required to cover more than 50% of the food product's surface area?",
+      "displayed_answer": "Food product, according to claim 1, characterized by having a chocolate coating.",
+      "displayed_source_excerpts": [
+        "Food product, according to claim 1, characterized by having a chocolate coating.",
+        "the coating can be dark chocolate with a percentage of cocoa purity of between 50 and 100%"
+      ]
+    },
+    {
+      "example_id": "C4",
+      "file": "data/chemistry/ai4chem_abstract_pairs/qac/chemistry_google_patents_model_comparison_generator/generator_compare_200_gpt-5.6-luna_gemini38.csv",
+      "csv_data_row_1_based_excluding_header": 1,
+      "candidate_id": null,
+      "candidate_rank": "1",
+      "publication_number": "MX-2008001188-A",
+      "source_document_id": "MX-2008001188-A_es",
+      "question_language": "es",
+      "mode": "conceptual",
+      "question": "¿Qué función se atribuye preferentemente a las amidina-amidas de naftaleno descritas en aplicaciones cosméticas?",
+      "answer": "Los compuestos son utiles para diferentes propositos, preferentemente como absorbentes de UV para aplicaciones cosmeticas.",
+      "evidence": "Los compuestos son utiles para diferentes propositos, preferentemente como absorbentes de UV para aplicaciones cosmeticas.",
+      "assertion_status": null,
+      "answer_is_translation": "false",
+      "rubric_versions": {
+        "quality": "chemistry-clir-exceptional-r2",
+        "faithfulness": "chemistry-clir-exceptional-r2"
+      },
+      "source_file": "data/chemistry/ai4chem_abstract_pairs/multilingual_corpus.csv",
+      "source_csv_data_row_1_based_excluding_header": 4013,
+      "source_context": "Se describen amidina-amidas de naftaleno de la formula (ver formula) en donde R1, R2, R3, R4, R5 y R6 independientemente entre si son hidrogeno, o C1-C37alquilo; en donde uno a 10 de las unidades de CH2 del C1-C37alquilo independientemente entre si se puede sustituir por grupos carbonilo; atomos de oxigeno, atomos de azufre, atomos de selenio; atomos de telurio; grupos cis- o trans-CH=CH-; grupos C(C-acetilenicos; radicales fenilos 1,2-, 1,3- o 1,4-sustituidos; radicales piridina 2,3-, 2,4-, 2,5-, 2,6-, 3,4- o 3,5-disustituidos, radicales tiofeno 2,3-, 2,4-, 2,5- o 3,4-disustituidos, radicales antraceno 1,2-, 1,3-, 1,4-, 1,5-, 1,6-, 1,7-, 1,8-, 2,3-, 2,6- o 2,7-disustituidos, 1,2-. 1,3-, 1,4-, 1,5-, 1,6-, 1,7-, 1,8-, 1,9-, 1,10-, 2,.3-, 2,6-, 2,7-, 2,9-, 2,10- o 9,10-disustituidos; en donde uno o mas grupos 2CH- de los grupos CN=CH-, los radicales naftaleno y los radicales antraceno pueden estar sustituidos por atomos de nitrogeno; hasta 12 atomos de hidrogeno individuales de los grupos CH2 independientemente entre si se pueden sustituir en los mismos atomos de carbono por fluoro; cloro, bromo; o yodo; el grupo ciano, una cadena de alquilo lineal con hasta 18 atomos de carbono; grupos cis- o trans-CH=CH-; grupos C(C-acetilenicos, radicales fenilo 1,2-, 1,3- o 1,4-sustituido; radicales piridina 2,3-, 2,4-, 2,5-, 2,6-, 3,4- o 3,5-disustituidos, radicales tiofeno 2,3-, 2,4-, 2,5- o 3,4-disustituidos, radicales naftaleno 1,2-. 1,3-, 1,4-, 1,5-, 1,6-, 1,7-, 1,8-, 2,.3-, 2,6-, 2,7-disustituidos; radicales antraceno 1,2-. 1,3-, 1,4-, 1,5-, 1,6-, 1,7-, 1,8-, 1,9-, 1,10-, 2,.3-, 2,6-, 2,7-, 2,9-, 2,10- o 9,10-disustituidos; en donde hasta 6 unidades CH2- en la cadena de alquilo independientemente entre si se pueden sustituir por grupos carbonilo, atomos de oxigeno, atomos de azufre, atomos de selenio, atomos de telurio y hasta 12 atomos de hidrogeno individuales de los grupos CH2- de los radicales alquilo cada uno independientemente entre si tambien se puede sustituir en los mismos atomos de carbono por fluor, cloro, bromo o yodo o grupos ciano o cadenas de alquilo lineales con hasta 18 atomos de carbono, en donde de uno a 6 unidades de CH2- independientemente entre si se pueden sustituir por grupos carbonilo, atomos de oxigeno, atomos de azufre, atomos de selenio, atomos de telurio, grupos cis- o trans-CH=CH-, en donde una unidad CH- tambien se puede sustituir por un atomo de nitrogeno, por grupos C(C-acetilenicos, radicales fenilos 1,2-, 1,3- o 1,4-sustituidos; radicales piridina 2,3-, 2,4-, 2,5-, 2,6-, 3,4- o 3,5-disustituidos, radicales tiofeno 2,3-, 2,4-, 2,5- o 3,4-disustituidos, radicales naftaleno 1,2-. 1,3-, 1,4-, 1,5-, 1,6-, 1,7-, 1,8-, 2,.3-, 2,6-, 2,7-disustituidos, en donde de uno de dos atomos de carbono se pueden sustituir por atomos de nitrogeno, por radicales antraceno 1,2-. 1,3-, 1,4-, 1,5-, 1,6-, 1,7-, 1,8-, 1,9-, 1,10-, 2,.3-, 2,6-, 2,7-, 2,9-, 2,10- o 9,10-disustituidos, en donde uno o dos atomos de carbono se pueden sustituir por atomos de nitrogeno; o en lugar de sustituyentes, las valencias libres de los atomos de carbono cuaternarios o de metino- se pueden enlazar en pares formando anillos tipo anillos de ciclohexano, o son un radical amino, si R1 y R2 conjuntamente con los atomos de carbono C1 y C2 o R3 y R4 conjuntamente con los atomos de carbono C3 y C4 forman un radical de 6 miembro, R7 y R8, independientemente entre si son =O; o =NH-, si =NH- junto con el atomo de nitrogeno N1 (para R6) o junto con el atomo de nitrogeno N2 ( para R7) forman un radical de cinco miembros. Los compuestos son utiles para diferentes propositos, preferentemente como absorbentes de UV para aplicaciones cosmeticas.",
+      "source_excerpts_for_guideline": [
+        "Se describen amidina-amidas de naftaleno de la formula (ver formula)",
+        "Los compuestos son utiles para diferentes propositos, preferentemente como absorbentes de UV para aplicaciones cosmeticas."
+      ],
+      "source_context_sha256": "9e547891e1fc8a99f8bbb82e5eff847363051b9005c7e3304f130cb808d9fd67",
+      "all_displayed_source_excerpts_verified_exact": true,
+      "recommended_scores_status": "Author recommendations for annotator calibration; not human gold labels and not adopted from automated grades.",
+      "guidance_translation": {
+        "language": "en",
+        "status": "Author translation for guidance only; not original dataset content or evidence. Score the Spanish original.",
+        "question": "What role is preferably attributed to the described naphthalene amidine-amides in cosmetic applications?",
+        "answer": "The compounds are useful for various purposes, preferably as UV absorbers for cosmetic applications."
+      },
+      "teaching_scores": {
+        "linguistic_quality": 4
+      },
+      "numerical_fidelity_applicability": "not_applicable",
+      "teaching_scores_rubric": "unified_annotation_v1",
+      "guideline_criterion": 8,
+      "displayed_in_guideline": true,
+      "displayed_question": "¿Qué función se atribuye preferentemente a las amidina-amidas de naftaleno descritas en aplicaciones cosméticas?",
+      "displayed_answer": null,
+      "displayed_guidance_translation": {
+        "question": "What role is preferably attributed to the described naphthalene amidine-amides in cosmetic applications?",
+        "answer": null
+      },
+      "displayed_source_excerpts": []
+    },
+    {
+      "example_id": "C5",
+      "file": "data/chemistry/ai4chem_abstract_pairs/qac/chemistry_google_patents_model_comparison_generator/generator_compare_200_qwen_qwen3.8-27b_gemini38.csv",
+      "csv_data_row_1_based_excluding_header": 35,
+      "candidate_id": null,
+      "candidate_rank": "1",
+      "publication_number": "CA-2948587-A1",
+      "source_document_id": "CA-2948587-A1_en",
+      "question_language": "en",
+      "mode": "conceptual",
+      "question": "In compounds where A and A' are independently C or N, and the linker X is selected from a bond, -CO-, -CONH-, -SO2-, -SONH-, or -(CH2)m-, for what diseases are such compounds particularly indicated for treatment?",
+      "answer": "The invention also relates to pharmaceutically acceptable salts of these compounds and to pharmaceutically acceptable solvates thereof; to compositions containing such compounds; and to the uses of such compounds in the treatment of various diseases, particularly asthma and COPD.",
+      "evidence": "The invention also relates to pharmaceutically acceptable salts of these compounds and to pharmaceutically acceptable solvates thereof; to compositions containing such compounds; and to the uses of such compounds in the treatment of various diseases, particularly asthma and COPD.",
+      "assertion_status": null,
+      "answer_is_translation": "false",
+      "rubric_versions": {
+        "quality": "chemistry-clir-exceptional-r2",
+        "faithfulness": "chemistry-clir-exceptional-r2"
+      },
+      "source_file": "data/chemistry/ai4chem_abstract_pairs/multilingual_corpus.csv",
+      "source_csv_data_row_1_based_excluding_header": 107,
+      "source_context": "A compound having the structure: A compound having the structure (I) or a pharmaceutically acceptable salt thereof, or a pharmaceutically acceptable solvate of said compound or pharmaceutically acceptable salt, wherein A and A' are independently C or N, where C may be unsubstituted or substituted by halo or C1-C6 alkyl; R and R0 are independently selected from the group consisting of H, C1-C6 alkyl, hydroxy(C1-C6 alkyl), phenyl(C1-C6 alkyl), and -(CH2)n-W, where W is C3-C8 cycloalkyl, phenyl, naphthyl, 5- or 6-membered heteroaryl or heterocyclic containing 1 -3 N, S and/or 0 atoms, -SO2-R', -NHSO2-R', -NR\"SO2-R' and SR', where R' and R\" are independently C1-C6 alkyl or C3-C8 cycloalkyl, etc.; wherein each of said alkyl, cycloalkyl, heterocyclic, phenyl, naphthyl or heteroaryl may be unsubstituted or substituted by phenyl, heteroaryl, etc.; or, R and R0 and the N atom to which they are bonded together form a monocyclic or bicyclic heterocyclic ring which may be unsubstituted or substituted by (a) halo, hydroxy, heteroaryl, C1-C6 alkyl, C1-C6 alkoxy, etc., or (b) -(CH2)n-W, where W is C3-C8cycloalkyl, phenyl, etc.; R1 is H, halo or cyano; R2 and R2' are independently H, C1-C6 alkyl, cyano, C1-C6 alkoxy, C1-C6 alkylthio, or C3-C8 cycloalkyl where alkyl, alkoxy, or cycloalkyl is optionally substituted by one or more fluorine atoms; X is a bond, -CO-, -CONH-, -S02-, -SONH-, or -(CH2)m-; R3 is H, C1-C4 alkyl, phenyl, naphthyl, 5- or 6-membered heteroaryl or heterocyclic containing 1 -3 N atoms, a 5-membered heteroaryl or heterocyclic, etc., or (c) 2 O or S atoms and 0-2 N atoms; wherein each of said phenyl, naphthyl, heteroaryl or heterocyclic is optionally substituted by alkyl, 1 substituent -Y-R4 and/or 1 -4 substituents each independently selected from R5; with the proviso that when X is -CO- or -SO2-, R3 is not H; Y is a bond, -(CH2)m- or -O-; R4 is (a) H, C1-C6 alkyl, C3-C8 cycloalkl, halo, oxo, -OR6, -NR7R8, -SR6, -SOR9, -SO2R9, -COR6, -OCOR6, -COOR6, -NR6COR6, -CONR7R8, etc.; (b) phenyl or naphthyl, said phenyl and naphthyl being optionally substituted with 1 -5 substituents selected from C1-C6 alkyl, C3-C8 cycloalkyl, halo, cyano, -OR6, -NR7R8, etc.; or (c) a 3 to 8-membered saturated or partially unsaturated monocyclic heteroaryl, etc.; R6 is H, C1-C6 alkyl or C3-C8 cycloalkyl, etc.; R7 and R8 are each independently H, C1-C6 alkyl or C3-C8 cycloalkyl or are taken together with the nitrogen atom to which they are attached to form a 4-, 5- or 6-membered saturated heterocyclic ring containing 1 -2 nitrogen atoms or 1 nitrogen and 1 oxygen atom, said C1-C6 alkyl is optionally substituted by C3-C8 cycloalkyl, ha lo, etc., and said heterocyclic ring being optionally substituted by one or more C1-C6 alkyl or C3-C8 cycloalkyli groups; R9 is C1-C6 alkyl or C3-C8 cycloalkyl; and, m and n are independently 0, 1, 2 or 3. The invention also relates to pharmaceutically acceptable salts of these compounds and to pharmaceutically acceptable solvates thereof; to compositions containing such compounds; and to the uses of such compounds in the treatment of various diseases, particularly asthma and COPD.",
+      "source_excerpts_for_guideline": [
+        "The invention also relates to pharmaceutically acceptable salts of these compounds and to pharmaceutically acceptable solvates thereof; to compositions containing such compounds; and to the uses of such compounds in the treatment of various diseases, particularly asthma and COPD.",
+        "to the uses of such compounds in the treatment of various diseases, particularly asthma and COPD."
+      ],
+      "source_context_sha256": "3c177ee61bf9c7ec7388ec5beb8c82aa28bcd4e132298c4b5779e74fe554c583",
+      "all_displayed_source_excerpts_verified_exact": true,
+      "recommended_scores_status": "Author recommendations for annotator calibration; not human gold labels and not adopted from automated grades.",
+      "guideline_criterion_number": 2,
+      "suggested_score": 3,
+      "guideline_criterion": 2,
+      "displayed_in_guideline": true,
+      "displayed_question": "In compounds where A and A' are independently C or N, and the linker X is selected from a bond, -CO-, -CONH-, -SO2-, -SONH-, or -(CH2)m-, for what diseases are such compounds particularly indicated for treatment?",
+      "displayed_answer": "The invention also relates to pharmaceutically acceptable salts of these compounds and to pharmaceutically acceptable solvates thereof; to compositions containing such compounds; and to the uses of such compounds in the treatment of various diseases, particularly asthma and COPD.",
+      "teaching_scores": {
+        "precision": 3
+      },
+      "displayed_source_excerpts": [
+        "The invention also relates to pharmaceutically acceptable salts of these compounds and to pharmaceutically acceptable solvates thereof; to compositions containing such compounds; and to the uses of such compounds in the treatment of various diseases, particularly asthma and COPD.",
+        "to the uses of such compounds in the treatment of various diseases, particularly asthma and COPD."
+      ],
+      "teaching_scores_rubric": "unified_annotation_v1"
+    },
+    {
+      "example_id": "C6",
+      "file": "data/chemistry/ai4chem_abstract_pairs/qac/chemistry_google_patents_model_comparison_generator/generator_compare_200_qwen_qwen3.8-27b_gemini38.csv",
+      "csv_data_row_1_based_excluding_header": 19,
+      "candidate_id": null,
+      "candidate_rank": "1",
+      "publication_number": "CN-102143961-A",
+      "source_document_id": "CN-102143961-A_en",
+      "question_language": "en",
+      "mode": "conceptual",
+      "question": "What selectivity is reported for formula (I) benzoxazines and benzothiazines with respect to nitric oxide synthase isoforms?",
+      "answer": "Said benzoxazines and benzothiazines of formula (I) inhibit nitric oxide synthase (NOS), particularly selectively inhibit neuronal nitric oxide synthase (nNOS) in preference to other NOS isoforms.",
+      "evidence": "Said benzoxazines and benzothiazines of formula (I) inhibit nitric oxide synthase (NOS), particularly selectively inhibit neuronal nitric oxide synthase (nNOS) in preference to other NOS isoforms.",
+      "assertion_status": null,
+      "answer_is_translation": "false",
+      "rubric_versions": {
+        "quality": "chemistry-clir-exceptional-r2",
+        "faithfulness": "chemistry-clir-exceptional-r2"
+      },
+      "source_file": "data/chemistry/ai4chem_abstract_pairs/multilingual_corpus.csv",
+      "source_csv_data_row_1_based_excluding_header": 435,
+      "source_context": "Disclosed are benzoxazines and benzothiazines of formula (I) wherein Q is O-(CHR6)1-3 or S-(CHR6)1-3; R1 and each R6 is H, optionally substituted [C1-6 alkyl, C1-4alkaryl, C1-4 alkheterocyclyl, C2-9 heterocyclyl, C3-8 cycloalkyl, C1-4 alkcycloalkyl] or - (CR1AR1B)nNR1cR1D wherein R1A, R1B, R1C, R1D are independently hydrogen, optionally substituted [C1-6 alkyl, C1-4alkaryl, C1-4 alkheterocyclyl, C2-9 heterocyclyl, C3-8 cycloalkyl, etc.] or wherein R1A and R1B combine to form =O, or wherein R1C and R1D combine to form an optionally substituted C2-9 heterocyclyl, and n is an integer between 1-6; each of R2 and R3 is H, hal, optionally substituted [C1-6 alkyl, C6-10aryl, C1-6alkaiyl, C2-9 heterocyclyl, C1-6 alkoxy, C1-6 thioalkoxy, (CH2)r2NHC(NH)R2A, CH2)r2NHC(S)NHR2A, C1-4 alkheterocyclyl] or hydroxy, wherein r2 is an integer from 0 to 2, R2A is optionally substituted [C1-6 alkyl, C6-10aryl, C^alkaryl, C2-9 heterocyclyl, C1-4 alkheterocyclyl,C1-6 thioalkoxy, C1-4 thioalkaryl, aryloyl, C1- 4thioalkheterocylyl, or amino]; each R4 and R5 is H, hal, (CH2)r2NHC(NH)R2A or CH2)r2NHC(S)NH R2A; Y1 and Y2 are together =O or Y1 and Y2 are independently H, optionally substituted [C1-6 alkyl, C6-10aryl, C1-6alkaryl, C2-9 heterocyclyl, C1-6 alkoxy, C1-6 thioalkoxy, C1-4alkheterocyclyl] or hydroxy; wherein only one of R2, R3, R4 and R5 is (CH2)r2NHC(NH)R2A or CH2)r2NHC(S)NH R2A; or a pharmaceutically acceptable salt or prodrug thereof. Said benzoxazines and benzothiazines of formula (I) inhibit nitric oxide synthase (NOS), particularly selectively inhibit neuronal nitric oxide synthase (nNOS) in preference to other NOS isoforms. The NOS inhibitors of formula (I), alone or in combinatioon with other pharmaceutically active agents, can be used for treating or preventing various medical conditions.",
+      "source_excerpts_for_guideline": [
+        "Said benzoxazines and benzothiazines of formula (I) inhibit nitric oxide synthase (NOS), particularly selectively inhibit neuronal nitric oxide synthase (nNOS) in preference to other NOS isoforms."
+      ],
+      "source_context_sha256": "306cd52e1ed606e6c1b793ee5332deeefa05be7611fe799b55dc0bb952305cf3",
+      "all_displayed_source_excerpts_verified_exact": true,
+      "recommended_scores_status": "Author recommendations for annotator calibration; not human gold labels and not adopted from automated grades.",
+      "guideline_criterion_number": 4,
+      "suggested_score": 4,
+      "guideline_criterion": 4,
+      "displayed_in_guideline": true,
+      "displayed_question": "What selectivity is reported for formula (I) benzoxazines and benzothiazines with respect to nitric oxide synthase isoforms?",
+      "displayed_answer": null,
+      "teaching_scores": {
+        "search_realism": 4
+      },
+      "displayed_source_excerpts": [],
+      "teaching_scores_rubric": "unified_annotation_v1"
+    },
+    {
+      "example_id": "C7",
+      "file": "data/chemistry/ai4chem_abstract_pairs/qac/chemistry_google_patents_model_comparison_generator/generator_compare_200_qwen_qwen3.8-27b_gemini38.csv",
+      "csv_data_row_1_based_excluding_header": 117,
+      "candidate_id": null,
+      "candidate_rank": "1",
+      "publication_number": "EP-4689569-A1",
+      "source_document_id": "EP-4689569-A1_en",
+      "question_language": "en",
+      "mode": "assertion_verification",
+      "question": "In a Coriolis flow-measuring device with a calibrating system carrying a calibrating medium, is the calibrating line combined with the measuring line?",
+      "answer": "the calibrating system (20) has, separate from the measuring line (11), a calibrating line (21) for carrying a calibrating medium",
+      "evidence": "the calibrating system (20) has, separate from the measuring line (11), a calibrating line (21) for carrying a calibrating medium",
+      "assertion_status": "contradicted",
+      "answer_is_translation": "false",
+      "rubric_versions": {
+        "quality": "chemistry-clir-exceptional-r2",
+        "faithfulness": "chemistry-clir-exceptional-r2"
+      },
+      "source_file": "data/chemistry/ai4chem_abstract_pairs/multilingual_corpus.csv",
+      "source_csv_data_row_1_based_excluding_header": 3484,
+      "source_context": "The invention relates to a Coriolis flow-measuring device (1) for determining a mass flow, a medium density and/or a medium viscosity of a fluid measuring medium, in particular a liquid, in a process line, comprising: - a measuring system (10), wherein the measuring system (10) has a measuring line (11) for carrying the measuring medium, wherein the measuring system (10) has at least one measuring tube (12); - a calibrating system (20), wherein the calibrating system (20) has, separate from the measuring line (11), a calibrating line (21) for carrying a calibrating medium, wherein the calibrating system (20) comprises at least one calibrating tube (22); - a (combination) exciter system (30) for exciting mechanical oscillations both of the measuring system and of the calibrating system; - a (combination) sensor system (40) for detecting mechanical oscillations both of the measuring system and of the calibrating system, wherein the exciter system (30) and the sensor system (40) are each connected, in particular re-releasably, to the measuring system (10) and to the calibrating system (20), in particular the exciter system (30) and the sensor system (40) are each connected, preferably re-releasably, to the measuring system (10) and to the calibrating system (20); - and also measuring and calibrating electronics (50), wherein the measuring and calibrating electronics (50) are electrically connected both to the exciter system (30) and to the sensor system (40) and are set up to make both the measuring tube (12) and the calibrating tube (22) perform oscillations by means of the exciter system (30) and to determine oscillations of the measuring tube (12) and the calibrating tube (22) by means of the sensor system (40), wherein the measuring and calibrating electronics (50) are set up to determine at least one calibrating variable of an overall system formed by the measuring system (10) and the calibrating system (20) on the basis of oscillations, determined by means of the sensor system (40), both of the measuring system (10) and of the calibrating system (20) carrying the calibrating medium and wherein the measuring and calibrating electronics (50) are set up to determine the mass flow, the medium density and/or the medium viscosity of the measuring medium carried in the measuring system (10), in dependence on the at least one calibrating variable and/or a variable derived from it.",
+      "source_excerpts_for_guideline": [
+        "the calibrating system (20) has, separate from the measuring line (11), a calibrating line (21) for carrying a calibrating medium"
+      ],
+      "source_context_sha256": "bea6f8a58ba8e15ba3d55dd3e487e4941b78c94357017048e07eac608e3f4047",
+      "all_displayed_source_excerpts_verified_exact": true,
+      "recommended_scores_status": "Author recommendations for annotator calibration; not human gold labels and not adopted from automated grades.",
+      "guideline_criterion_number": 6,
+      "suggested_score": 4,
+      "guideline_criterion": 6,
+      "displayed_in_guideline": true,
+      "displayed_question": "In a Coriolis flow-measuring device with a calibrating system carrying a calibrating medium, is the calibrating line combined with the measuring line?",
+      "displayed_answer": "the calibrating system (20) has, separate from the measuring line (11), a calibrating line (21) for carrying a calibrating medium",
+      "teaching_scores": {
+        "information_value": 4
+      },
+      "displayed_source_excerpts": [
+        "the calibrating system (20) has, separate from the measuring line (11), a calibrating line (21) for carrying a calibrating medium"
+      ],
+      "teaching_scores_rubric": "unified_annotation_v1"
+    },
+    {
+      "example_id": "C8",
+      "file": "data/chemistry/ai4chem_abstract_pairs/qac/chemistry_google_patents_model_comparison_generator/generator_compare_200_qwen_qwen3.8-27b_gemini38.csv",
+      "csv_data_row_1_based_excluding_header": 132,
+      "candidate_id": null,
+      "candidate_rank": "1",
+      "publication_number": "ES-1255279-U",
+      "source_document_id": "ES-1255279-U_en",
+      "question_language": "en",
+      "mode": "assertion_verification",
+      "question": "Can a cheese and black garlic food product include a chocolate coating?",
+      "answer": "Food product, according to claim 1, characterized by having a chocolate coating.",
+      "evidence": "Food product, according to claim 1, characterized by having a chocolate coating.",
+      "assertion_status": "supported",
+      "answer_is_translation": "false",
+      "rubric_versions": {
+        "quality": "chemistry-clir-exceptional-r2",
+        "faithfulness": "chemistry-clir-exceptional-r2"
+      },
+      "source_file": "data/chemistry/ai4chem_abstract_pairs/multilingual_corpus.csv",
+      "source_csv_data_row_1_based_excluding_header": 3594,
+      "source_context": "Food product characterized by being composed of a mixture of cheese and black garlic. 2 Food product, according to claim 1, characterized by having a chocolate coating. 3. Food product according to claim 1, characterized in that the cheese is made from sheep, goat or cow. 4. Food product according to claim 3 characterized in that the cheese used is tender. 5. Food product according to claim 3, characterized in that the cheese used is semi-cured. 6 Food product according to claim 3 characterized in that the cheese used is cured. 7. Food product according to claim 2, characterized in that the coating can be dark chocolate with a percentage of cocoa purity of between 50 and 100%. 8. Food product according to claim 2, characterized in that the coating can be milk chocolate with a cocoa purity percentage of between 30 and 100%. 9. Food product according to claim 2, characterized in that the coating can be white chocolate with a percentage of purity of cocoa butter between 30 and 100%. 10. Food product according to claim 1, characterized in that black garlic with a proportion of black garlic from 0.0001 to 50% of the mass and/or volume of the rest of the filling mixture is used on the filling material. (crushed, crushed, rolled, chopped, or even brought to a liquid or near liquid state) directly and/or dissolved and/or mixed in water or in any other substance. 11. Food product according to claim 1, characterized in that the black garlic acts by dissolving and/or suspending and/or grinding and/or mixing. and/or by injecting and/or inoculating black garlic into the filling material. 12 Food product according to the preceding claims, where the foods that can be mixed with cheese and black garlic are infusions, nuts, fruits, both fresh and dried, semi-processed, processed or cooked, in solid, viscous, pasty and/or brought to a liquid or almost liquid state. 13. Food product according to the preceding claims, where the beverages that can be mixed with the cheese and black garlic are water (pure or not), wines, beers, ciders, cavas, soft drinks or other beverages, even alcoholic such as brandy, cognac, whiskey, gin, rum, anise, vodka and others. 14. Food product according to the preceding claims, where other products used in gastronomy that can be mixed with cheese and black garlic are olive oils, virgin or extra virgin olive oils, sunflower oils, soybean oils, vinegar, salts, sugars, seasonings. 15. Food product according to the preceding claims, where elements and/or compounds and/or chemicals for preservation or of interest that can be mixed with cheese and black garlic are any of those commonly used in the food industry. Agri-food, gastronomic or cooking such as preservatives, additives. 16. Food product according to any of the preceding claims, characterized in that the previous mixtures, before and/or after making the black garlic act, will be subjected to a cooking process at a temperature of 1ºC or more up to 500ºC and for a time 0.1 s or more up to 240 h. 17. Food product according to any of claims 1 to 12, characterized in that the previous mixtures, before and/or after making the black garlic act, will be subjected to a cooling or freezing process at a temperature of 0ºC or less until - 500ºC and for a time of 0.1 s or more up to 240 h. 18. Food product according to claim 1 characterized in that it contains, part of a sheep, goat or cow cheese, as the main ingredient, in a percentage between 0.0001% and 90%, to which black garlic is added, in a percentage between 0.0001 to 50%. The following ingredients are added to the resulting product: cream, lactic ferments, rennet, hardener: calcium chloride, preservative egg lysozyme, common salt, flux salt E-452, E330, anti-caking milk protein E-341ii, E-341iii, stabilizers E-406, E-407, E-410, E-417, pea starch, aroma, pH corrector E-339, fiber, salt, preservative E-202, acidulant E-330, black garlic. (Machine-translation by Google Translate, not legally binding)",
+      "source_excerpts_for_guideline": [
+        "Food product, according to claim 1, characterized by having a chocolate coating.",
+        "Food product characterized by being composed of a mixture of cheese and black garlic."
+      ],
+      "source_context_sha256": "c504908e5293c2cffc774bea536e84766330855e684bfa995f494b381672e1aa",
+      "all_displayed_source_excerpts_verified_exact": true,
+      "recommended_scores_status": "Author recommendations for annotator calibration; not human gold labels and not adopted from automated grades.",
+      "guideline_criterion_number": 7,
+      "suggested_score": 4,
+      "guideline_criterion": 7,
+      "displayed_in_guideline": true,
+      "displayed_question": "Can a cheese and black garlic food product include a chocolate coating?",
+      "displayed_answer": null,
+      "teaching_scores": {
+        "focus_and_formulation": 4
+      },
+      "displayed_source_excerpts": [],
+      "teaching_scores_rubric": "unified_annotation_v1"
+    }
+  ]
+}

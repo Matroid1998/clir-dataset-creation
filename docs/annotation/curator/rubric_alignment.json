@@ -1,0 +1,900 @@
+{
+  "checked_date": "2026-11-02",
+  "scope": "Private crosswalk from current active verifier criteria to one public eight-criterion rubric. No question-type names, categories, eligibility checks or selection instructions are shown to annotators.",
+  "scale": "Integer scores 1–5; inapplicable numerical fidelity remains 4 with a separate not-applicable notation. Human notes omit machine-only formatting requirements.",
+  "mappings": [
+    {
+      "domain": "chemistry",
+      "question_type": "lookup",
+      "faithfulness_criteria": [
+        "grounding",
+        "precision",
+        "numerical_fidelity"
+      ],
+      "quality_criteria": [
+        "technical_search_realism",
+        "standalone_anchoring",
+        "information_value",
+        "focus_and_economy",
+        "linguistic_quality"
+      ],
+      "faithfulness_prompt": "src/clir_bench/domains/chemistry/qac/prompts/verifiers/faithfulness_batch.txt",
+      "faithfulness_sha256": "c8f03aada31f5c347be8f2832ff333466d279a5e9b182a27b2138cf5b7592694",
+      "quality_prompt": "src/clir_bench/domains/chemistry/qac/prompts/verifiers/lookup_batch.txt",
+      "quality_sha256": "cf53a4aa8ec85e6a142a5037c37b7deaab2db141c9bd3bc99c77190039b45ad0",
+      "quality_crosswalk": {
+        "technical_search_realism": "search_realism",
+        "standalone_anchoring": "standalone_clarity",
+        "information_value": "information_value",
+        "focus_and_economy": "focus_and_formulation",
+        "linguistic_quality": "linguistic_quality"
+      },
+      "unified_quality_criteria": [
+        "search_realism",
+        "standalone_clarity",
+        "information_value",
+        "focus_and_formulation",
+        "linguistic_quality"
+      ],
+      "unified_faithfulness_criteria": [
+        "grounding",
+        "precision",
+        "numerical_fidelity"
+      ],
+      "unified_criteria_without_separate_original_quality_score": [],
+      "merged_original_quality_fields": {},
+      "mapping_note": "Common family labels preserve the main quality dimensions; original type eligibility is not assessed by annotators."
+    },
+    {
+      "domain": "chemistry",
+      "question_type": "process_retrieval",
+      "faithfulness_criteria": [
+        "grounding",
+        "precision",
+        "numerical_fidelity"
+      ],
+      "quality_criteria": [
+        "process_search_realism",
+        "start_goal_anchoring",
+        "route_completeness",
+        "focus_and_economy",
+        "linguistic_quality"
+      ],
+      "faithfulness_prompt": "src/clir_bench/domains/chemistry/qac/prompts/verifiers/faithfulness_batch.txt",
+      "faithfulness_sha256": "c8f03aada31f5c347be8f2832ff333466d279a5e9b182a27b2138cf5b7592694",
+      "quality_prompt": "src/clir_bench/domains/chemistry/qac/prompts/verifiers/process_retrieval_batch.txt",
+      "quality_sha256": "9fb170b1e68b8fd865cf27b633a0878f2ae3a3c6ee772db36b704c17ebdcc12c",
+      "quality_crosswalk": {
+        "process_search_realism": "search_realism",
+        "start_goal_anchoring": "standalone_clarity",
+        "route_completeness": "information_value",
+        "focus_and_economy": "focus_and_formulation",
+        "linguistic_quality": "linguistic_quality"
+      },
+      "unified_quality_criteria": [
+        "search_realism",
+        "standalone_clarity",
+        "information_value",
+        "focus_and_formulation",
+        "linguistic_quality"
+      ],
+      "unified_faithfulness_criteria": [
+        "grounding",
+        "precision",
+        "numerical_fidelity"
+      ],
+      "unified_criteria_without_separate_original_quality_score": [],
+      "merged_original_quality_fields": {},
+      "mapping_note": "Common family labels preserve the main quality dimensions; original type eligibility is not assessed by annotators."
+    },
+    {
+      "domain": "chemistry",
+      "question_type": "conceptual",
+      "faithfulness_criteria": [
+        "grounding",
+        "precision",
+        "numerical_fidelity"
+      ],
+      "quality_criteria": [
+        "relationship_search_realism",
+        "subject_anchoring",
+        "explicit_relationship",
+        "focus_and_economy",
+        "linguistic_quality"
+      ],
+      "faithfulness_prompt": "src/clir_bench/domains/chemistry/qac/prompts/verifiers/faithfulness_batch.txt",
+      "faithfulness_sha256": "c8f03aada31f5c347be8f2832ff333466d279a5e9b182a27b2138cf5b7592694",
+      "quality_prompt": "src/clir_bench/domains/chemistry/qac/prompts/verifiers/conceptual_batch.txt",
+      "quality_sha256": "600b511d1b25eece73bfa3dbe12e1b026b7077de0c7ba076c922f51c14366da1",
+      "quality_crosswalk": {
+        "relationship_search_realism": "search_realism",
+        "subject_anchoring": "standalone_clarity",
+        "explicit_relationship": "information_value",
+        "focus_and_economy": "focus_and_formulation",
+        "linguistic_quality": "linguistic_quality"
+      },
+      "unified_quality_criteria": [
+        "search_realism",
+        "standalone_clarity",
+        "information_value",
+        "focus_and_formulation",
+        "linguistic_quality"
+      ],
+      "unified_faithfulness_criteria": [
+        "grounding",
+        "precision",
+        "numerical_fidelity"
+      ],
+      "unified_criteria_without_separate_original_quality_score": [],
+      "merged_original_quality_fields": {},
+      "mapping_note": "Common family labels preserve the main quality dimensions; original type eligibility is not assessed by annotators."
+    },
+    {
+      "domain": "chemistry",
+      "question_type": "constraint_search",
+      "faithfulness_criteria": [
+        "grounding",
+        "precision",
+        "numerical_fidelity"
+      ],
+      "quality_criteria": [
+        "requirement_search_realism",
+        "task_and_constraint_anchoring",
+        "candidate_fit",
+        "focus_and_economy",
+        "linguistic_quality"
+      ],
+      "faithfulness_prompt": "src/clir_bench/domains/chemistry/qac/prompts/verifiers/faithfulness_batch.txt",
+      "faithfulness_sha256": "c8f03aada31f5c347be8f2832ff333466d279a5e9b182a27b2138cf5b7592694",
+      "quality_prompt": "src/clir_bench/domains/chemistry/qac/prompts/verifiers/constraint_search_batch.txt",
+      "quality_sha256": "aa008f74dcc5eee4f7b8610b2c5064832ecdd92fd07c1b99f945713a5fbd1599",
+      "quality_crosswalk": {
+        "requirement_search_realism": "search_realism",
+        "task_and_constraint_anchoring": "standalone_clarity",
+        "candidate_fit": "information_value",
+        "focus_and_economy": "focus_and_formulation",
+        "linguistic_quality": "linguistic_quality"
+      },
+      "unified_quality_criteria": [
+        "search_realism",
+        "standalone_clarity",
+        "information_value",
+        "focus_and_formulation",
+        "linguistic_quality"
+      ],
+      "unified_faithfulness_criteria": [
+        "grounding",
+        "precision",
+        "numerical_fidelity"
+      ],
+      "unified_criteria_without_separate_original_quality_score": [],
+      "merged_original_quality_fields": {},
+      "mapping_note": "Common family labels preserve the main quality dimensions; original type eligibility is not assessed by annotators."
+    },
+    {
+      "domain": "chemistry",
+      "question_type": "comparison",
+      "faithfulness_criteria": [
+        "grounding",
+        "precision",
+        "numerical_fidelity"
+      ],
+      "quality_criteria": [
+        "comparative_search_realism",
+        "two_sided_anchoring",
+        "common_dimension_value",
+        "focus_and_economy",
+        "linguistic_quality"
+      ],
+      "faithfulness_prompt": "src/clir_bench/domains/chemistry/qac/prompts/verifiers/faithfulness_batch.txt",
+      "faithfulness_sha256": "c8f03aada31f5c347be8f2832ff333466d279a5e9b182a27b2138cf5b7592694",
+      "quality_prompt": "src/clir_bench/domains/chemistry/qac/prompts/verifiers/comparison_batch.txt",
+      "quality_sha256": "e7cededcf4d749f53b8331124b15a61a64b6f43489498dfafe230b52b49c5de9",
+      "quality_crosswalk": {
+        "comparative_search_realism": "search_realism",
+        "two_sided_anchoring": "standalone_clarity",
+        "common_dimension_value": "information_value",
+        "focus_and_economy": "focus_and_formulation",
+        "linguistic_quality": "linguistic_quality"
+      },
+      "unified_quality_criteria": [
+        "search_realism",
+        "standalone_clarity",
+        "information_value",
+        "focus_and_formulation",
+        "linguistic_quality"
+      ],
+      "unified_faithfulness_criteria": [
+        "grounding",
+        "precision",
+        "numerical_fidelity"
+      ],
+      "unified_criteria_without_separate_original_quality_score": [],
+      "merged_original_quality_fields": {},
+      "mapping_note": "Common family labels preserve the main quality dimensions; original type eligibility is not assessed by annotators."
+    },
+    {
+      "domain": "chemistry",
+      "question_type": "assertion_verification",
+      "faithfulness_criteria": [
+        "grounding",
+        "precision",
+        "numerical_fidelity"
+      ],
+      "quality_criteria": [
+        "checking_search_realism",
+        "assertion_scope",
+        "verdict_decisiveness",
+        "focus_and_economy",
+        "linguistic_quality"
+      ],
+      "faithfulness_prompt": "src/clir_bench/domains/chemistry/qac/prompts/verifiers/faithfulness_batch.txt",
+      "faithfulness_sha256": "c8f03aada31f5c347be8f2832ff333466d279a5e9b182a27b2138cf5b7592694",
+      "quality_prompt": "src/clir_bench/domains/chemistry/qac/prompts/verifiers/assertion_verification_batch.txt",
+      "quality_sha256": "e37683108f5089f87d84d181992621978c296265a97e55022837b1dd8bb323de",
+      "quality_crosswalk": {
+        "checking_search_realism": "search_realism",
+        "assertion_scope": "standalone_clarity",
+        "verdict_decisiveness": "information_value",
+        "focus_and_economy": "focus_and_formulation",
+        "linguistic_quality": "linguistic_quality"
+      },
+      "unified_quality_criteria": [
+        "search_realism",
+        "standalone_clarity",
+        "information_value",
+        "focus_and_formulation",
+        "linguistic_quality"
+      ],
+      "unified_faithfulness_criteria": [
+        "grounding",
+        "precision",
+        "numerical_fidelity"
+      ],
+      "unified_criteria_without_separate_original_quality_score": [],
+      "merged_original_quality_fields": {},
+      "mapping_note": "Common family labels preserve the main quality dimensions; original type eligibility is not assessed by annotators."
+    },
+    {
+      "domain": "chemistry",
+      "question_type": "source_finding",
+      "faithfulness_criteria": [
+        "grounding",
+        "precision",
+        "numerical_fidelity"
+      ],
+      "quality_criteria": [
+        "disclosure_search_realism",
+        "technical_clue_anchoring",
+        "clue_identity_fit",
+        "focus_and_economy",
+        "linguistic_quality"
+      ],
+      "faithfulness_prompt": "src/clir_bench/domains/chemistry/qac/prompts/verifiers/faithfulness_batch.txt",
+      "faithfulness_sha256": "c8f03aada31f5c347be8f2832ff333466d279a5e9b182a27b2138cf5b7592694",
+      "quality_prompt": "src/clir_bench/domains/chemistry/qac/prompts/verifiers/source_finding_batch.txt",
+      "quality_sha256": "03cc518f9bb5e5fbaf3e2996577194e236a8a12c4f900436dfaecb15778375f1",
+      "quality_crosswalk": {
+        "disclosure_search_realism": "search_realism",
+        "technical_clue_anchoring": "standalone_clarity",
+        "clue_identity_fit": "information_value",
+        "focus_and_economy": "focus_and_formulation",
+        "linguistic_quality": "linguistic_quality"
+      },
+      "unified_quality_criteria": [
+        "search_realism",
+        "standalone_clarity",
+        "information_value",
+        "focus_and_formulation",
+        "linguistic_quality"
+      ],
+      "unified_faithfulness_criteria": [
+        "grounding",
+        "precision",
+        "numerical_fidelity"
+      ],
+      "unified_criteria_without_separate_original_quality_score": [],
+      "merged_original_quality_fields": {},
+      "mapping_note": "Common family labels preserve the main quality dimensions; original type eligibility is not assessed by annotators."
+    },
+    {
+      "domain": "legal_eurlex",
+      "question_type": "lookup",
+      "faithfulness_criteria": [
+        "grounding",
+        "precision",
+        "numerical_fidelity"
+      ],
+      "quality_criteria": [
+        "practitioner_realism",
+        "anchoring",
+        "informativeness",
+        "focus",
+        "linguistic_quality"
+      ],
+      "faithfulness_prompt": "src/clir_bench/domains/legal/qac/prompts_eurlex/verifiers/faithfulness_batch.txt",
+      "faithfulness_sha256": "0bf5626844d962cd95791f1698df8e69c5133a6794f7680573d030f64362ba41",
+      "quality_prompt": "src/clir_bench/domains/legal/qac/prompts_eurlex/verifiers/lookup_batch.txt",
+      "quality_sha256": "60ff25e0d08011336fd6c938166bf86e898e8fa6c272cf336a733a6c65a6888c",
+      "quality_crosswalk": {
+        "practitioner_realism": "search_realism",
+        "anchoring": "standalone_clarity",
+        "informativeness": "information_value",
+        "focus": "focus_and_formulation",
+        "linguistic_quality": "linguistic_quality"
+      },
+      "unified_quality_criteria": [
+        "search_realism",
+        "standalone_clarity",
+        "information_value",
+        "focus_and_formulation",
+        "linguistic_quality"
+      ],
+      "unified_faithfulness_criteria": [
+        "grounding",
+        "precision",
+        "numerical_fidelity"
+      ],
+      "unified_criteria_without_separate_original_quality_score": [],
+      "merged_original_quality_fields": {},
+      "mapping_note": "Related concepts are regrouped, not renamed one-to-one. Legal focus/formulation includes both bounded purpose and faithful independent wording, even where the original template scored only one. Information value always assesses a complete, useful answer."
+    },
+    {
+      "domain": "legal_eurlex",
+      "question_type": "fact_pattern",
+      "faithfulness_criteria": [
+        "grounding",
+        "precision",
+        "numerical_fidelity"
+      ],
+      "quality_criteria": [
+        "situation",
+        "regime_fixing",
+        "terminology_and_distance",
+        "focus",
+        "linguistic_quality"
+      ],
+      "faithfulness_prompt": "src/clir_bench/domains/legal/qac/prompts_eurlex/verifiers/faithfulness_batch.txt",
+      "faithfulness_sha256": "0bf5626844d962cd95791f1698df8e69c5133a6794f7680573d030f64362ba41",
+      "quality_prompt": "src/clir_bench/domains/legal/qac/prompts_eurlex/verifiers/fact_pattern_batch.txt",
+      "quality_sha256": "4d68ee977872173aebe120e76d9bf3df1999e13006c0eaff167698c49f988447",
+      "quality_crosswalk": {
+        "situation": "search_realism",
+        "regime_fixing": "standalone_clarity",
+        "terminology_and_distance": "focus_and_formulation",
+        "focus": "focus_and_formulation",
+        "linguistic_quality": "linguistic_quality"
+      },
+      "unified_quality_criteria": [
+        "search_realism",
+        "standalone_clarity",
+        "information_value",
+        "focus_and_formulation",
+        "linguistic_quality"
+      ],
+      "unified_faithfulness_criteria": [
+        "grounding",
+        "precision",
+        "numerical_fidelity"
+      ],
+      "unified_criteria_without_separate_original_quality_score": [
+        "information_value"
+      ],
+      "merged_original_quality_fields": {
+        "focus_and_formulation": [
+          "terminology_and_distance",
+          "focus"
+        ]
+      },
+      "mapping_note": "Related concepts are regrouped, not renamed one-to-one. Legal focus/formulation includes both bounded purpose and faithful independent wording, even where the original template scored only one. Information value always assesses a complete, useful answer."
+    },
+    {
+      "domain": "legal_eurlex",
+      "question_type": "conceptual",
+      "faithfulness_criteria": [
+        "grounding",
+        "precision",
+        "numerical_fidelity"
+      ],
+      "quality_criteria": [
+        "search_realism",
+        "anchoring_and_time",
+        "consequence",
+        "lexical_distance",
+        "linguistic_quality"
+      ],
+      "faithfulness_prompt": "src/clir_bench/domains/legal/qac/prompts_eurlex/verifiers/faithfulness_batch.txt",
+      "faithfulness_sha256": "0bf5626844d962cd95791f1698df8e69c5133a6794f7680573d030f64362ba41",
+      "quality_prompt": "src/clir_bench/domains/legal/qac/prompts_eurlex/verifiers/conceptual_batch.txt",
+      "quality_sha256": "2b8ae99c205a6af76bc8db3b362c1f3b59337eed1414e34656f1cd034b945503",
+      "quality_crosswalk": {
+        "search_realism": "search_realism",
+        "anchoring_and_time": "standalone_clarity",
+        "consequence": "information_value",
+        "lexical_distance": "focus_and_formulation",
+        "linguistic_quality": "linguistic_quality"
+      },
+      "unified_quality_criteria": [
+        "search_realism",
+        "standalone_clarity",
+        "information_value",
+        "focus_and_formulation",
+        "linguistic_quality"
+      ],
+      "unified_faithfulness_criteria": [
+        "grounding",
+        "precision",
+        "numerical_fidelity"
+      ],
+      "unified_criteria_without_separate_original_quality_score": [],
+      "merged_original_quality_fields": {},
+      "mapping_note": "Related concepts are regrouped, not renamed one-to-one. Legal focus/formulation includes both bounded purpose and faithful independent wording, even where the original template scored only one. Information value always assesses a complete, useful answer."
+    },
+    {
+      "domain": "legal_eurlex",
+      "question_type": "comparison",
+      "faithfulness_criteria": [
+        "grounding",
+        "precision",
+        "numerical_fidelity"
+      ],
+      "quality_criteria": [
+        "search_realism",
+        "anchoring_and_time",
+        "consequence",
+        "lexical_distance",
+        "linguistic_quality"
+      ],
+      "faithfulness_prompt": "src/clir_bench/domains/legal/qac/prompts_eurlex/verifiers/faithfulness_batch.txt",
+      "faithfulness_sha256": "0bf5626844d962cd95791f1698df8e69c5133a6794f7680573d030f64362ba41",
+      "quality_prompt": "src/clir_bench/domains/legal/qac/prompts_eurlex/verifiers/comparison_batch.txt",
+      "quality_sha256": "b9e47833187a147ffbffd8af13227495634bd7265589619046711970896f7667",
+      "quality_crosswalk": {
+        "search_realism": "search_realism",
+        "anchoring_and_time": "standalone_clarity",
+        "consequence": "information_value",
+        "lexical_distance": "focus_and_formulation",
+        "linguistic_quality": "linguistic_quality"
+      },
+      "unified_quality_criteria": [
+        "search_realism",
+        "standalone_clarity",
+        "information_value",
+        "focus_and_formulation",
+        "linguistic_quality"
+      ],
+      "unified_faithfulness_criteria": [
+        "grounding",
+        "precision",
+        "numerical_fidelity"
+      ],
+      "unified_criteria_without_separate_original_quality_score": [],
+      "merged_original_quality_fields": {},
+      "mapping_note": "Related concepts are regrouped, not renamed one-to-one. Legal focus/formulation includes both bounded purpose and faithful independent wording, even where the original template scored only one. Information value always assesses a complete, useful answer."
+    },
+    {
+      "domain": "legal_eurlex",
+      "question_type": "claim_verification",
+      "faithfulness_criteria": [
+        "grounding",
+        "precision",
+        "numerical_fidelity"
+      ],
+      "quality_criteria": [
+        "search_realism",
+        "anchoring_and_time",
+        "consequence",
+        "lexical_distance",
+        "linguistic_quality"
+      ],
+      "faithfulness_prompt": "src/clir_bench/domains/legal/qac/prompts_eurlex/verifiers/faithfulness_batch.txt",
+      "faithfulness_sha256": "0bf5626844d962cd95791f1698df8e69c5133a6794f7680573d030f64362ba41",
+      "quality_prompt": "src/clir_bench/domains/legal/qac/prompts_eurlex/verifiers/claim_verification_batch.txt",
+      "quality_sha256": "221ab978f2434a06055e661b079c400b84f7092ca268634cfd43c7255dd52e35",
+      "quality_crosswalk": {
+        "search_realism": "search_realism",
+        "anchoring_and_time": "standalone_clarity",
+        "consequence": "information_value",
+        "lexical_distance": "focus_and_formulation",
+        "linguistic_quality": "linguistic_quality"
+      },
+      "unified_quality_criteria": [
+        "search_realism",
+        "standalone_clarity",
+        "information_value",
+        "focus_and_formulation",
+        "linguistic_quality"
+      ],
+      "unified_faithfulness_criteria": [
+        "grounding",
+        "precision",
+        "numerical_fidelity"
+      ],
+      "unified_criteria_without_separate_original_quality_score": [],
+      "merged_original_quality_fields": {},
+      "mapping_note": "Related concepts are regrouped, not renamed one-to-one. Legal focus/formulation includes both bounded purpose and faithful independent wording, even where the original template scored only one. Information value always assesses a complete, useful answer."
+    },
+    {
+      "domain": "legal_eurlex",
+      "question_type": "source_finding",
+      "faithfulness_criteria": [
+        "grounding",
+        "precision",
+        "numerical_fidelity"
+      ],
+      "quality_criteria": [
+        "search_realism",
+        "anchoring_and_time",
+        "consequence",
+        "lexical_distance",
+        "linguistic_quality"
+      ],
+      "faithfulness_prompt": "src/clir_bench/domains/legal/qac/prompts_eurlex/verifiers/faithfulness_batch.txt",
+      "faithfulness_sha256": "0bf5626844d962cd95791f1698df8e69c5133a6794f7680573d030f64362ba41",
+      "quality_prompt": "src/clir_bench/domains/legal/qac/prompts_eurlex/verifiers/source_finding_batch.txt",
+      "quality_sha256": "af61b93d2685a4ccf3b414a510770962db3282903cbdbe34d32a019841a75850",
+      "quality_crosswalk": {
+        "search_realism": "search_realism",
+        "anchoring_and_time": "standalone_clarity",
+        "consequence": "information_value",
+        "lexical_distance": "focus_and_formulation",
+        "linguistic_quality": "linguistic_quality"
+      },
+      "unified_quality_criteria": [
+        "search_realism",
+        "standalone_clarity",
+        "information_value",
+        "focus_and_formulation",
+        "linguistic_quality"
+      ],
+      "unified_faithfulness_criteria": [
+        "grounding",
+        "precision",
+        "numerical_fidelity"
+      ],
+      "unified_criteria_without_separate_original_quality_score": [],
+      "merged_original_quality_fields": {},
+      "mapping_note": "Related concepts are regrouped, not renamed one-to-one. Legal focus/formulation includes both bounded purpose and faithful independent wording, even where the original template scored only one. Information value always assesses a complete, useful answer."
+    },
+    {
+      "domain": "legal_un",
+      "question_type": "lookup",
+      "faithfulness_criteria": [
+        "grounding",
+        "precision",
+        "numerical_fidelity"
+      ],
+      "quality_criteria": [
+        "practitioner_realism",
+        "anchoring",
+        "informativeness",
+        "consequence",
+        "linguistic_quality"
+      ],
+      "faithfulness_prompt": "src/clir_bench/domains/legal/qac/prompts_un/verifiers/faithfulness_batch.txt",
+      "faithfulness_sha256": "8392f1108b224332f0512b546a3cfb538baa8c3ab41e3abc07d3e6b5118df341",
+      "quality_prompt": "src/clir_bench/domains/legal/qac/prompts_un/verifiers/lookup_batch.txt",
+      "quality_sha256": "a165626ee9a86ef039345b716dc0d197d16f470cdb9dbfdab59e5a0186640c48",
+      "quality_crosswalk": {
+        "practitioner_realism": "search_realism",
+        "anchoring": "standalone_clarity",
+        "informativeness": "information_value",
+        "consequence": "information_value",
+        "linguistic_quality": "linguistic_quality"
+      },
+      "unified_quality_criteria": [
+        "search_realism",
+        "standalone_clarity",
+        "information_value",
+        "focus_and_formulation",
+        "linguistic_quality"
+      ],
+      "unified_faithfulness_criteria": [
+        "grounding",
+        "precision",
+        "numerical_fidelity"
+      ],
+      "unified_criteria_without_separate_original_quality_score": [
+        "focus_and_formulation"
+      ],
+      "merged_original_quality_fields": {
+        "information_value": [
+          "informativeness",
+          "consequence"
+        ]
+      },
+      "mapping_note": "Related concepts are regrouped, not renamed one-to-one. Legal focus/formulation includes both bounded purpose and faithful independent wording, even where the original template scored only one. Information value always assesses a complete, useful answer."
+    },
+    {
+      "domain": "legal_un",
+      "question_type": "practitioners",
+      "faithfulness_criteria": [
+        "grounding",
+        "precision",
+        "numerical_fidelity"
+      ],
+      "quality_criteria": [
+        "practitioner_realism",
+        "anchoring_and_time",
+        "consequence",
+        "informativeness",
+        "linguistic_quality"
+      ],
+      "faithfulness_prompt": "src/clir_bench/domains/legal/qac/prompts_un/verifiers/faithfulness_batch.txt",
+      "faithfulness_sha256": "8392f1108b224332f0512b546a3cfb538baa8c3ab41e3abc07d3e6b5118df341",
+      "quality_prompt": "src/clir_bench/domains/legal/qac/prompts_un/verifiers/practitioners_batch.txt",
+      "quality_sha256": "c16e18aa8d9ef856f0273cfaa22baa37e8de46552a688a380a625c7f30d8d42b",
+      "quality_crosswalk": {
+        "practitioner_realism": "search_realism",
+        "anchoring_and_time": "standalone_clarity",
+        "consequence": "information_value",
+        "informativeness": "information_value",
+        "linguistic_quality": "linguistic_quality"
+      },
+      "unified_quality_criteria": [
+        "search_realism",
+        "standalone_clarity",
+        "information_value",
+        "focus_and_formulation",
+        "linguistic_quality"
+      ],
+      "unified_faithfulness_criteria": [
+        "grounding",
+        "precision",
+        "numerical_fidelity"
+      ],
+      "unified_criteria_without_separate_original_quality_score": [
+        "focus_and_formulation"
+      ],
+      "merged_original_quality_fields": {
+        "information_value": [
+          "consequence",
+          "informativeness"
+        ]
+      },
+      "mapping_note": "Related concepts are regrouped, not renamed one-to-one. Legal focus/formulation includes both bounded purpose and faithful independent wording, even where the original template scored only one. Information value always assesses a complete, useful answer."
+    },
+    {
+      "domain": "legal_un",
+      "question_type": "conceptual",
+      "faithfulness_criteria": [
+        "grounding",
+        "precision",
+        "numerical_fidelity"
+      ],
+      "quality_criteria": [
+        "search_realism",
+        "anchoring_and_time",
+        "consequence",
+        "lexical_distance",
+        "linguistic_quality"
+      ],
+      "faithfulness_prompt": "src/clir_bench/domains/legal/qac/prompts_un/verifiers/faithfulness_batch.txt",
+      "faithfulness_sha256": "8392f1108b224332f0512b546a3cfb538baa8c3ab41e3abc07d3e6b5118df341",
+      "quality_prompt": "src/clir_bench/domains/legal/qac/prompts_un/verifiers/conceptual_batch.txt",
+      "quality_sha256": "a954ce7bb8de49b8b83396e1e6e129972a1d3b6b90db43793f3e365804dc88cf",
+      "quality_crosswalk": {
+        "search_realism": "search_realism",
+        "anchoring_and_time": "standalone_clarity",
+        "consequence": "information_value",
+        "lexical_distance": "focus_and_formulation",
+        "linguistic_quality": "linguistic_quality"
+      },
+      "unified_quality_criteria": [
+        "search_realism",
+        "standalone_clarity",
+        "information_value",
+        "focus_and_formulation",
+        "linguistic_quality"
+      ],
+      "unified_faithfulness_criteria": [
+        "grounding",
+        "precision",
+        "numerical_fidelity"
+      ],
+      "unified_criteria_without_separate_original_quality_score": [],
+      "merged_original_quality_fields": {},
+      "mapping_note": "Related concepts are regrouped, not renamed one-to-one. Legal focus/formulation includes both bounded purpose and faithful independent wording, even where the original template scored only one. Information value always assesses a complete, useful answer."
+    },
+    {
+      "domain": "legal_un",
+      "question_type": "comparison",
+      "faithfulness_criteria": [
+        "grounding",
+        "precision",
+        "numerical_fidelity"
+      ],
+      "quality_criteria": [
+        "search_realism",
+        "anchoring_and_time",
+        "consequence",
+        "lexical_distance",
+        "linguistic_quality"
+      ],
+      "faithfulness_prompt": "src/clir_bench/domains/legal/qac/prompts_un/verifiers/faithfulness_batch.txt",
+      "faithfulness_sha256": "8392f1108b224332f0512b546a3cfb538baa8c3ab41e3abc07d3e6b5118df341",
+      "quality_prompt": "src/clir_bench/domains/legal/qac/prompts_un/verifiers/comparison_batch.txt",
+      "quality_sha256": "dd683b047226835f4dc55c390aa7164500634303518676940323a46f96176795",
+      "quality_crosswalk": {
+        "search_realism": "search_realism",
+        "anchoring_and_time": "standalone_clarity",
+        "consequence": "information_value",
+        "lexical_distance": "focus_and_formulation",
+        "linguistic_quality": "linguistic_quality"
+      },
+      "unified_quality_criteria": [
+        "search_realism",
+        "standalone_clarity",
+        "information_value",
+        "focus_and_formulation",
+        "linguistic_quality"
+      ],
+      "unified_faithfulness_criteria": [
+        "grounding",
+        "precision",
+        "numerical_fidelity"
+      ],
+      "unified_criteria_without_separate_original_quality_score": [],
+      "merged_original_quality_fields": {},
+      "mapping_note": "Related concepts are regrouped, not renamed one-to-one. Legal focus/formulation includes both bounded purpose and faithful independent wording, even where the original template scored only one. Information value always assesses a complete, useful answer."
+    },
+    {
+      "domain": "legal_un",
+      "question_type": "claim_verification",
+      "faithfulness_criteria": [
+        "grounding",
+        "precision",
+        "numerical_fidelity"
+      ],
+      "quality_criteria": [
+        "search_realism",
+        "anchoring_and_time",
+        "consequence",
+        "lexical_distance",
+        "linguistic_quality"
+      ],
+      "faithfulness_prompt": "src/clir_bench/domains/legal/qac/prompts_un/verifiers/faithfulness_batch.txt",
+      "faithfulness_sha256": "8392f1108b224332f0512b546a3cfb538baa8c3ab41e3abc07d3e6b5118df341",
+      "quality_prompt": "src/clir_bench/domains/legal/qac/prompts_un/verifiers/claim_verification_batch.txt",
+      "quality_sha256": "155157bcd6771764d8ec055093f5828fabbd25fb011c6b2d55fd63605e346a9a",
+      "quality_crosswalk": {
+        "search_realism": "search_realism",
+        "anchoring_and_time": "standalone_clarity",
+        "consequence": "information_value",
+        "lexical_distance": "focus_and_formulation",
+        "linguistic_quality": "linguistic_quality"
+      },
+      "unified_quality_criteria": [
+        "search_realism",
+        "standalone_clarity",
+        "information_value",
+        "focus_and_formulation",
+        "linguistic_quality"
+      ],
+      "unified_faithfulness_criteria": [
+        "grounding",
+        "precision",
+        "numerical_fidelity"
+      ],
+      "unified_criteria_without_separate_original_quality_score": [],
+      "merged_original_quality_fields": {},
+      "mapping_note": "Related concepts are regrouped, not renamed one-to-one. Legal focus/formulation includes both bounded purpose and faithful independent wording, even where the original template scored only one. Information value always assesses a complete, useful answer."
+    },
+    {
+      "domain": "legal_un",
+      "question_type": "source_finding",
+      "faithfulness_criteria": [
+        "grounding",
+        "precision",
+        "numerical_fidelity"
+      ],
+      "quality_criteria": [
+        "search_realism",
+        "anchoring_and_time",
+        "consequence",
+        "lexical_distance",
+        "linguistic_quality"
+      ],
+      "faithfulness_prompt": "src/clir_bench/domains/legal/qac/prompts_un/verifiers/faithfulness_batch.txt",
+      "faithfulness_sha256": "8392f1108b224332f0512b546a3cfb538baa8c3ab41e3abc07d3e6b5118df341",
+      "quality_prompt": "src/clir_bench/domains/legal/qac/prompts_un/verifiers/source_finding_batch.txt",
+      "quality_sha256": "35a8c59a71bc0f2884221b8926b4510727b5d99bd90202100fbcc00da16c9fa0",
+      "quality_crosswalk": {
+        "search_realism": "search_realism",
+        "anchoring_and_time": "standalone_clarity",
+        "consequence": "information_value",
+        "lexical_distance": "focus_and_formulation",
+        "linguistic_quality": "linguistic_quality"
+      },
+      "unified_quality_criteria": [
+        "search_realism",
+        "standalone_clarity",
+        "information_value",
+        "focus_and_formulation",
+        "linguistic_quality"
+      ],
+      "unified_faithfulness_criteria": [
+        "grounding",
+        "precision",
+        "numerical_fidelity"
+      ],
+      "unified_criteria_without_separate_original_quality_score": [],
+      "merged_original_quality_fields": {},
+      "mapping_note": "Related concepts are regrouped, not renamed one-to-one. Legal focus/formulation includes both bounded purpose and faithful independent wording, even where the original template scored only one. Information value always assesses a complete, useful answer."
+    }
+  ],
+  "annotation_rubric": "unified_annotation_v1",
+  "public_faithfulness_criteria": [
+    "grounding",
+    "precision",
+    "numerical_fidelity"
+  ],
+  "public_quality_criteria": [
+    "search_realism",
+    "standalone_clarity",
+    "information_value",
+    "focus_and_formulation",
+    "linguistic_quality"
+  ],
+  "score_conversion": "No automatic conversion. Rate every unified criterion directly from the complete item. The crosswalk identifies related concepts, not score equivalence or an averaging rule.",
+  "comparability_note": "Chemistry uses a direct family mapping. Legal harmonization merges separately scored concepts in some templates and applies common quality checks in every item, changing weighting and coverage. Identical /40 ranges do not establish equivalence to historical verifier totals. Type compliance is intentionally outside the public annotation task.",
+  "public_presentation": "One genuine example document appears before the eight plain-language checks, each followed by its unified criterion name in parentheses. Each criterion paragraph begins with a definition, then gives judging and scoring instructions. Each check has Good and Bad question–answer examples, each followed by a suggested 1–5 score and a brief explanation for that criterion only. Saved generated examples are preferred; teaching edits or new examples are allowed when no suitable saved example exists. No faithfulness/quality group labels, question-type taxonomy, or separate verdict/evidence fields are shown. A fourth page tests understanding of the annotation task and scoring instructions through 10 single-choice questions, each with four options and one correct answer. The expected answers and readiness rule are kept in coordinator files.",
+  "public_criterion_headings": [
+    {
+      "number": 1,
+      "internal_key": "grounding",
+      "heading": "Are the question and answer supported by the text? (Grounding)",
+      "plain_language_heading": "Are the question and answer supported by the text?",
+      "criterion_name": "Grounding"
+    },
+    {
+      "number": 2,
+      "internal_key": "precision",
+      "heading": "Does the answer include the right amount of evidence? (Precision)",
+      "plain_language_heading": "Does the answer include the right amount of evidence?",
+      "criterion_name": "Precision"
+    },
+    {
+      "number": 3,
+      "internal_key": "numerical_fidelity",
+      "heading": "Are numbers and references accurate? (Numerical fidelity)",
+      "plain_language_heading": "Are numbers and references accurate?",
+      "criterion_name": "Numerical fidelity"
+    },
+    {
+      "number": 4,
+      "internal_key": "search_realism",
+      "heading": "Would an expert reasonably need this information? (Search realism)",
+      "plain_language_heading": "Would an expert reasonably need this information?",
+      "criterion_name": "Search realism"
+    },
+    {
+      "number": 5,
+      "internal_key": "standalone_clarity",
+      "heading": "Is the question understandable on its own? (Standalone clarity)",
+      "plain_language_heading": "Is the question understandable on its own?",
+      "criterion_name": "Standalone clarity"
+    },
+    {
+      "number": 6,
+      "internal_key": "information_value",
+      "heading": "Does the answer provide the information asked for? (Information value)",
+      "plain_language_heading": "Does the answer provide the information asked for?",
+      "criterion_name": "Information value"
+    },
+    {
+      "number": 7,
+      "internal_key": "focus_and_formulation",
+      "heading": "Does the question make one clear, focused request? (Focus and formulation)",
+      "plain_language_heading": "Does the question make one clear, focused request?",
+      "criterion_name": "Focus and formulation"
+    },
+    {
+      "number": 8,
+      "internal_key": "linguistic_quality",
+      "heading": "Is the language clear and natural? (Linguistic quality)",
+      "plain_language_heading": "Is the language clear and natural?",
+      "criterion_name": "Linguistic quality"
+    }
+  ]
+}
