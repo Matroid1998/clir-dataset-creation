@@ -1,0 +1,36 @@
+language,mode,status,winner_models,mean_total_score,score_out_of,winner_sample_counts,models_with_grades
+en,assertion_verification,tie,anthropic_claude-haiku-5.5 | deepseek_deepseek-v4.1-flash | gpt-5.6-luna | qwen_qwen3.8-27b | z-ai_glm-5.3-flashx,32.0,40,7 | 6 | 6 | 8 | 6,10
+en,comparison,tie,deepseek_deepseek-v4.1-flash | qwen_qwen3.8-27b,32.0,40,5 | 5,10
+en,conceptual,winner,anthropic_claude-haiku-5.5,31.75,40,8,10
+en,constraint_search,winner,prism-ml_ternary-bonsai-2-27b,31.8,40,5,10
+en,lookup,winner,qwen_qwen3.8-27b,31.555555555555557,40,9,10
+en,process_retrieval,winner,deepseek_deepseek-v4.1-flash,31.5,40,6,10
+en,source_finding,tie,anthropic_claude-haiku-5.5 | qwen_qwen3.8-27b,32.0,40,6 | 7,10
+fr,assertion_verification,winner,qwen_qwen3.8-27b,32.0,40,9,10
+fr,comparison,winner,deepseek_deepseek-v4.1-flash,31.785714285714285,40,14,10
+fr,conceptual,winner,anthropic_claude-haiku-5.5,31.428571428571427,40,7,10
+fr,constraint_search,winner,qwen_qwen3.8-27b,31.857142857142858,40,7,10
+fr,lookup,winner,qwen_qwen3.8-27b,32.2,40,10,10
+fr,process_retrieval,winner,qwen_qwen3.8-27b,31.77777777777778,40,9,10
+fr,source_finding,winner,anthropic_claude-haiku-5.5,32.375,40,8,10
+es,assertion_verification,tie,deepseek_deepseek-v4.1-flash | qwen_qwen3.8-27b,32.0,40,8 | 6,10
+es,comparison,winner,qwen_qwen3.8-27b,32.0,40,3,10
+es,conceptual,tie,deepseek_deepseek-v4.1-flash | z-ai_glm-5.3-flashx,32.0,40,6 | 6,10
+es,constraint_search,winner,prism-ml_ternary-bonsai-2-27b,29.625,40,8,10
+es,lookup,tie,anthropic_claude-haiku-5.5 | deepseek_deepseek-v4.1-flash,32.0,40,2 | 3,10
+es,process_retrieval,tie,anthropic_claude-haiku-5.5 | deepseek_deepseek-v4.1-flash | prism-ml_ternary-bonsai-2-27b,32.0,40,3 | 3 | 3,10
+es,source_finding,tie,anthropic_claude-haiku-5.5 | deepseek_deepseek-v4.1-flash | gpt-5.6-luna | prism-ml_ternary-bonsai-2-27b | qwen_qwen3.8-27b,32.0,40,4 | 4 | 4 | 5 | 4,10
+de,assertion_verification,tie,anthropic_claude-haiku-5.5 | deepseek_deepseek-v4.1-flash | z-ai_glm-5.3-flashx,32.0,40,2 | 2 | 2,10
+de,comparison,winner,anthropic_claude-haiku-5.5,31.666666666666668,40,3,9
+de,conceptual,no_graded_samples,,,40,,0
+de,constraint_search,winner,qwen_qwen3.8-27b,31.0,40,2,10
+de,lookup,tie,anthropic_claude-haiku-5.5 | deepseek_deepseek-v4.1-flash | gpt-5.6-luna | prism-ml_ternary-bonsai-2-27b | qwen_qwen3.8-27b | z-ai_glm-5.3-flashx,32.0,40,2 | 2 | 2 | 2 | 2 | 1,10
+de,process_retrieval,winner,gpt-5.6-luna,31.666666666666668,40,3,10
+de,source_finding,winner,upstage_solar-pro4,33.666666666666664,40,3,10
+zh,assertion_verification,tie,anthropic_claude-haiku-5.5 | deepseek_deepseek-v4.1-flash | qwen_qwen3.8-27b,32.0,40,5 | 5 | 4,10
+zh,comparison,winner,qwen_qwen3.8-27b,32.25,40,4,10
+zh,conceptual,winner,qwen_qwen3.8-27b,32.142857142857146,40,7,10
+zh,constraint_search,winner,z-ai_glm-5.3-flashx,30.714285714285715,40,7,10
+zh,lookup,winner,anthropic_claude-haiku-5.5,31.4,40,5,10
+zh,process_retrieval,winner,z-ai_glm-5.3-flashx,32.0,40,3,10
+zh,source_finding,tie,anthropic_claude-haiku-5.5 | qwen_qwen3.8-27b | z-ai_glm-5.3-flashx,32.0,40,7 | 7 | 7,10

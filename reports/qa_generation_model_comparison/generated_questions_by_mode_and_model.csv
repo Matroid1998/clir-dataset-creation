@@ -1,0 +1,9 @@
+Mode,DeepSeek v4.1 Flash,GPT-5.6 Luna,GLM-5.3 FlashX,Mistral Small 2603,Ternary Bonsai 2 27B,Qwen3.8 27B,Solar Pro4,Claude Haiku 5.5,Nemotron 3.5 Lightning,MiniMax M2.7,Total
+Assertion verification,32,29,28,29,29,29,27,29,28,34,294
+Comparison,28,29,28,29,29,25,26,25,22,16,257
+Conceptual,26,28,27,28,30,27,27,25,26,23,267
+Constraint search,29,29,28,28,29,28,24,29,27,26,277
+Lookup,43,36,38,31,28,31,30,27,24,29,317
+Process retrieval,26,25,25,28,26,26,27,23,27,25,258
+Source finding,28,28,28,28,28,28,28,28,28,28,280
+Total,212,204,202,201,199,194,189,186,182,181,1950

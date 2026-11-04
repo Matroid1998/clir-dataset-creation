@@ -1,0 +1,81 @@
+{
+  "domain": "chemistry",
+  "corpus": "Google Patents",
+  "source_directory": "data/chemistry/ai4chem_abstract_pairs/qac/chemistry_google_patents_model_comparison_generator",
+  "metric": "Arithmetic mean of total_score over all graded candidate rows per model/language/mode",
+  "score_out_of": 40,
+  "ties": "Exact unrounded means, compared as rational numbers",
+  "selection": "Top-level generator_compare_200_*_gemini38.csv; excludes best, retry, failure, and archive copies",
+  "graded_outputs": 1950,
+  "ungraded_outputs": 0,
+  "rubric_versions": [
+    [
+      "chemistry-clir-exceptional-r2",
+      "chemistry-clir-exceptional-r2"
+    ]
+  ],
+  "model_labels": {
+    "anthropic_claude-haiku-5.5": "Claude Haiku",
+    "deepseek_deepseek-v4.1-flash": "DeepSeek",
+    "gpt-5.6-luna": "GPT-5.6 Luna",
+    "minimax_minimax-m2.7": "MiniMax M2.7",
+    "mistralai_mistral-small-2603": "Mistral Small",
+    "nvidia_nemotron-3.5-lightning": "Nemotron 3.5",
+    "prism-ml_ternary-bonsai-2-27b": "Ternary Bonsai",
+    "qwen_qwen3.8-27b": "Qwen3.8-27B",
+    "upstage_solar-pro4": "Solar Pro4",
+    "z-ai_glm-5.3-flashx": "GLM-5.3"
+  },
+  "sources": [
+    {
+      "file": "data/chemistry/ai4chem_abstract_pairs/qac/chemistry_google_patents_model_comparison_generator/generator_compare_200_anthropic_claude-haiku-5.5_gemini38.csv",
+      "rows": 186,
+      "graded_rows": 186
+    },
+    {
+      "file": "data/chemistry/ai4chem_abstract_pairs/qac/chemistry_google_patents_model_comparison_generator/generator_compare_200_deepseek_deepseek-v4.1-flash_gemini38.csv",
+      "rows": 212,
+      "graded_rows": 212
+    },
+    {
+      "file": "data/chemistry/ai4chem_abstract_pairs/qac/chemistry_google_patents_model_comparison_generator/generator_compare_200_gpt-5.6-luna_gemini38.csv",
+      "rows": 204,
+      "graded_rows": 204
+    },
+    {
+      "file": "data/chemistry/ai4chem_abstract_pairs/qac/chemistry_google_patents_model_comparison_generator/generator_compare_200_minimax_minimax-m2.7_gemini38.csv",
+      "rows": 181,
+      "graded_rows": 181
+    },
+    {
+      "file": "data/chemistry/ai4chem_abstract_pairs/qac/chemistry_google_patents_model_comparison_generator/generator_compare_200_mistralai_mistral-small-2603_gemini38.csv",
+      "rows": 201,
+      "graded_rows": 201
+    },
+    {
+      "file": "data/chemistry/ai4chem_abstract_pairs/qac/chemistry_google_patents_model_comparison_generator/generator_compare_200_nvidia_nemotron-3.5-lightning_gemini38.csv",
+      "rows": 182,
+      "graded_rows": 182
+    },
+    {
+      "file": "data/chemistry/ai4chem_abstract_pairs/qac/chemistry_google_patents_model_comparison_generator/generator_compare_200_prism-ml_ternary-bonsai-2-27b_gemini38.csv",
+      "rows": 199,
+      "graded_rows": 199
+    },
+    {
+      "file": "data/chemistry/ai4chem_abstract_pairs/qac/chemistry_google_patents_model_comparison_generator/generator_compare_200_qwen_qwen3.8-27b_gemini38.csv",
+      "rows": 194,
+      "graded_rows": 194
+    },
+    {
+      "file": "data/chemistry/ai4chem_abstract_pairs/qac/chemistry_google_patents_model_comparison_generator/generator_compare_200_upstage_solar-pro4_gemini38.csv",
+      "rows": 189,
+      "graded_rows": 189
+    },
+    {
+      "file": "data/chemistry/ai4chem_abstract_pairs/qac/chemistry_google_patents_model_comparison_generator/generator_compare_200_z-ai_glm-5.3-flashx_gemini38.csv",
+      "rows": 202,
+      "graded_rows": 202
+    }
+  ]
+}
