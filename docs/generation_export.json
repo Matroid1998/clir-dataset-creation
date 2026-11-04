@@ -1,0 +1,78 @@
+{
+  "version": 1,
+  "root": "..",
+  "corpora": {
+    "eurlex": {
+      "generation_sqlite": [
+        "data/legal/qac/generation_600_20261008_model_comparison/eurlex/run.sqlite",
+        "data/legal/qac/generation_600_20261008_model_comparison/continuation_de_zh_50_20261012/eurlex/run.sqlite"
+      ],
+      "articles": "data/legal/eurlex/structure/articles.jsonl",
+      "languages": [
+        "en",
+        "fr",
+        "de",
+        "es"
+      ]
+    },
+    "un": {
+      "generation_sqlite": [
+        "data/legal/qac/generation_600_20261008_model_comparison/un_parallel/run.sqlite",
+        "data/legal/qac/generation_600_20261008_model_comparison/continuation_de_zh_50_20261012/un_parallel/run.sqlite"
+      ],
+      "documents": "data/legal/un_parallel/blocks/docs_en.jsonl",
+      "text_prefix": "data/legal/un_parallel/6way/UNv1.0.6way",
+      "languages": [
+        "en",
+        "fr",
+        "es",
+        "zh"
+      ]
+    },
+    "chemistry": {
+      "generation_csv": [
+        {
+          "path": "data/chemistry/ai4chem_abstract_pairs/qac/chemistry_google_patents_model_comparison_generator/generator_compare_200_gpt-5.6-luna_gemini38.csv",
+          "model": "gpt-5.6-luna"
+        },
+        {
+          "path": "data/chemistry/ai4chem_abstract_pairs/qac/chemistry_google_patents_model_comparison_generator/generator_compare_200_anthropic_claude-haiku-5.5_gemini38.csv",
+          "model": "anthropic/claude-haiku-5.5"
+        },
+        {
+          "path": "data/chemistry/ai4chem_abstract_pairs/qac/chemistry_google_patents_model_comparison_generator/generator_compare_200_deepseek_deepseek-v4.1-flash_gemini38.csv",
+          "model": "deepseek/deepseek-v4.1-flash"
+        },
+        {
+          "path": "data/chemistry/ai4chem_abstract_pairs/qac/chemistry_google_patents_model_comparison_generator/generator_compare_200_mistralai_mistral-small-2603_gemini38.csv",
+          "model": "mistralai/mistral-small-2603"
+        },
+        {
+          "path": "data/chemistry/ai4chem_abstract_pairs/qac/chemistry_google_patents_model_comparison_generator/generator_compare_200_prism-ml_ternary-bonsai-2-27b_gemini38.csv",
+          "model": "prism-ml/ternary-bonsai-2-27b"
+        },
+        {
+          "path": "data/chemistry/ai4chem_abstract_pairs/qac/chemistry_google_patents_model_comparison_generator/generator_compare_200_z-ai_glm-5.3-flashx_gemini38.csv",
+          "model": "z-ai/glm-5.3-flashx"
+        },
+        {
+          "path": "data/chemistry/ai4chem_abstract_pairs/qac/chemistry_google_patents_model_comparison_generator/generator_compare_200_qwen_qwen3.8-27b_gemini38.csv",
+          "model": "qwen/qwen3.8-27b"
+        },
+        {
+          "path": "data/chemistry/ai4chem_abstract_pairs/qac/chemistry_google_patents_model_comparison_generator/generator_compare_200_nvidia_nemotron-3.5-lightning_gemini38.csv",
+          "model": "nvidia/nemotron-3.5-lightning"
+        },
+        {
+          "path": "data/chemistry/ai4chem_abstract_pairs/qac/chemistry_google_patents_model_comparison_generator/generator_compare_200_minimax_minimax-m2.7_gemini38.csv",
+          "model": "minimax/minimax-m2.7"
+        },
+        {
+          "path": "data/chemistry/ai4chem_abstract_pairs/qac/chemistry_google_patents_model_comparison_generator/generator_compare_200_upstage_solar-pro4_gemini38.csv",
+          "model": "upstage/solar-pro4"
+        }
+      ],
+      "corpus_csv": "data/chemistry/ai4chem_abstract_pairs/multilingual_corpus.csv"
+    }
+  }
+}

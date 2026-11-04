@@ -4,20 +4,21 @@ from __future__ import annotations
 
 import argparse
 from pathlib import Path
-from typing import Optional
 
 from clir_bench.core import corpus as corpus_io
 from clir_bench.core import publish as publish_io
 from clir_bench.core.context import AppContext
 
 
-def register(subparsers: argparse._SubParsersAction, context: Optional[AppContext]) -> None:
+def register(subparsers: argparse._SubParsersAction, context: AppContext | None) -> None:
     parser = subparsers.add_parser("publish", help="Publish datasets to the Hugging Face Hub")
     sub = parser.add_subparsers(dest="publish_command", metavar="<subcommand>")
 
     common = argparse.ArgumentParser(add_help=False)
     common.add_argument("--repo", help="Target dataset repo (default: from clir.toml)")
-    common.add_argument("--dry-run", action="store_true", help="Write parquet locally instead of uploading")
+    common.add_argument(
+        "--dry-run", action="store_true", help="Write parquet locally instead of uploading"
+    )
     common.add_argument("--private", action="store_true", help="Create the repo as private")
 
     corpus_parser = sub.add_parser(
@@ -42,10 +43,63 @@ def register(subparsers: argparse._SubParsersAction, context: Optional[AppContex
     benchmark.add_argument("--only-configs", nargs="+", help="Re-push only these configs")
     benchmark.set_defaults(handler=_benchmark)
 
-    results = sub.add_parser("results", parents=[common], help="Upload a run's tables to a dataset repo")
+    results = sub.add_parser(
+        "results", parents=[common], help="Upload a run's tables to a dataset repo"
+    )
     results.add_argument("--run", help="Run id or path (default: latest)")
-    results.add_argument("--path-in-repo", default="benchmark_outputs", help="Destination folder in the repo")
+    results.add_argument(
+        "--path-in-repo", default="benchmark_outputs", help="Destination folder in the repo"
+    )
     results.set_defaults(handler=_results)
+
+    generations = sub.add_parser(
+        "generations",
+        help="Export all generated QAs, metadata and their related documents",
+    )
+    inputs = generations.add_mutually_exclusive_group(required=True)
+    inputs.add_argument("--manifest", type=Path, help="Explicit generation/source input manifest")
+    inputs.add_argument("--upload-from", type=Path, help="Upload an already prepared export")
+    generations.add_argument("--output", type=Path, help="New local export directory")
+    generations.add_argument(
+        "--corpora",
+        nargs="+",
+        choices=["eurlex", "un", "chemistry"],
+        help="Select corpora from the input manifest (default: all)",
+    )
+    generations.add_argument(
+        "--corpus-scope",
+        choices=["referenced", "full"],
+        default="referenced",
+        help="Related documents only (default), or the full local corpora",
+    )
+    generations.add_argument("--push", action="store_true", help="Upload after preparing")
+    generations.add_argument("--repo", help="Destination Hugging Face dataset repository")
+    generations.add_argument("--public", action="store_true", help="Create a public repository")
+    generations.set_defaults(handler=_generations, needs_domain=False)
+
+
+def _generations(args: argparse.Namespace, context: AppContext | None) -> int:
+    import json
+
+    from clir_bench.publishing.generations import prepare, upload
+
+    push = args.push or args.upload_from is not None
+    if push and not args.repo:
+        raise ValueError("upload requires --repo OWNER/DATASET")
+    if args.repo and not push:
+        raise ValueError("use --push to upload, or omit --repo to prepare locally")
+    if args.upload_from and args.output:
+        raise ValueError("--upload-from cannot be combined with --output")
+    if args.manifest and not args.output:
+        raise ValueError("preparation requires --output")
+    output = args.upload_from or args.output
+    if args.manifest:
+        report = prepare(args.manifest, output, scope=args.corpus_scope, corpora=args.corpora)
+        print(json.dumps(report, ensure_ascii=False, indent=2))
+        print(f"Prepared dataset: {output}")
+    if push:
+        print(upload(output, args.repo, private=not args.public))
+    return 0
 
 
 def _corpus(args: argparse.Namespace, context: AppContext) -> int:
@@ -116,15 +170,19 @@ def _benchmark(args: argparse.Namespace, context: AppContext) -> int:
     corpus_rows = corpus_io.read_rows(corpus_path)
     if domain.qac_validate_corpus:
         domain.qac_validate_corpus(
-            corpus_io.group_by_family(corpus_rows, context.schema), context.schema,
+            corpus_io.group_by_family(corpus_rows, context.schema),
+            context.schema,
         )
     configs = publish_io.build_retrieval_configs(
-        corpus_rows, corpus_io.read_rows(qac_path), context.schema,
+        corpus_rows,
+        corpus_io.read_rows(qac_path),
+        context.schema,
     )
     bundle = publish_io.bundle_from_configs(configs)
     relevance = (
         "its selected source document and that document's directly accepted translation partners"
-        if context.schema.parallel_ids_field else "every language version of its source document"
+        if context.schema.parallel_ids_field
+        else "every language version of its source document"
     )
     card = publish_io.build_card(
         title=f"{domain.title} — {source.name} retrieval benchmark",

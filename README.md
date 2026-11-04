@@ -63,6 +63,9 @@ clir analyze questions --run latest
 clir runs list
 ```
 
+To publish all generated QAs with supporting evidence, personas, metadata and related
+documents, see [generation publishing](docs/generation_publishing.md).
+
 Chemistry uses only
 [`BASF-AI/ai4chem-clir-google-patents-within-document-abstract-pairs`](https://huggingface.co/datasets/BASF-AI/ai4chem-clir-google-patents-within-document-abstract-pairs).
 The existing `gp` command key now names this source. Import keeps records with
