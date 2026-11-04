@@ -523,7 +523,11 @@ def _execute(args, context, operation, directory, output, saved, options, select
         # verifier until the entire corpus has finished generation.
         config["generation_barrier_policy"] = "per_target_streaming_before_verification-v4"
         config["generation_target_window"] = 8
-        config["verification_deduplication_policy"] = "exact_question_within_target-v1"
+        from .evidence import uses_contract
+        evidence_contract = any(uses_contract(text) for text in prompts.values())
+        config["verification_deduplication_policy"] = (
+            "full_candidate_with_evidence-v1" if evidence_contract
+            else "exact_question_within_target-v1")
     from clir_bench.core.prompt_registry import manifest_metadata
     registry = manifest_metadata()
     if registry:

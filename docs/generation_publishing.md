@@ -74,6 +74,20 @@ using Unicode character offsets with an exclusive end. Whitespace-normalized and
 support have null offsets; they are retained. `supporting_text_origin` makes answer-as-support
 fallback explicit without changing the raw evidence field. Matching is not a semantic judgment.
 
+Future legal generations use `evidence_contract=legal_evidence_spans_v1` and an ordered
+`evidence_spans` list. Exports preserve every source-tagged span and write one `evidence`
+configuration row per span. The span list retains original article/block `start`/`end` and
+adds `source_unit_id` plus `document_start`/`document_end` for the exported corpus. UN mapping
+uses the recorded block line range and verifies the original block hash, so a repeated quote
+in another block cannot receive the span accidentally.
+
+The first span supplies the scalar evidence fields. `support_start`/`support_end` refer to
+`support_source_unit_id`, which can identify a supplied reference or another source language;
+the QA's `source_unit_id` and `document_text` still identify its primary target. All evidence
+languages are loaded even if the manifest omitted them. Missing sources, changed text,
+invalid offsets or incomplete multi-article coverage abort an export. Legacy rows keep their
+existing behavior and receive no automatic evidence backfill.
+
 This release includes **related documents**, not the complete retrieval haystack. EUR-Lex
 source units are whole articles; chemistry uses title plus abstract; UN reconstructs the whole
 document from its original aligned line range, including material omitted from generation

@@ -1,3 +1,39 @@
+EVIDENCE_CONTRACT: legal_evidence_spans_v1
+
+Idioma de salida: español. Las preguntas y anotaciones de texto libre van en español; las citas y los identificadores copiados conservan su forma original.
+
+PASAJES DE APOYO EXPLÍCITOS — OBLIGATORIOS EN TODOS LOS MODOS
+Devuelva evidence_spans como una lista ordenada de objetos con exactamente source_ref, language y
+text. El primer pasaje respalda directamente answer o, en source_finding, la pista sustantiva.
+Cada pasaje es UN extracto continuo mínimo y suficiente, copiado EXACTAMENTE del cuerpo de una
+fuente realmente proporcionada, en su idioma original. Conserve ortografía, espacios, puntuación,
+marcado y errores. Nunca traduzca la evidencia, una fragmentos separados, añada puntos suspensivos,
+copie metadatos ni cite contenido oculto por truncamiento. language indica el idioma de la versión
+citada, que no es necesariamente el idioma de la pregunta.
+Conserve toda condición, excepción, actor, modalidad y límite de alcance decisivos para la respuesta.
+No copie un artículo o documento completo en lugar de seleccionar los pasajes necesarios.
+Quite texto inicial o final prescindible y conserve el texto intermedio indispensable. No hay un
+límite fijo de tokens. Acote u omita la pregunta si no puede cumplir este contrato.
+Fije primero el pasaje primario. Salvo en source_finding, answer copia TODO su texto si se ha
+proporcionado una versión adecuada en el idioma de salida; answer_is_translation es false.
+En caso contrario traduzca fielmente TODO el pasaje al idioma solicitado y marque
+answer_is_translation como true. No resuma, calcule, agregue un veredicto ni cambie el alcance.
+En source_finding, answer conserva la identidad exacta del objetivo según las reglas del modo,
+answer_is_translation es false y el primer pasaje demuestra la pista en el cuerpo del objetivo.
+Devuelva answer_is_translation como booleano JSON en TODOS los modos. No devuelva los campos
+escalares evidence, evidence_language, evidence_is_translation, identificadores canónicos ni
+posiciones de caracteres: el analizador los deriva del primer pasaje y los datos fuente. Conserve
+los campos propios del modo junto a evidence_spans. Los extractos de los ejemplos son solo material
+didáctico. Aunque una respuesta ilustrativa se traduzca, la evidencia queda en el idioma mostrado.
+
+EUR-LEX: COBERTURA DE EVIDENCIA
+Devuelva exactamente un pasaje por CADA unidad de articles_involved: objetivo y toda referencia o
+anexo proporcionado indispensable. No incluya fuentes sin uso ni versiones lingüísticas duplicadas.
+source_ref es el número simple para artículos del propio acto y la clave Cite as exacta para otro
+acto o cualquier anexo. El pasaje primario puede proceder de una referencia permitida solo si la
+regla del objetivo sigue siendo indispensable; aporte un pasaje separado del objetivo. En
+source_finding el primer pasaje procede del objetivo. Cada extracto permanece dentro de su unidad.
+
 Creas preguntas de búsqueda conceptual a partir de la legislación de la Unión Europea. La persona que busca conoce una cuestión o actividad regulada, pero no el instrumento aplicable ni su redacción exacta. Pregunta por un problema identificado expresamente en la disposición, una respuesta o un mecanismo jurídico, o la posición de una parte afectada. Una pregunta conceptual no es intrínsecamente mejor que una consulta factual precisa o un caso práctico concreto.
 
 FUENTE Y PRUEBAS TEXTUALES
@@ -23,7 +59,23 @@ Reformula con naturalidad las expresiones corrientes de la pregunta, manteniendo
 UTILIDAD Y SALIDA
 Prefiere el contenido regulatorio sustantivo. Omite las disposiciones de mera transposición, entrada en vigor o derogación general, así como las cláusulas genéricas de revisión o sanción que carezcan de una relación regulatoria informativa. Una salvaguardia concreta, una disposición transitoria o un mecanismo de ejecución no es una fórmula vacía por el mero hecho de su encabezado. En un artículo mixto, utiliza su parte sustantiva.
 Devuelve hasta tres preguntas distintas; basta una pregunta sólida. No fuerces todos los enfoques ni un número fijo de candidatos. Devuelve únicamente JSON válido:
-[{"question":"...","answer":"...","framing":"situation|response|stakeholder","anchor":"...","articles_involved":["..."]}]
+[{
+  "question": "...",
+  "answer": "...",
+  "framing": "situation|response|stakeholder",
+  "anchor": "...",
+  "articles_involved": [
+    "..."
+  ],
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "...",
+      "language": "es",
+      "text": "..."
+    }
+  ]
+}]
 Elige un único valor efectivo de framing. anchor es una expresión sustantiva copiada exactamente de la pregunta. No se necesitan los campos question_cited ni particulars. Si ninguna pregunta cumple los requisitos, devuelve [{"skip_reason":"una razón breve"}].
 
 ILUSTRACIÓN (redacción inventada, no cita legislativa)

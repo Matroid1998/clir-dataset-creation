@@ -1,3 +1,37 @@
+EVIDENCE_CONTRACT: legal_evidence_spans_v1
+
+Idioma de salida: español. Las preguntas y anotaciones de texto libre van en español; las citas y los identificadores copiados conservan su forma original.
+
+PASAJES DE APOYO EXPLÍCITOS — OBLIGATORIOS EN TODOS LOS MODOS
+Devuelva evidence_spans como una lista ordenada de objetos con exactamente source_ref, language y
+text. El primer pasaje respalda directamente answer o, en source_finding, la pista sustantiva.
+Cada pasaje es UN extracto continuo mínimo y suficiente, copiado EXACTAMENTE del cuerpo de una
+fuente realmente proporcionada, en su idioma original. Conserve ortografía, espacios, puntuación,
+marcado y errores. Nunca traduzca la evidencia, una fragmentos separados, añada puntos suspensivos,
+copie metadatos ni cite contenido oculto por truncamiento. language indica el idioma de la versión
+citada, que no es necesariamente el idioma de la pregunta.
+Conserve toda condición, excepción, actor, modalidad y límite de alcance decisivos para la respuesta.
+No copie un artículo o documento completo en lugar de seleccionar los pasajes necesarios.
+Quite texto inicial o final prescindible y conserve el texto intermedio indispensable. No hay un
+límite fijo de tokens. Acote u omita la pregunta si no puede cumplir este contrato.
+Fije primero el pasaje primario. Salvo en source_finding, answer copia TODO su texto si se ha
+proporcionado una versión adecuada en el idioma de salida; answer_is_translation es false.
+En caso contrario traduzca fielmente TODO el pasaje al idioma solicitado y marque
+answer_is_translation como true. No resuma, calcule, agregue un veredicto ni cambie el alcance.
+En source_finding, answer conserva la identidad exacta del objetivo según las reglas del modo,
+answer_is_translation es false y el primer pasaje demuestra la pista en el cuerpo del objetivo.
+Devuelva answer_is_translation como booleano JSON en TODOS los modos. No devuelva los campos
+escalares evidence, evidence_language, evidence_is_translation, identificadores canónicos ni
+posiciones de caracteres: el analizador los deriva del primer pasaje y los datos fuente. Conserve
+los campos propios del modo junto a evidence_spans. Los extractos de los ejemplos son solo material
+didáctico. Aunque una respuesta ilustrativa se traduzca, la evidencia queda en el idioma mostrado.
+
+ONU: COBERTURA DE EVIDENCIA
+Devuelva exactamente un pasaje con source_ref="target", del cuerpo de TARGET BLOCK. Ni REFERENCED
+DOCUMENTS ni DOCUMENT CONTEXT pueden aportar evidencia. Identificar el documento no habilita sus
+otros bloques como evidencia. Conserve la calidad del hablante y el estado de la afirmación.
+Un bloque objetivo breve puede citarse entero solo si cada parte es necesaria; nunca lo sustituya por el documento completo.
+
 ACLARACIONES PRIORITARIAS — estas reglas sustituyen cualquier regla o ejemplo contrario que siga, sin cambiar el idioma de salida ni las claves JSON.
 La respuesta es un fragmento continuo del bloque objetivo que resuelve por completo la pregunta en su contexto. Conserve condiciones, excepciones, modalidad y atribución necesarias; se permiten varias cláusulas u oraciones adyacentes. El contexto y las referencias aclaran nombres, fechas y hablantes, pero nunca aportan contenido que falte en la respuesta.
 Una solicitud, recomendación, propuesta o conclusión atribuida puede ser útil: preserve su estado y su autor real. Un verbo de habla no basta para excluirla. No infiera obligaciones vinculantes, adopción ni ejecución ausentes del texto. Juzgue la proposición concreta, no un verbo aislado ni su importancia política. Un contenido recurrente identificado por su régimen y período puede servir; no exija novedades anuales ni suponga duplicados no vistos.
@@ -33,22 +67,101 @@ QUÉ PREGUNTAR — tres encuadres ("framing"); las preguntas deben abordar aspec
   3. stakeholder — parte afectada o escenario: ¿quién queda obligado, sancionado, protegido o asistido, y en qué escenario del mundo real? Aquí caben tanto la perspectiva del destinatario («¿Qué estaba obligado a hacer el Gobierno de X...?») como la del beneficiario («¿Qué protección proporcionaron las Naciones Unidas a los civiles en...?»), y también la posición de un Estado sobre un asunto concreto.
 EJEMPLOS — casos canónicos correctos, con el texto del bloque del que proceden:
 Bloque objetivo: S/RES/918 (1994), aprobada el 17 de mayo de 1994: "3. Decide ampliar el mandato de la UNAMIR para incluir la protección de las personas desplazadas, los refugiados y los civiles en peligro en Rwanda y la seguridad de las operaciones de socorro humanitario; 4. Autoriza en este contexto una ampliación de los efectivos de la UNAMIR hasta 5,500 soldados;" (contexto: preámbulo que condena las matanzas de civiles en Rwanda)
-✓ {"question": "¿Cómo respondió el Consejo de Seguridad a los ataques contra civiles desplazados en Rwanda en mayo de 1994?", "answer": "Decide ampliar el mandato de la UNAMIR para incluir la protección de las personas desplazadas, los refugiados y los civiles en peligro en Rwanda", "framing": "response", "anchor": "Rwanda"}
-✓ {"question": "¿Qué función recibieron los cascos azules para proteger a las personas desplazadas por el conflicto de Rwanda en 1994?", "answer": "la protección de las personas desplazadas, los refugiados y los civiles en peligro en Rwanda y la seguridad de las operaciones de socorro humanitario", "framing": "stakeholder", "anchor": "el conflicto de Rwanda"}
+✓ {
+  "question": "¿Cómo respondió el Consejo de Seguridad a los ataques contra civiles desplazados en Rwanda en mayo de 1994?",
+  "answer": "Decide ampliar el mandato de la UNAMIR para incluir la protección de las personas desplazadas, los refugiados y los civiles en peligro en Rwanda",
+  "framing": "response",
+  "anchor": "Rwanda",
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "target",
+      "language": "es",
+      "text": "Decide ampliar el mandato de la UNAMIR para incluir la protección de las personas desplazadas, los refugiados y los civiles en peligro en Rwanda"
+    }
+  ]
+}
+✓ {
+  "question": "¿Qué función recibieron los cascos azules para proteger a las personas desplazadas por el conflicto de Rwanda en 1994?",
+  "answer": "la protección de las personas desplazadas, los refugiados y los civiles en peligro en Rwanda y la seguridad de las operaciones de socorro humanitario",
+  "framing": "stakeholder",
+  "anchor": "el conflicto de Rwanda",
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "target",
+      "language": "es",
+      "text": "la protección de las personas desplazadas, los refugiados y los civiles en peligro en Rwanda y la seguridad de las operaciones de socorro humanitario"
+    }
+  ]
+}
   → «Ataques contra civiles desplazados», «cascos azules», «personas desplazadas por el conflicto de Rwanda»: palabras de alguien ajeno al expediente para las fórmulas del bloque; UNAMIR y el término «personas desplazadas» permanecen en la respuesta. «Mayo» distingue esta respuesta de las otras decisiones del Consejo sobre Rwanda en 1994.
 Bloque objetivo: informe S/1994/565: "Se estima que 250,000 refugiados cruzaron la frontera hacia la República Unida de Tanzanía los días 28 y 29 de abril." (contexto: éxodo de refugiados de Rwanda, abril–mayo de 1994)
-✓ {"question": "Según informes de las Naciones Unidas, ¿qué gravedad tuvo el éxodo de refugiados de Rwanda hacia países vecinos en la primavera de 1994?", "answer": "Se estima que 250,000 refugiados cruzaron la frontera hacia la República Unida de Tanzanía los días 28 y 29 de abril", "framing": "situation", "anchor": "éxodo de refugiados de Rwanda"}
+✓ {
+  "question": "Según informes de las Naciones Unidas, ¿qué gravedad tuvo el éxodo de refugiados de Rwanda hacia países vecinos en la primavera de 1994?",
+  "answer": "Se estima que 250,000 refugiados cruzaron la frontera hacia la República Unida de Tanzanía los días 28 y 29 de abril",
+  "framing": "situation",
+  "anchor": "éxodo de refugiados de Rwanda",
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "target",
+      "language": "es",
+      "text": "Se estima que 250,000 refugiados cruzaron la frontera hacia la República Unida de Tanzanía los días 28 y 29 de abril"
+    }
+  ]
+}
   → Una pregunta conceptual («qué gravedad») respondida por un segmento concreto; no se pide la cifra por su nombre. Se conserva la atribución a los informes de las Naciones Unidas.
 Bloque objetivo: S/RES/2148 (2014), preámbulo: "Reconociendo que la capacidad de la UNAMID para facilitar avances en la aplicación del DDPD se ve obstaculizada por las demoras de las partes signatarias y la ausencia de un arreglo político inclusivo entre el gobierno y los movimientos no signatarios"
-✓ {"question": "¿Por qué tenía UNAMID dificultades para impulsar el Documento de Doha para la Paz en Darfur en 2014?", "answer": "la capacidad de la UNAMID para facilitar avances en la aplicación del DDPD se ve obstaculizada por las demoras de las partes signatarias y la ausencia de un arreglo político inclusivo entre el gobierno y los movimientos no signatarios", "framing": "situation", "anchor": "UNAMID"}
+✓ {
+  "question": "¿Por qué tenía UNAMID dificultades para impulsar el Documento de Doha para la Paz en Darfur en 2014?",
+  "answer": "la capacidad de la UNAMID para facilitar avances en la aplicación del DDPD se ve obstaculizada por las demoras de las partes signatarias y la ausencia de un arreglo político inclusivo entre el gobierno y los movimientos no signatarios",
+  "framing": "situation",
+  "anchor": "UNAMID",
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "target",
+      "language": "es",
+      "text": "la capacidad de la UNAMID para facilitar avances en la aplicación del DDPD se ve obstaculizada por las demoras de las partes signatarias y la ausencia de un arreglo político inclusivo entre el gobierno y los movimientos no signatarios"
+    }
+  ]
+}
   → Una EVALUACIÓN preambular — obstáculos concretos — es admisible para el encuadre de situación; un considerando no lo sería. «Dificultades para impulsar» mantiene distancia con «capacidad para facilitar avances ... se ve obstaculizada»; DDPD se nombra mediante su denominación oficial desarrollada, sin rebautizarlo.
 Bloque objetivo: CD/1860, carta del Representante Permanente Adjunto de Francia ante la Conferencia de Desarme: "ante la próxima Conferencia de las Partes de 2010 encargada del Examen del Tratado sobre la No Proliferación de las Armas Nucleares, y sobre la base de las propuestas formuladas en Cherburgo, Europa presentó un plan de acción sobre desarme que fue respaldado por 27 Jefes de Estado y de Gobierno de la Unión Europea en diciembre de 2008."
-✓ {"question": "¿Qué iniciativa conjunta de desarme desarrolló la Unión Europea antes de la Conferencia de Examen del TNP de 2010?", "answer": "Europa presentó un plan de acción sobre desarme que fue respaldado por 27 Jefes de Estado y de Gobierno de la Unión Europea en diciembre de 2008", "framing": "response", "anchor": "la Unión Europea"}
+✓ {
+  "question": "¿Qué iniciativa conjunta de desarme desarrolló la Unión Europea antes de la Conferencia de Examen del TNP de 2010?",
+  "answer": "Europa presentó un plan de acción sobre desarme que fue respaldado por 27 Jefes de Estado y de Gobierno de la Unión Europea en diciembre de 2008",
+  "framing": "response",
+  "anchor": "la Unión Europea",
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "target",
+      "language": "es",
+      "text": "Europa presentó un plan de acción sobre desarme que fue respaldado por 27 Jefes de Estado y de Gobierno de la Unión Europea en diciembre de 2008"
+    }
+  ]
+}
   → Acto propio, sin matiz atributivo: un acto consumado de la UE relatado en una carta francesa, concreto y fechado. Una afirmación controvertida sobre otra parte habría requerido «según Francia».
 FALLOS REALES DE EJECUCIONES ANTERIORES — nunca reproduzcas estos patrones:
 ✗ «¿Qué enfoque colaborativo se pidió que adoptaran el Alto Comisionado de las Naciones Unidas para los Derechos Humanos y el Consejo de Derechos Humanos en 2011?» — respuesta «apoyar a la sociedad civil, el sector privado, las instituciones académicas, las organizaciones regionales, los medios de comunicación y otras partes interesadas pertinentes, y cooperar y colaborar estrechamente con ellos» → Una lista de cooperación y colaboración (DESCALIFICADA) en la serie anual sobre aprendizaje de los derechos humanos. Omite.
 ✗ «¿Cómo debían coordinarse las Naciones Unidas y la Comunidad Económica de Eurasia en 2007?» — respuesta «invita al Secretario General de las Naciones Unidas a celebrar ... consultas periódicas con el Secretario General de la Comunidad Económica de Eurasia ...» → La cláusula de consultas de todas las resoluciones bienales de cooperación con organizaciones, un mecanismo sumamente débil y un párrafo entero. Omite.
-✗ «¿A qué actores se invitó a cooperar, celebrar y dar a conocer el Día Internacional del Deporte para el Desarrollo y la Paz?» → Una lista de invitación, aunque el mismo bloque contenía el acto sustantivo. Corrección: {"question": "¿Cómo reconoció formalmente la Asamblea General el deporte como instrumento de desarrollo y paz en 2013?", "answer": "Decide proclamar el 6 de abril Día Internacional del Deporte para el Desarrollo y la Paz", "framing": "response", "anchor": "el deporte como instrumento de desarrollo y paz"}
+Extracto didáctico del bloque objetivo A/RES/67/296: Decide proclamar el 6 de abril Día Internacional del Deporte para el Desarrollo y la Paz
+✗ «¿A qué actores se invitó a cooperar, celebrar y dar a conocer el Día Internacional del Deporte para el Desarrollo y la Paz?» → Una lista de invitación, aunque el mismo bloque contenía el acto sustantivo. Corrección: {
+  "question": "¿Cómo reconoció formalmente la Asamblea General el deporte como instrumento de desarrollo y paz en 2013?",
+  "answer": "Decide proclamar el 6 de abril Día Internacional del Deporte para el Desarrollo y la Paz",
+  "framing": "response",
+  "anchor": "el deporte como instrumento de desarrollo y paz",
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "target",
+      "language": "es",
+      "text": "Decide proclamar el 6 de abril Día Internacional del Deporte para el Desarrollo y la Paz"
+    }
+  ]
+}
 ✗ «¿Cómo describió Guyana la crisis de Kosovo?» → Un relato de declaraciones cuya respuesta es una expresión de preocupación; sin año. Solo serviría una posición sobre un asunto concreto — «¿Qué posición adoptó Guyana sobre el uso de la fuerza en Kosovo en 1999?» — y únicamente si el bloque la enuncia.
 ✗ «¿A quién se asignó la responsabilidad primordial de aplicar el Acuerdo de Paz para Bosnia y Herzegovina?» → Un CONSIDERANDO preambular («Reconociendo que ... la responsabilidad primordial ... recae en las propias autoridades») presente en todas las resoluciones anuales sobre Bosnia desde 1996; sin año. Omite.
 ✗ «¿Qué límite jurídico se impuso a las medidas contra el terrorismo?» → La cláusula universal de cumplimiento de todos los textos contra el terrorismo; sin actor, situación ni año. Omite.
@@ -66,7 +179,20 @@ AUTOVERIFICACIÓN de cada pregunta, en este orden:
 8. ¿Han superado la verificación menos de tres? Devuelve menos. ¿Ninguna? Devuelve la omisión.
 SALIDA (solo JSON válido, sin markdown): una lista de hasta TRES objetos:
 [
-  {"question": "...", "answer": "...", "framing": "...", "anchor": "..."}
+  {
+  "question": "...",
+  "answer": "...",
+  "framing": "...",
+  "anchor": "...",
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "target",
+      "language": "es",
+      "text": "..."
+    }
+  ]
+}
 ]
 Si ninguna pregunta supera todas las pruebas, devuelve exactamente: [{"skip_reason": "<one short phrase>"}]
 - answer: el segmento contiguo más corto del bloque objetivo que responde de forma completa y directa a la pregunta, en español.

@@ -1,3 +1,37 @@
+EVIDENCE_CONTRACT: legal_evidence_spans_v1
+
+Langue de sortie : français. Les questions et annotations libres sont en français ; les citations et identifiants copiés gardent leur forme originale.
+
+PASSAGES JUSTIFICATIFS EXPLICITES — OBLIGATOIRES DANS TOUS LES MODES
+Renvoyez evidence_spans comme une liste ordonnée d'objets contenant exactement source_ref, language
+et text. Le premier passage justifie directement answer ou, en source_finding, l'indice substantiel.
+Chaque passage est UN extrait continu minimal et suffisant, copié EXACTEMENT dans le corps d'une
+source effectivement fournie, dans sa langue d'origine. Conservez orthographe, espaces, ponctuation,
+balisage et erreurs. Ne traduisez jamais la preuve, ne rassemblez pas de fragments distants,
+n'ajoutez pas de points de suspension, ne copiez pas les métadonnées et ne citez pas de texte masqué
+par une troncature. language désigne la langue de la version citée, pas forcément celle de la question.
+Conservez toutes les conditions, exceptions, modalités, attributions et limites qui changent la réponse.
+Ne copiez pas un article ou document entier au lieu de sélectionner les passages nécessaires.
+Supprimez tout début ou fin superflu, mais gardez le texte intermédiaire indispensable. Aucune limite
+fixe de tokens n'est imposée. Restreignez ou omettez la question si ce contrat ne peut être respecté.
+Fixez d'abord le passage principal. Sauf en source_finding, answer en reprend TOUT le texte lorsqu'une
+version adéquate dans la langue de sortie est fournie; answer_is_translation vaut false. Sinon,
+traduisez fidèlement TOUT ce passage dans la langue demandée et indiquez answer_is_translation=true.
+Aucun résumé, calcul, verdict ajouté ou changement de portée. En source_finding, answer reste
+l'identité exacte de la cible selon la règle du mode, answer_is_translation vaut false et le premier
+passage établit l'indice substantiel dans le corps de la cible.
+Renvoyez answer_is_translation comme booléen JSON dans TOUS les modes. Ne renvoyez pas les champs
+scalaires evidence, evidence_language, evidence_is_translation, des identifiants canoniques ou des
+positions de caractères: le parseur les déduit du premier passage et des sources. Conservez les
+champs propres au mode à côté de evidence_spans. Les extraits illustratifs sont uniquement du
+matériel pédagogique. Même si la réponse est traduite, la preuve reste dans la langue montrée.
+
+ONU: COUVERTURE DES PREUVES
+Renvoyez exactement un passage avec source_ref="target", tiré du corps de TARGET BLOCK. Ni REFERENCED
+DOCUMENTS ni DOCUMENT CONTEXT ne fournissent de preuve. L'identité du document n'autorise pas ses
+autres blocs comme sources de preuve. Préservez le rôle du locuteur et le statut de l'énoncé.
+Un court bloc cible peut être cité en entier uniquement si chaque partie est nécessaire ; ne le remplacez jamais par le document complet.
+
 PRÉCISIONS PRIORITAIRES — ces règles remplacent toute règle ou tout exemple contraire ci-dessous, sans changer la langue de sortie ni les clés JSON.
 La réponse est un extrait continu du bloc cible qui résout entièrement la question dans son contexte. Gardez les conditions, exceptions, modalités et attributions nécessaires ; plusieurs propositions ou phrases adjacentes sont permises. Le contexte et les références servent à identifier noms, dates et locuteurs, jamais à fournir une partie manquante de la réponse.
 Une demande, recommandation, proposition ou constat attribué peut être utile : conservez son statut et son auteur réel. Un verbe de parole ne suffit pas à l'exclure. N'inférez ni obligation contraignante, ni adoption, ni mise en œuvre absente du texte. Jugez la proposition concrète, pas un verbe isolé ni l'importance politique. Un contenu récurrent identifié par son régime et sa période peut convenir ; n'exigez ni changement annuel ni doublons supposés.
@@ -33,22 +67,101 @@ QUE DEMANDER — trois cadrages (« framing ») ; les questions doivent cibler d
   3. stakeholder — partie affectée ou scénario : qui est lié, sanctionné, protégé ou assisté, et dans quel scénario du monde réel ? Les perspectives du destinataire (« Que devait faire le Gouvernement de X... ») et du bénéficiaire (« Quelle protection l'ONU a-t-elle assurée aux civils dans... ») relèvent toutes deux de ce cadrage, de même que la position d'un État sur une question concrète.
 EXEMPLES — les bons cas canoniques, avec le texte du bloc dont ils proviennent :
 Bloc cible : S/RES/918 (1994), adoptée le 17 mai 1994 : "3. Décide d'élargir le mandat de la MINUAR pour y inclure la protection des personnes déplacées, des réfugiés et des civils en danger au Rwanda et la sécurité des opérations de secours humanitaires ; 4. Autorise dans ce contexte un accroissement de l'effectif de la MINUAR jusqu'à 5,500 soldats ;" (contexte : préambule condamnant les meurtres de civils au Rwanda)
-✓ {"question": "Comment le Conseil de sécurité a-t-il réagi aux attaques contre les civils déplacés au Rwanda en mai 1994 ?", "answer": "Décide d'élargir le mandat de la MINUAR pour y inclure la protection des personnes déplacées, des réfugiés et des civils en danger au Rwanda", "framing": "response", "anchor": "Rwanda"}
-✓ {"question": "Quel rôle les Casques bleus reçurent-ils pour protéger les personnes déplacées par le conflit rwandais en 1994 ?", "answer": "la protection des personnes déplacées, des réfugiés et des civils en danger au Rwanda et la sécurité des opérations de secours humanitaires", "framing": "stakeholder", "anchor": "le conflit rwandais"}
+✓ {
+  "question": "Comment le Conseil de sécurité a-t-il réagi aux attaques contre les civils déplacés au Rwanda en mai 1994 ?",
+  "answer": "Décide d'élargir le mandat de la MINUAR pour y inclure la protection des personnes déplacées, des réfugiés et des civils en danger au Rwanda",
+  "framing": "response",
+  "anchor": "Rwanda",
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "target",
+      "language": "fr",
+      "text": "Décide d'élargir le mandat de la MINUAR pour y inclure la protection des personnes déplacées, des réfugiés et des civils en danger au Rwanda"
+    }
+  ]
+}
+✓ {
+  "question": "Quel rôle les Casques bleus reçurent-ils pour protéger les personnes déplacées par le conflit rwandais en 1994 ?",
+  "answer": "la protection des personnes déplacées, des réfugiés et des civils en danger au Rwanda et la sécurité des opérations de secours humanitaires",
+  "framing": "stakeholder",
+  "anchor": "le conflit rwandais",
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "target",
+      "language": "fr",
+      "text": "la protection des personnes déplacées, des réfugiés et des civils en danger au Rwanda et la sécurité des opérations de secours humanitaires"
+    }
+  ]
+}
   → « Attaques contre les civils déplacés », « Casques bleus », « personnes déplacées par le conflit rwandais » : les mots d'une personne extérieure pour les formules du bloc ; MINUAR et le terme « personnes déplacées » restent dans la réponse. « Mai » distingue cette réponse des autres décisions du Conseil sur le Rwanda en 1994.
 Bloc cible : rapport S/1994/565 : "Selon les estimations, 250,000 réfugiés ont franchi la frontière de la République-Unie de Tanzanie les 28 et 29 avril." (contexte : exode des réfugiés du Rwanda, avril–mai 1994)
-✓ {"question": "Selon l'ONU, quelle ampleur avait l'exode des réfugiés du Rwanda vers les pays voisins au printemps 1994 ?", "answer": "Selon les estimations, 250,000 réfugiés ont franchi la frontière de la République-Unie de Tanzanie les 28 et 29 avril", "framing": "situation", "anchor": "l'exode des réfugiés du Rwanda"}
+✓ {
+  "question": "Selon l'ONU, quelle ampleur avait l'exode des réfugiés du Rwanda vers les pays voisins au printemps 1994 ?",
+  "answer": "Selon les estimations, 250,000 réfugiés ont franchi la frontière de la République-Unie de Tanzanie les 28 et 29 avril",
+  "framing": "situation",
+  "anchor": "l'exode des réfugiés du Rwanda",
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "target",
+      "language": "fr",
+      "text": "Selon les estimations, 250,000 réfugiés ont franchi la frontière de la République-Unie de Tanzanie les 28 et 29 avril"
+    }
+  ]
+}
   → Une question conceptuelle (« quelle ampleur ») à laquelle répond un segment concret ; le chiffre n'est pas demandé par son nom. L'attribution aux informations communiquées par l'ONU est conservée.
 Bloc cible : S/RES/2148 (2014), préambule : "Constatant que la capacité de la MINUAD à faciliter les progrès dans l'application du DDPD est entravée par les retards des parties signataires et l'absence d'un règlement politique inclusif entre le gouvernement et les mouvements non signataires"
-✓ {"question": "Pourquoi la MINUAD peinait-elle à faire avancer le Document de Doha pour la paix au Darfour en 2014 ?", "answer": "la capacité de la MINUAD à faciliter les progrès dans l'application du DDPD est entravée par les retards des parties signataires et l'absence d'un règlement politique inclusif entre le gouvernement et les mouvements non signataires", "framing": "situation", "anchor": "MINUAD"}
+✓ {
+  "question": "Pourquoi la MINUAD peinait-elle à faire avancer le Document de Doha pour la paix au Darfour en 2014 ?",
+  "answer": "la capacité de la MINUAD à faciliter les progrès dans l'application du DDPD est entravée par les retards des parties signataires et l'absence d'un règlement politique inclusif entre le gouvernement et les mouvements non signataires",
+  "framing": "situation",
+  "anchor": "MINUAD",
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "target",
+      "language": "fr",
+      "text": "la capacité de la MINUAD à faciliter les progrès dans l'application du DDPD est entravée par les retards des parties signataires et l'absence d'un règlement politique inclusif entre le gouvernement et les mouvements non signataires"
+    }
+  ]
+}
   → Une ÉVALUATION du préambule — des obstacles concrets — est admissible pour le cadrage situation ; un considérant ne le serait pas. « Peinait à faire avancer » garde une distance avec « capacité à faciliter les progrès ... est entravée » ; DDPD est désigné par sa forme officielle développée, et non rebaptisé.
 Bloc cible : CD/1860, lettre du Représentant permanent adjoint de la France auprès de la Conférence du désarmement : "dans la perspective de la Conférence des Parties chargée d'examiner le Traité sur la non-prolifération des armes nucléaires en 2010, et sur la base des propositions faites à Cherbourg, l'Europe a présenté un plan d'action sur le désarmement, approuvé par 27 chefs d'État et de gouvernement de l'Union européenne en décembre 2008."
-✓ {"question": "Quelle initiative commune de désarmement l'Union européenne développa-t-elle avant la Conférence d'examen du TNP de 2010 ?", "answer": "l'Europe a présenté un plan d'action sur le désarmement, approuvé par 27 chefs d'État et de gouvernement de l'Union européenne en décembre 2008", "framing": "response", "anchor": "l'Union européenne"}
+✓ {
+  "question": "Quelle initiative commune de désarmement l'Union européenne développa-t-elle avant la Conférence d'examen du TNP de 2010 ?",
+  "answer": "l'Europe a présenté un plan d'action sur le désarmement, approuvé par 27 chefs d'État et de gouvernement de l'Union européenne en décembre 2008",
+  "framing": "response",
+  "anchor": "l'Union européenne",
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "target",
+      "language": "fr",
+      "text": "l'Europe a présenté un plan d'action sur le désarmement, approuvé par 27 chefs d'État et de gouvernement de l'Union européenne en décembre 2008"
+    }
+  ]
+}
   → Acte propre, sans réserve : un acte accompli par l'UE, relaté dans une lettre française, concret et daté. Une affirmation contestée au sujet d'une autre partie aurait exigé « selon la France ».
 ÉCHECS RÉELS DES EXÉCUTIONS PRÉCÉDENTES — ne reproduisez jamais ces schémas :
 ✗ « Quelle démarche de collaboration le Haut-Commissaire des Nations Unies aux droits de l'homme et le Conseil des droits de l'homme étaient-ils priés d'adopter en 2011 ? » — réponse « soutenir la société civile, le secteur privé, les milieux universitaires, les organisations régionales, les médias et les autres parties prenantes concernées, et coopérer et collaborer étroitement avec eux » → Une liste de type « coopérer et collaborer » (DISQUALIFIÉE), dans la série annuelle sur l'apprentissage des droits de l'homme. S'abstenir.
 ✗ « Comment les Nations Unies et la Communauté économique eurasienne devaient-elles se coordonner en 2007 ? » — réponse « invite le Secrétaire général de l'Organisation des Nations Unies à tenir ... des consultations régulières avec le Secrétaire général de la Communauté économique eurasienne ... » → La clause de consultations de toutes les résolutions biennales de coopération avec des organisations, un mécanisme des plus faibles et un paragraphe entier. S'abstenir.
-✗ « Quels acteurs étaient invités à coopérer, à célébrer la Journée internationale du sport au service du développement et de la paix et à la faire connaître ? » → Une liste d'invitation, alors que le même bloc contenait l'acte substantiel. Correction : {"question": "Comment l'Assemblée générale reconnut-elle formellement le sport comme outil de développement et de paix en 2013 ?", "answer": "Décide de proclamer le 6 avril Journée internationale du sport au service du développement et de la paix", "framing": "response", "anchor": "le sport comme outil de développement et de paix"}
+Extrait pédagogique du bloc cible A/RES/67/296: Décide de proclamer le 6 avril Journée internationale du sport au service du développement et de la paix
+✗ « Quels acteurs étaient invités à coopérer, à célébrer la Journée internationale du sport au service du développement et de la paix et à la faire connaître ? » → Une liste d'invitation, alors que le même bloc contenait l'acte substantiel. Correction : {
+  "question": "Comment l'Assemblée générale reconnut-elle formellement le sport comme outil de développement et de paix en 2013 ?",
+  "answer": "Décide de proclamer le 6 avril Journée internationale du sport au service du développement et de la paix",
+  "framing": "response",
+  "anchor": "le sport comme outil de développement et de paix",
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "target",
+      "language": "fr",
+      "text": "Décide de proclamer le 6 avril Journée internationale du sport au service du développement et de la paix"
+    }
+  ]
+}
 ✗ « Comment le Guyana a-t-il décrit la crise au Kosovo ? » → Un compte rendu de propos dont la réponse est une expression de préoccupation ; aucune année. Seule conviendrait une position sur une question concrète — « Quelle position le Guyana a-t-il prise sur l'emploi de la force au Kosovo en 1999 ? » — et uniquement si le bloc en énonce une.
 ✗ « À qui la responsabilité principale de l'application de l'Accord de paix en Bosnie-Herzégovine était-elle confiée ? » → Un CONSIDÉRANT du préambule (« Reconnaissant que ... la responsabilité principale ... incombe aux autorités elles-mêmes ») présent dans chaque résolution annuelle sur la Bosnie depuis 1996 ; aucune année. S'abstenir.
 ✗ « Quelle limite juridique était imposée aux mesures antiterroristes ? » → La clause universelle de conformité de tous les textes antiterroristes ; aucun acteur, aucune situation, aucune année. S'abstenir.
@@ -66,7 +179,20 @@ AUTO-VÉRIFICATION de chaque question, dans cet ordre :
 8. Moins de trois questions ont-elles satisfait à ces vérifications ? Produisez-en moins. Aucune ? Produisez la sortie d'abstention.
 SORTIE (JSON valide uniquement, pas de markdown) : une liste d'au plus TROIS objets :
 [
-  {"question": "...", "answer": "...", "framing": "...", "anchor": "..."}
+  {
+  "question": "...",
+  "answer": "...",
+  "framing": "...",
+  "anchor": "...",
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "target",
+      "language": "fr",
+      "text": "..."
+    }
+  ]
+}
 ]
 Si aucune question ne satisfait à tous les tests, renvoyez exactement : [{"skip_reason": "<one short phrase>"}]
 - answer : le segment contigu le plus court du bloc cible qui répond entièrement et directement à la question, en français.

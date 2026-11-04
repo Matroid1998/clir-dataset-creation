@@ -1,7 +1,9 @@
-"""Shared candidate annotations for the additional legal retrieval modes."""
+"""Shared legal candidate annotations and versioned evidence serialization."""
 
 import json
 from dataclasses import dataclass, field, fields
+
+from clir_bench.domains.legal.qac.evidence import CONTRACT
 
 MODE_COMPARISON = "comparison"
 MODE_CLAIM_VERIFICATION = "claim_verification"
@@ -20,6 +22,10 @@ class GenerationMetadata:
     source_article: str = ""
     evidence: str = ""
     evidence_is_translation: bool | None = None
+    evidence_language: str = ""
+    evidence_source_id: str = ""
+    evidence_contract: str = ""
+    evidence_spans: list[dict] = field(default_factory=list)
 
 
 FIELDS = tuple(f.name for f in fields(GenerationMetadata))
@@ -45,6 +51,15 @@ def parse_metadata(item, mode, *, eurlex=False):
             result[key] = str(item.get(key, "")).strip()
         flag = item.get("evidence_is_translation")
         result["evidence_is_translation"] = flag if isinstance(flag, bool) else None
+    if item.get("evidence_contract") == CONTRACT:
+        # Canonical evidence is already validated during new generation; restore
+        # it verbatim during checkpoint replay/regrading, including whitespace.
+        for key in ("evidence", "evidence_language", "evidence_source_id", "evidence_contract"):
+            result[key] = item.get(key, "")
+        result["evidence_spans"] = item.get("evidence_spans", [])
+        for key in ("answer_is_translation", "evidence_is_translation"):
+            flag = item.get(key)
+            result[key] = flag if isinstance(flag, bool) else None
     return result
 
 
@@ -56,8 +71,9 @@ def metadata(candidate):
 def row_metadata(candidate):
     """CSV values; JSON preserves entity order and punctuation losslessly."""
     result = metadata(candidate)
-    entities = result["comparison_entities"]
-    result["comparison_entities"] = json.dumps(entities, ensure_ascii=False) if entities else ""
+    for key in ("comparison_entities", "evidence_spans"):
+        values = result[key]
+        result[key] = json.dumps(values, ensure_ascii=False) if values else ""
     return {key: value if value is not None else "" for key, value in result.items()}
 
 
@@ -67,6 +83,9 @@ def restore_metadata(row, mode, *, eurlex=False):
     entities = item.get("comparison_entities")
     if mode == MODE_COMPARISON and isinstance(entities, str):
         item["comparison_entities"] = json.loads(entities) if entities else []
+    spans = item.get("evidence_spans")
+    if isinstance(spans, str):
+        item["evidence_spans"] = json.loads(spans) if spans else []
     for key in ("answer_is_translation", "evidence_is_translation"):
         flag = item.get(key)
         if isinstance(flag, str):

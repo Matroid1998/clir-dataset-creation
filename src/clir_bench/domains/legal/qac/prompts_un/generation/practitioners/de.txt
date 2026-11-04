@@ -1,3 +1,39 @@
+EVIDENCE_CONTRACT: legal_evidence_spans_v1
+
+Ausgabesprache: Deutsch. Fragen und Freitextannotationen sind deutsch; Quellenzitate und kopierte Kennungen behalten ihre ursprüngliche Form.
+
+AUSDRÜCKLICHE BELEGSPANNEN — IN JEDEM MODUS ERFORDERLICH
+Geben Sie evidence_spans als geordnete Liste von Objekten mit genau source_ref, language und text
+zurück. Die erste Spanne belegt answer unmittelbar, bei source_finding den materiellen Suchhinweis.
+Jede Spanne ist EIN kleinstmöglicher ausreichender zusammenhängender Ausschnitt, WÖRTLICH aus dem
+tatsächlich mitgelieferten Quellenkörper in dessen Originalsprache kopiert. Bewahren Sie Schreibweise,
+Leerraum, Zeichensetzung, Markup und Fehler. Übersetzen Sie Belege niemals; verbinden Sie keine
+getrennten Stellen, fügen Sie keine Auslassungszeichen ein, kopieren Sie keine Metadaten und zitieren
+Sie nichts hinter einer Kürzungsgrenze. language bezeichnet die Sprache der zitierten Fassung.
+Bewahren Sie alle antwortrelevanten Bedingungen, Ausnahmen, Akteure, Modalitäten und Geltungsgrenzen.
+Kopieren Sie keine ganzen Artikel oder Dokumente anstelle der benötigten Belegstellen.
+Entfernen Sie entbehrlichen Anfangs- und Endtext, bewahren Sie aber notwendige Zwischenpassagen.
+Es gibt keine feste Tokenobergrenze. Grenzen Sie die Frage ein oder überspringen Sie sie, wenn diese
+Beleganforderungen nicht erfüllbar sind.
+Legen Sie zuerst die primäre Belegspanne fest. Außer bei source_finding übernimmt answer deren
+vollständigen Text, wenn eine passende Fassung in der Ausgabesprache mitgeliefert wurde;
+answer_is_translation ist dann false. Andernfalls übersetzen Sie die gesamte Spanne sinngenau in
+die Ausgabesprache und setzen answer_is_translation auf true. Keine Zusammenfassung, Berechnung,
+zusätzliche Ja/Nein-Antwort oder Bedeutungsänderung. Bei source_finding bleibt answer die genaue
+Zielidentität nach der bestehenden Modusregel, answer_is_translation ist false, und die erste Spanne
+belegt den materiellen Hinweis im Zieltext.
+Geben Sie answer_is_translation in JEDEM Modus als JSON-Boolean zurück. Geben Sie keine skalaren
+Felder evidence, evidence_language, evidence_is_translation, kanonischen Quellenkennungen oder
+Zeichenpositionen aus: Diese werden aus erster Spanne und Quelldaten berechnet. Die bestehenden
+modusspezifischen Felder bleiben neben evidence_spans erhalten. Beispielauszüge sind nur Lehrmaterial.
+Auch bei übersetzten Beispielantworten bleibt der Beleg in der tatsächlich gezeigten Quellsprache.
+
+UN: BELEGABDECKUNG
+Geben Sie genau eine Spanne mit source_ref="target" aus dem Körper von TARGET BLOCK zurück.
+REFERENCED DOCUMENTS und DOCUMENT CONTEXT liefern keine Belegsubstanz. Die Dokumentidentität macht
+andere Blöcke nicht zu zulässigen Belegen. Bewahren Sie Sprecherrolle und Status der Aussage.
+Ein kurzer Zielblock darf nur vollständig zitiert werden, wenn jeder Teil notwendig ist; niemals das ganze Dokument als Beleg übernehmen.
+
 Sie erstellen fallbezogene Recherchefragen für Praktiker, die mit UN-Dokumenten arbeiten. Der Praktiker hat eine konkrete Situation oder Aufgabe, keine Dokumentfundstelle. Beschreiben Sie diese Situation und fragen Sie nach der Regel, dem Verfahren, der erbetenen Handlung oder der zugeschriebenen Feststellung, die zu ihrer Bearbeitung benötigt wird. Das Suchsystem muss anhand der Situation die einschlägigen UN-Belege finden.
 
 QUELLE UND SPRACHE
@@ -32,7 +68,22 @@ Antwort: „dass Überschwemmungen die östliche Hilfsgüterroute in Luma im Mä
 
 AUSGABE
 Geben Sie ausschließlich eine JSON-Liste mit bis zu DREI verschiedenen, nützlichen Paaren zurück. Ein gutes Paar genügt; füllen Sie nicht auf drei auf und erzwingen Sie keine Kategorienvielfalt. Wenn keines geeignet ist, geben Sie genau [{"skip_reason":"<one short phrase>"}] zurück.
-[{"question":"...","answer":"...","question_type":"...","anchors":["..."]}]
+[{
+  "question": "...",
+  "answer": "...",
+  "question_type": "...",
+  "anchors": [
+    "..."
+  ],
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "target",
+      "language": "de",
+      "text": "..."
+    }
+  ]
+}]
 Lassen Sie diese Schlüssel unverändert. Wählen Sie den treffendsten question_type aus: sanction_condition_or_consequence, date_deadline_or_mandate, quantity_force_or_finance, reporting_monitoring_or_verification, actor_body_or_procedure, situation_scope_or_coverage, operative_action, finding_event_or_assessment. Kein Typ hat Vorrang.
 „anchors“ enthält eine oder mehrere unterschiedliche, inhaltlich aussagekräftige wörtliche Teilzeichenfolgen der Frage in ihrer Reihenfolge, die die Situation identifizieren. Es gibt keine feste Anzahl; die Liste kann fehlenden Kontext in der Frage nicht ersetzen.
 Hier ist die Eingabe:

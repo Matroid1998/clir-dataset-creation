@@ -1,3 +1,37 @@
+EVIDENCE_CONTRACT: legal_evidence_spans_v1
+
+Idioma de salida: español. Las preguntas y anotaciones de texto libre van en español; las citas y los identificadores copiados conservan su forma original.
+
+PASAJES DE APOYO EXPLÍCITOS — OBLIGATORIOS EN TODOS LOS MODOS
+Devuelva evidence_spans como una lista ordenada de objetos con exactamente source_ref, language y
+text. El primer pasaje respalda directamente answer o, en source_finding, la pista sustantiva.
+Cada pasaje es UN extracto continuo mínimo y suficiente, copiado EXACTAMENTE del cuerpo de una
+fuente realmente proporcionada, en su idioma original. Conserve ortografía, espacios, puntuación,
+marcado y errores. Nunca traduzca la evidencia, una fragmentos separados, añada puntos suspensivos,
+copie metadatos ni cite contenido oculto por truncamiento. language indica el idioma de la versión
+citada, que no es necesariamente el idioma de la pregunta.
+Conserve toda condición, excepción, actor, modalidad y límite de alcance decisivos para la respuesta.
+No copie un artículo o documento completo en lugar de seleccionar los pasajes necesarios.
+Quite texto inicial o final prescindible y conserve el texto intermedio indispensable. No hay un
+límite fijo de tokens. Acote u omita la pregunta si no puede cumplir este contrato.
+Fije primero el pasaje primario. Salvo en source_finding, answer copia TODO su texto si se ha
+proporcionado una versión adecuada en el idioma de salida; answer_is_translation es false.
+En caso contrario traduzca fielmente TODO el pasaje al idioma solicitado y marque
+answer_is_translation como true. No resuma, calcule, agregue un veredicto ni cambie el alcance.
+En source_finding, answer conserva la identidad exacta del objetivo según las reglas del modo,
+answer_is_translation es false y el primer pasaje demuestra la pista en el cuerpo del objetivo.
+Devuelva answer_is_translation como booleano JSON en TODOS los modos. No devuelva los campos
+escalares evidence, evidence_language, evidence_is_translation, identificadores canónicos ni
+posiciones de caracteres: el analizador los deriva del primer pasaje y los datos fuente. Conserve
+los campos propios del modo junto a evidence_spans. Los extractos de los ejemplos son solo material
+didáctico. Aunque una respuesta ilustrativa se traduzca, la evidencia queda en el idioma mostrado.
+
+ONU: COBERTURA DE EVIDENCIA
+Devuelva exactamente un pasaje con source_ref="target", del cuerpo de TARGET BLOCK. Ni REFERENCED
+DOCUMENTS ni DOCUMENT CONTEXT pueden aportar evidencia. Identificar el documento no habilita sus
+otros bloques como evidencia. Conserve la calidad del hablante y el estado de la afirmación.
+Un bloque objetivo breve puede citarse entero solo si cada parte es necesaria; nunca lo sustituya por el documento completo.
+
 Creas preguntas de recuperación documental basadas en casos para profesionales que trabajan con documentos de las Naciones Unidas. El profesional tiene una situación o tarea concreta, no una cita documental. Describe esa situación y pregunta por la regla, el procedimiento, la acción solicitada o la constatación atribuida que necesita para abordarla. El sistema de búsqueda debe identificar la evidencia pertinente de la ONU a partir de la situación.
 
 FUENTE E IDIOMA
@@ -32,7 +66,22 @@ Respuesta: «las inundaciones bloquearon la ruta oriental de socorro en Luma en 
 
 SALIDA
 Devuelve únicamente una lista JSON con hasta TRES parejas distintas y útiles. Basta una pareja sólida; no rellenes hasta llegar a tres ni fuerces diversidad de categorías. Si ninguna cumple los requisitos, devuelve exactamente [{"skip_reason":"<one short phrase>"}].
-[{"question":"...","answer":"...","question_type":"...","anchors":["..."]}]
+[{
+  "question": "...",
+  "answer": "...",
+  "question_type": "...",
+  "anchors": [
+    "..."
+  ],
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "target",
+      "language": "es",
+      "text": "..."
+    }
+  ]
+}]
 Mantén estas claves sin cambios. Elige el question_type más descriptivo entre: sanction_condition_or_consequence, date_deadline_or_mandate, quantity_force_or_finance, reporting_monitoring_or_verification, actor_body_or_procedure, situation_scope_or_coverage, operative_action, finding_event_or_assessment. Ningún tipo tiene prioridad.
 «anchors» contiene una o más subcadenas distintas, sustantivas y literales de la pregunta, en su orden de aparición, que identifican la situación. No hay un número fijo; la lista no puede subsanar la falta de contexto en la pregunta.
 Esta es la entrada:

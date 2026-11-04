@@ -1,3 +1,39 @@
+EVIDENCE_CONTRACT: legal_evidence_spans_v1
+
+Idioma de salida: español. Las preguntas y anotaciones de texto libre van en español; las citas y los identificadores copiados conservan su forma original.
+
+PASAJES DE APOYO EXPLÍCITOS — OBLIGATORIOS EN TODOS LOS MODOS
+Devuelva evidence_spans como una lista ordenada de objetos con exactamente source_ref, language y
+text. El primer pasaje respalda directamente answer o, en source_finding, la pista sustantiva.
+Cada pasaje es UN extracto continuo mínimo y suficiente, copiado EXACTAMENTE del cuerpo de una
+fuente realmente proporcionada, en su idioma original. Conserve ortografía, espacios, puntuación,
+marcado y errores. Nunca traduzca la evidencia, una fragmentos separados, añada puntos suspensivos,
+copie metadatos ni cite contenido oculto por truncamiento. language indica el idioma de la versión
+citada, que no es necesariamente el idioma de la pregunta.
+Conserve toda condición, excepción, actor, modalidad y límite de alcance decisivos para la respuesta.
+No copie un artículo o documento completo en lugar de seleccionar los pasajes necesarios.
+Quite texto inicial o final prescindible y conserve el texto intermedio indispensable. No hay un
+límite fijo de tokens. Acote u omita la pregunta si no puede cumplir este contrato.
+Fije primero el pasaje primario. Salvo en source_finding, answer copia TODO su texto si se ha
+proporcionado una versión adecuada en el idioma de salida; answer_is_translation es false.
+En caso contrario traduzca fielmente TODO el pasaje al idioma solicitado y marque
+answer_is_translation como true. No resuma, calcule, agregue un veredicto ni cambie el alcance.
+En source_finding, answer conserva la identidad exacta del objetivo según las reglas del modo,
+answer_is_translation es false y el primer pasaje demuestra la pista en el cuerpo del objetivo.
+Devuelva answer_is_translation como booleano JSON en TODOS los modos. No devuelva los campos
+escalares evidence, evidence_language, evidence_is_translation, identificadores canónicos ni
+posiciones de caracteres: el analizador los deriva del primer pasaje y los datos fuente. Conserve
+los campos propios del modo junto a evidence_spans. Los extractos de los ejemplos son solo material
+didáctico. Aunque una respuesta ilustrativa se traduzca, la evidencia queda en el idioma mostrado.
+
+EUR-LEX: COBERTURA DE EVIDENCIA
+Devuelva exactamente un pasaje por CADA unidad de articles_involved: objetivo y toda referencia o
+anexo proporcionado indispensable. No incluya fuentes sin uso ni versiones lingüísticas duplicadas.
+source_ref es el número simple para artículos del propio acto y la clave Cite as exacta para otro
+acto o cualquier anexo. El pasaje primario puede proceder de una referencia permitida solo si la
+regla del objetivo sigue siendo indispensable; aporte un pasaje separado del objetivo. En
+source_finding el primer pasaje procede del objetivo. Cada extracto permanece dentro de su unidad.
+
 ACLARACIONES PRIORITARIAS — estas reglas sustituyen cualquier formulación o ejemplo incompatible que aparezca más abajo.
 La respuesta es un fragmento probatorio continuo del texto suministrado, leído junto con la pregunta, la disposición que lo rige y las referencias expresas suministradas. No añada «sí/no», una conclusión reformulada ni una fecha calculada. Comparar hechos estipulados con una categoría, condición, umbral o fecha explícitos, resolver referentes ordinarios o reconocer el incumplimiento de una obligación expresa no es inferencia jurídica sin respaldo. Nunca invente condiciones decisivas, sanciones, reglas inversas o derecho externo.
 Las preguntas abiertas y de sí/no son igualmente válidas. Preguntar únicamente por la pertenencia a una categoría no exige todas las condiciones de un derecho definitivo; preguntar por el derecho completo exige todas las condiciones decisivas. Repetir términos jurídicos o condiciones necesarias entre pregunta y respuesta no revela por sí mismo la respuesta: el punto de derecho solicitado debe seguir siendo desconocido. No use la eliminación del fragmento de respuesta como prueba automática de descarte.
@@ -54,7 +90,25 @@ Ejemplo 1 — la respuesta está íntegramente en el artículo objetivo
 ### REFERENCED ARTICLES
 [ES] Artículo 12 — Competencias de ejecución
 «La Comisión adoptará actos de ejecución que establezcan el formato de los informes.»
-✓ {"question": "¿Cuál es el plazo anual para que los productores de plásticos de un solo uso comuniquen a la autoridad nacional las cantidades que han introducido en el mercado?", "question_cited": "¿Cuál es el plazo anual con arreglo a la Directiva (UE) 2019/904 para que los productores de plásticos de un solo uso comuniquen a la autoridad nacional las cantidades que han introducido en el mercado?", "instrument_short_name": "Directiva de plásticos de un solo uso", "answer": "a más tardar el 31 de marzo de cada año", "question_type": "deadline_or_duration", "anchor": "productores de plásticos de un solo uso", "articles_involved": ["8"]}
+✓ {
+  "question": "¿Cuál es el plazo anual para que los productores de plásticos de un solo uso comuniquen a la autoridad nacional las cantidades que han introducido en el mercado?",
+  "question_cited": "¿Cuál es el plazo anual con arreglo a la Directiva (UE) 2019/904 para que los productores de plásticos de un solo uso comuniquen a la autoridad nacional las cantidades que han introducido en el mercado?",
+  "instrument_short_name": "Directiva de plásticos de un solo uso",
+  "answer": "a más tardar el 31 de marzo de cada año",
+  "question_type": "deadline_or_duration",
+  "anchor": "productores de plásticos de un solo uso",
+  "articles_involved": [
+    "8"
+  ],
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "8",
+      "language": "es",
+      "text": "a más tardar el 31 de marzo de cada año"
+    }
+  ]
+}
   → El anclaje es el actor regulado, construido a partir de la materia de la línea «Act»; «productores» por sí solo no superaría la prueba del acto hermano (las normas sobre envases, residuos de aparatos eléctricos y electrónicos y baterías también imponen plazos de información a los productores). La estructura se parafrasea («plazo anual»), mientras que se conserva el término técnico («introducidas en el mercado»): la formulación literal «¿Antes de qué fecha de cada año deben los productores … comunicar las cantidades introducidas en el mercado?» es aceptable, pero reproduce el artículo. El artículo 12 se cita, pero no aporta nada, por lo que no se enumera.
 ✗ «¿Antes de qué fecha deben los productores comunicar las cantidades anuales introducidas en el mercado?» → ¿qué productores, con arreglo a qué régimen? No supera la prueba del acto hermano.
 ✗ «¿Qué formato deben utilizar los productores de plásticos de un solo uso para sus informes anuales?» → el formato figura en un acto de ejecución que no se ha facilitado. Descarta la pregunta.
@@ -65,12 +119,75 @@ Ejemplo 2 — un artículo referenciado completa la respuesta
 ### REFERENCED ARTICLES
 [ES] Artículo 3 — Productos incluidos
 «La presente Directiva se aplica a los bastoncillos de algodón, cubiertos, platos, pajitas y agitadores de bebidas fabricados con plástico.»
-✓ {"question": "¿Qué productos de plástico de un solo uso está prohibido introducir en el mercado de la UE a partir del 3 de julio de 2026?", "question_cited": "¿Qué productos de plástico de un solo uso está prohibido introducir en el mercado de la UE con arreglo a la Directiva (UE) 2019/904 a partir del 3 de julio de 2026?", "instrument_short_name": "Directiva de plásticos de un solo uso", "answer": "bastoncillos de algodón, cubiertos, platos, pajitas y agitadores de bebidas fabricados con plástico", "question_type": "scope_or_applicability", "anchor": "productos de plástico de un solo uso", "articles_involved": ["3", "4"]}
+✓ {
+  "question": "¿Qué productos de plástico de un solo uso está prohibido introducir en el mercado de la UE a partir del 3 de julio de 2026?",
+  "question_cited": "¿Qué productos de plástico de un solo uso está prohibido introducir en el mercado de la UE con arreglo a la Directiva (UE) 2019/904 a partir del 3 de julio de 2026?",
+  "instrument_short_name": "Directiva de plásticos de un solo uso",
+  "answer": "bastoncillos de algodón, cubiertos, platos, pajitas y agitadores de bebidas fabricados con plástico",
+  "question_type": "scope_or_applicability",
+  "anchor": "productos de plástico de un solo uso",
+  "articles_involved": [
+    "3",
+    "4"
+  ],
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "3",
+      "language": "es",
+      "text": "bastoncillos de algodón, cubiertos, platos, pajitas y agitadores de bebidas fabricados con plástico"
+    },
+    {
+      "source_ref": "4",
+      "language": "es",
+      "text": "Los Estados miembros prohibirán la introducción en el mercado de los artículos de plástico de un solo uso enumerados en el artículo 3 a partir del 3 de julio de 2026."
+    }
+  ]
+}
   → La prohibición y su fecha son hechos propios del artículo objetivo; la lista de productos procede del artículo 3, por lo que se declaran ambos. PRUEBA DEL ARTÍCULO ÚNICO: el artículo 3 enumera productos, pero no dice que estén prohibidos ni desde cuándo.
 ✗ «¿A qué productos se aplica la directiva de plásticos de un solo uso?» → es una pregunta sobre el artículo 3; descártala.
-✗ {"question": "¿Qué productos de plástico de un solo uso están prohibidos a partir del 3 de julio de 2026?", "answer": "bastoncillos de algodón, cubiertos, platos, pajitas y agitadores de bebidas", "articles_involved": ["4"]}
+✗ {
+  "question": "¿Qué productos de plástico de un solo uso están prohibidos a partir del 3 de julio de 2026?",
+  "answer": "bastoncillos de algodón, cubiertos, platos, pajitas y agitadores de bebidas",
+  "articles_involved": [
+    "4"
+  ],
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "3",
+      "language": "es",
+      "text": "bastoncillos de algodón, cubiertos, platos, pajitas y agitadores de bebidas"
+    },
+    {
+      "source_ref": "4",
+      "language": "es",
+      "text": "Los Estados miembros prohibirán la introducción en el mercado de los artículos de plástico de un solo uso enumerados en el artículo 3 a partir del 3 de julio de 2026."
+    }
+  ]
+}
   → declaración insuficiente: la lista procede del artículo 3.
-✗ {"question": "¿A partir de qué fecha deben los Estados miembros prohibir la introducción en el mercado de los artículos de plástico de un solo uso incluidos en la prohibición de la UE?", "answer": "a partir del 3 de julio de 2026", "articles_involved": ["3", "4"]}
+✗ {
+  "question": "¿A partir de qué fecha deben los Estados miembros prohibir la introducción en el mercado de los artículos de plástico de un solo uso incluidos en la prohibición de la UE?",
+  "answer": "a partir del 3 de julio de 2026",
+  "articles_involved": [
+    "3",
+    "4"
+  ],
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "4",
+      "language": "es",
+      "text": "a partir del 3 de julio de 2026"
+    },
+    {
+      "source_ref": "3",
+      "language": "es",
+      "text": "La presente Directiva se aplica a los bastoncillos de algodón, cubiertos, platos, pajitas y agitadores de bebidas fabricados con plástico."
+    }
+  ]
+}
   → declaración excesiva: la fecha figura íntegramente en el artículo 4.
 ✗ {"question": "¿Qué productos prohíbe la Directiva (UE) 2019/904 a partir del 3 de julio de 2026?"} → identificador en la formulación base; solo corresponde a «question_cited».
 Ejemplo 3 — fallos reales de una ejecución de producción que se apartaban del artículo objetivo; todas las preguntas multiartículo incumplieron así la prueba del artículo único
@@ -88,7 +205,31 @@ Ejemplo 4 — un artículo de OTRO acto completa la respuesta
 ### REFERENCED ARTICLES FROM OTHER ACTS
 [ES] Artículo 5 — Controles   Act: Reglamento (CE) n.º 21/2004 del Consejo …   Cite as: 32004R0021:5
 «Los Estados miembros realizarán controles sobre el terreno que abarquen al menos el 3 % de las explotaciones cada año.»
-✓ {"question": "¿Qué controles deben haberse realizado antes de que se pague la ayuda a las explotaciones ovinas y caprinas?", "question_cited": "¿Qué controles deben haberse realizado con arreglo al Reglamento (CE) n.º 796/2004 de la Comisión antes de que se pague la ayuda a las explotaciones ovinas y caprinas?", "instrument_short_name": null, "answer": "controles sobre el terreno que abarquen al menos el 3 % de las explotaciones cada año", "question_type": "condition_or_prerequisite", "anchor": "ayuda a las explotaciones ovinas y caprinas", "articles_involved": ["2", "32004R0021:5"]}
+✓ {
+  "question": "¿Qué controles deben haberse realizado antes de que se pague la ayuda a las explotaciones ovinas y caprinas?",
+  "question_cited": "¿Qué controles deben haberse realizado con arreglo al Reglamento (CE) n.º 796/2004 de la Comisión antes de que se pague la ayuda a las explotaciones ovinas y caprinas?",
+  "instrument_short_name": null,
+  "answer": "controles sobre el terreno que abarquen al menos el 3 % de las explotaciones cada año",
+  "question_type": "condition_or_prerequisite",
+  "anchor": "ayuda a las explotaciones ovinas y caprinas",
+  "articles_involved": [
+    "2",
+    "32004R0021:5"
+  ],
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "32004R0021:5",
+      "language": "es",
+      "text": "controles sobre el terreno que abarquen al menos el 3 % de las explotaciones cada año"
+    },
+    {
+      "source_ref": "2",
+      "language": "es",
+      "text": "La ayuda solo se pagará una vez realizados los controles previstos en el artículo 5 del Reglamento (CE) n.º 21/2004 del Consejo."
+    }
+  ]
+}
   → La condición de pago es la norma del objetivo; el otro acto solo precisa cuáles son los controles y se declara con su clave «Cite as», nunca con un mero «5».
 ✗ «¿Qué proporción mínima de las explotaciones ovinas y caprinas debe controlarse sobre el terreno cada año?» → el artículo 5 del otro reglamento responde por sí solo. Descarta la pregunta.
 ✗ «Con arreglo al Reglamento (CE) n.º 21/2004, ¿cuándo se paga la ayuda?» → anclada en el identificador del otro acto; un sistema de recuperación devolvería ese acto.
@@ -99,19 +240,109 @@ Ejemplo 5 — preguntas reales de producción de EUR-Lex, respaldadas por el tex
 ✓ Salida para ambos: [{"skip_reason": "solo cláusula de estilo"}]
 (b) PRUEBA DEL ACTO HERMANO. Artículo OBJETIVO 10 de la Directiva 2010/43/UE de la Comisión (requisitos organizativos de las sociedades de gestión de OICVM): «… se nombrará a un responsable de cumplimiento que se encargará de … informar con frecuencia, y al menos anualmente, a la alta dirección sobre cuestiones de cumplimiento …»
 ✗ «¿Con qué frecuencia debe informar el responsable de cumplimiento a la alta dirección sobre cuestiones de cumplimiento?» → las medidas de ejecución de MiFID y AIFMD contienen la misma norma con palabras casi idénticas.
-✓ {"question": "¿Con qué frecuencia debe informar el responsable de cumplimiento de una sociedad de gestión de OICVM a la alta dirección sobre cuestiones de cumplimiento?", "question_cited": "¿Con qué frecuencia debe informar el responsable de cumplimiento de una sociedad de gestión de OICVM a la alta dirección sobre cuestiones de cumplimiento con arreglo a la Directiva 2010/43/UE de la Comisión?", "instrument_short_name": null, "answer": "con frecuencia, y al menos anualmente", "question_type": "monitoring_or_reporting", "anchor": "sociedad de gestión de OICVM", "articles_involved": ["10"]}
+✓ {
+  "question": "¿Con qué frecuencia debe informar el responsable de cumplimiento de una sociedad de gestión de OICVM a la alta dirección sobre cuestiones de cumplimiento?",
+  "question_cited": "¿Con qué frecuencia debe informar el responsable de cumplimiento de una sociedad de gestión de OICVM a la alta dirección sobre cuestiones de cumplimiento con arreglo a la Directiva 2010/43/UE de la Comisión?",
+  "instrument_short_name": null,
+  "answer": "con frecuencia, y al menos anualmente",
+  "question_type": "monitoring_or_reporting",
+  "anchor": "sociedad de gestión de OICVM",
+  "articles_involved": [
+    "10"
+  ],
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "10",
+      "language": "es",
+      "text": "con frecuencia, y al menos anualmente"
+    }
+  ]
+}
 (c) PRUEBA DEL COLEGA. Artículo OBJETIVO 9 del Reglamento (UE) n.º 1300/2014 de la Comisión (accesibilidad del sistema ferroviario para las personas de movilidad reducida) — Órgano consultivo: «Entre las tareas del órgano consultivo figurarán: a) supervisar el desarrollo de una estructura mínima de datos para el inventario de activos, …»
 ✗ «¿Qué debe supervisar el órgano consultivo respecto del inventario de activos?» → ¿qué órgano consultivo, qué inventario? Solo puede saberlo quien haya leído el artículo.
-✓ {"question": "¿Qué órgano supervisa el desarrollo de la estructura mínima de datos para el inventario de activos en la ETI de accesibilidad ferroviaria de la UE para las personas de movilidad reducida?", "question_cited": "¿Qué órgano supervisa con arreglo al Reglamento (UE) n.º 1300/2014 de la Comisión el desarrollo de la estructura mínima de datos para el inventario de activos en la ETI de accesibilidad ferroviaria de la UE para las personas de movilidad reducida?", "instrument_short_name": "ETI PMR", "answer": "Entre las tareas del órgano consultivo figurarán: a) supervisar el desarrollo de una estructura mínima de datos para el inventario de activos", "question_type": "definition_actor_or_procedure", "anchor": "ETI de accesibilidad ferroviaria de la UE para las personas de movilidad reducida", "articles_involved": ["9"]}
+✓ {
+  "question": "¿Qué órgano supervisa el desarrollo de la estructura mínima de datos para el inventario de activos en la ETI de accesibilidad ferroviaria de la UE para las personas de movilidad reducida?",
+  "question_cited": "¿Qué órgano supervisa con arreglo al Reglamento (UE) n.º 1300/2014 de la Comisión el desarrollo de la estructura mínima de datos para el inventario de activos en la ETI de accesibilidad ferroviaria de la UE para las personas de movilidad reducida?",
+  "instrument_short_name": "ETI PMR",
+  "answer": "Entre las tareas del órgano consultivo figurarán: a) supervisar el desarrollo de una estructura mínima de datos para el inventario de activos",
+  "question_type": "definition_actor_or_procedure",
+  "anchor": "ETI de accesibilidad ferroviaria de la UE para las personas de movilidad reducida",
+  "articles_involved": [
+    "9"
+  ],
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "9",
+      "language": "es",
+      "text": "Entre las tareas del órgano consultivo figurarán: a) supervisar el desarrollo de una estructura mínima de datos para el inventario de activos"
+    }
+  ]
+}
 (d) INFORMATIVIDAD. Artículo OBJETIVO 20 del Reglamento (CE) n.º 1393/2007 (notificación y traslado de documentos judiciales y extrajudiciales): «El presente Reglamento prevalecerá, en las materias a las que se aplica, sobre las disposiciones contenidas en los acuerdos o convenios bilaterales o multilaterales celebrados por los Estados miembros, en particular el artículo IV del Protocolo del Convenio de Bruselas de 1968 y el Convenio de La Haya de 15 de noviembre de 1965.»
 ✗ «¿En qué materias prevalece el reglamento de la UE de 2007 sobre la notificación y el traslado de documentos judiciales y extrajudiciales sobre los acuerdos bilaterales o multilaterales celebrados por los Estados miembros?» → la respuesta, «en las materias a las que se aplica», no aporta nada.
-✓ {"question": "¿Prevalece el reglamento de la UE sobre la notificación y el traslado de documentos judiciales y extrajudiciales en materia civil y mercantil sobre el Convenio de La Haya de 1965 sobre notificación entre los Estados miembros?", "question_cited": "Con arreglo al Reglamento (CE) n.º 1393/2007, ¿prevalece el reglamento de la UE sobre la notificación y el traslado de documentos judiciales y extrajudiciales en materia civil y mercantil sobre el Convenio de La Haya de 1965 sobre notificación entre los Estados miembros?", "instrument_short_name": "Reglamento de notificaciones", "answer": "El presente Reglamento prevalecerá, en las materias a las que se aplica, sobre las disposiciones contenidas en los acuerdos o convenios bilaterales o multilaterales celebrados por los Estados miembros, en particular el artículo IV del Protocolo del Convenio de Bruselas de 1968 y el Convenio de La Haya de 15 de noviembre de 1965.", "question_type": "scope_or_applicability", "anchor": "notificación y el traslado de documentos judiciales y extrajudiciales en materia civil y mercantil", "articles_involved": ["20"]}
+✓ {
+  "question": "¿Prevalece el reglamento de la UE sobre la notificación y el traslado de documentos judiciales y extrajudiciales en materia civil y mercantil sobre el Convenio de La Haya de 1965 sobre notificación entre los Estados miembros?",
+  "question_cited": "Con arreglo al Reglamento (CE) n.º 1393/2007, ¿prevalece el reglamento de la UE sobre la notificación y el traslado de documentos judiciales y extrajudiciales en materia civil y mercantil sobre el Convenio de La Haya de 1965 sobre notificación entre los Estados miembros?",
+  "instrument_short_name": "Reglamento de notificaciones",
+  "answer": "El presente Reglamento prevalecerá, en las materias a las que se aplica, sobre las disposiciones contenidas en los acuerdos o convenios bilaterales o multilaterales celebrados por los Estados miembros, en particular el artículo IV del Protocolo del Convenio de Bruselas de 1968 y el Convenio de La Haya de 15 de noviembre de 1965.",
+  "question_type": "scope_or_applicability",
+  "anchor": "notificación y el traslado de documentos judiciales y extrajudiciales en materia civil y mercantil",
+  "articles_involved": [
+    "20"
+  ],
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "20",
+      "language": "es",
+      "text": "El presente Reglamento prevalecerá, en las materias a las que se aplica, sobre las disposiciones contenidas en los acuerdos o convenios bilaterales o multilaterales celebrados por los Estados miembros, en particular el artículo IV del Protocolo del Convenio de Bruselas de 1968 y el Convenio de La Haya de 15 de noviembre de 1965."
+    }
+  ]
+}
 (e) RESPUESTA ESCRITA EN LA PREGUNTA. Artículo OBJETIVO 2 de la Directiva 2009/18/CE (investigación de accidentes en el sector del transporte marítimo) — Ámbito de aplicación: la Directiva no se aplica a siniestros que afecten únicamente a «buques pesqueros de eslora inferior a 15 metros».
 ✗ «¿Está excluido el régimen de investigación de accidentes marítimos para los siniestros y sucesos marítimos que afecten únicamente a buques pesqueros de eslora inferior a 15 metros?» — respuesta: «buques pesqueros de eslora inferior a 15 metros» → anclada y natural, pero el umbral es la respuesta y está en la pregunta.
-✓ {"question": "¿Por debajo de qué eslora quedan los buques pesqueros fuera del ámbito de aplicación del régimen de la UE de investigación de accidentes marítimos?", "question_cited": "¿Por debajo de qué eslora quedan los buques pesqueros fuera del ámbito de aplicación del régimen de la UE de investigación de accidentes marítimos con arreglo a la Directiva 2009/18/CE?", "instrument_short_name": null, "answer": "buques pesqueros de eslora inferior a 15 metros", "question_type": "scope_or_applicability", "anchor": "régimen de la UE de investigación de accidentes marítimos", "articles_involved": ["2"]}
+✓ {
+  "question": "¿Por debajo de qué eslora quedan los buques pesqueros fuera del ámbito de aplicación del régimen de la UE de investigación de accidentes marítimos?",
+  "question_cited": "¿Por debajo de qué eslora quedan los buques pesqueros fuera del ámbito de aplicación del régimen de la UE de investigación de accidentes marítimos con arreglo a la Directiva 2009/18/CE?",
+  "instrument_short_name": null,
+  "answer": "buques pesqueros de eslora inferior a 15 metros",
+  "question_type": "scope_or_applicability",
+  "anchor": "régimen de la UE de investigación de accidentes marítimos",
+  "articles_involved": [
+    "2"
+  ],
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "2",
+      "language": "es",
+      "text": "buques pesqueros de eslora inferior a 15 metros"
+    }
+  ]
+}
 (f) ANCLAJE — producto regulado. Artículo OBJETIVO 1 del Reglamento (UE) n.º 833/2012 de la Comisión (derecho antidumping provisional sobre las hojas de aluminio en rollos originarias de China): cuadro de tipos del derecho que termina con «Todas las demás empresas — 35,4 %».
 ✗ «¿Qué derecho antidumping provisional se aplica a las importaciones realizadas por todas las demás empresas?» → todos los reglamentos antidumping tienen un tipo para «todas las demás empresas».
-✓ {"question": "¿Cuál es el tipo residual para 'todas las demás empresas' del derecho antidumping provisional sobre las hojas de aluminio en rollos originarias de China?", "question_cited": "¿Cuál es el tipo residual para 'todas las demás empresas' del derecho antidumping provisional sobre las hojas de aluminio en rollos originarias de China con arreglo al Reglamento (UE) n.º 833/2012 de la Comisión?", "instrument_short_name": null, "answer": "35,4 %", "question_type": "amount_or_threshold", "anchor": "derecho antidumping provisional sobre las hojas de aluminio en rollos originarias de China", "articles_involved": ["1"]}
+✓ {
+  "question": "¿Cuál es el tipo residual para 'todas las demás empresas' del derecho antidumping provisional sobre las hojas de aluminio en rollos originarias de China?",
+  "question_cited": "¿Cuál es el tipo residual para 'todas las demás empresas' del derecho antidumping provisional sobre las hojas de aluminio en rollos originarias de China con arreglo al Reglamento (UE) n.º 833/2012 de la Comisión?",
+  "instrument_short_name": null,
+  "answer": "35,4 %",
+  "question_type": "amount_or_threshold",
+  "anchor": "derecho antidumping provisional sobre las hojas de aluminio en rollos originarias de China",
+  "articles_involved": [
+    "1"
+  ],
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "1",
+      "language": "es",
+      "text": "35,4 %"
+    }
+  ]
+}
 (g) ANCLAJE — término técnico, pregunta generada conservada. Artículo OBJETIVO 2 del Reglamento (CE) n.º 1935/2004 (materiales y objetos destinados a entrar en contacto con alimentos) — Definiciones.
 ✓ «¿Qué son los 'materiales y objetos activos destinados a entrar en contacto con alimentos'?» — el término solo existe en este régimen, por lo que es el anclaje y no necesita otras palabras que indiquen el régimen. Formulación con cita: «¿Qué son los 'materiales y objetos activos destinados a entrar en contacto con alimentos' con arreglo al Reglamento (CE) n.º 1935/2004?»
 AUTOVERIFICACIÓN para cada pregunta antes de finalizarla:
@@ -124,7 +355,25 @@ AUTOVERIFICACIÓN para cada pregunta antes de finalizarla:
 7. Estructura parafraseada, términos técnicos exactos; un solo elemento de información por pregunta; las preguntas abordan hechos distintos y al menos dos categorías.
 SALIDA (solo JSON válido, sin markdown): hasta tres entradas, menos si son menos las que superan todas las pruebas:
 [
-  {"question": "...", "question_cited": "...", "instrument_short_name": null, "answer": "...", "question_type": "...", "anchor": "...", "articles_involved": ["..."]}
+  {
+  "question": "...",
+  "question_cited": "...",
+  "instrument_short_name": null,
+  "answer": "...",
+  "question_type": "...",
+  "anchor": "...",
+  "articles_involved": [
+    "..."
+  ],
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "...",
+      "language": "es",
+      "text": "..."
+    }
+  ]
+}
 ]
 Si el artículo objetivo consiste únicamente en cláusulas de estilo, o no admite ninguna pregunta que supere las pruebas, devuelve exactamente: [{"skip_reason": "<una frase breve>"}]
 - anchor: la expresión del anclaje de régimen, exactamente como aparece en la pregunta base.

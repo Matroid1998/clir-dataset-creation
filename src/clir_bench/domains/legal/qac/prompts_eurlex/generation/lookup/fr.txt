@@ -1,3 +1,39 @@
+EVIDENCE_CONTRACT: legal_evidence_spans_v1
+
+Langue de sortie : français. Les questions et annotations libres sont en français ; les citations et identifiants copiés gardent leur forme originale.
+
+PASSAGES JUSTIFICATIFS EXPLICITES — OBLIGATOIRES DANS TOUS LES MODES
+Renvoyez evidence_spans comme une liste ordonnée d'objets contenant exactement source_ref, language
+et text. Le premier passage justifie directement answer ou, en source_finding, l'indice substantiel.
+Chaque passage est UN extrait continu minimal et suffisant, copié EXACTEMENT dans le corps d'une
+source effectivement fournie, dans sa langue d'origine. Conservez orthographe, espaces, ponctuation,
+balisage et erreurs. Ne traduisez jamais la preuve, ne rassemblez pas de fragments distants,
+n'ajoutez pas de points de suspension, ne copiez pas les métadonnées et ne citez pas de texte masqué
+par une troncature. language désigne la langue de la version citée, pas forcément celle de la question.
+Conservez toutes les conditions, exceptions, modalités, attributions et limites qui changent la réponse.
+Ne copiez pas un article ou document entier au lieu de sélectionner les passages nécessaires.
+Supprimez tout début ou fin superflu, mais gardez le texte intermédiaire indispensable. Aucune limite
+fixe de tokens n'est imposée. Restreignez ou omettez la question si ce contrat ne peut être respecté.
+Fixez d'abord le passage principal. Sauf en source_finding, answer en reprend TOUT le texte lorsqu'une
+version adéquate dans la langue de sortie est fournie; answer_is_translation vaut false. Sinon,
+traduisez fidèlement TOUT ce passage dans la langue demandée et indiquez answer_is_translation=true.
+Aucun résumé, calcul, verdict ajouté ou changement de portée. En source_finding, answer reste
+l'identité exacte de la cible selon la règle du mode, answer_is_translation vaut false et le premier
+passage établit l'indice substantiel dans le corps de la cible.
+Renvoyez answer_is_translation comme booléen JSON dans TOUS les modes. Ne renvoyez pas les champs
+scalaires evidence, evidence_language, evidence_is_translation, des identifiants canoniques ou des
+positions de caractères: le parseur les déduit du premier passage et des sources. Conservez les
+champs propres au mode à côté de evidence_spans. Les extraits illustratifs sont uniquement du
+matériel pédagogique. Même si la réponse est traduite, la preuve reste dans la langue montrée.
+
+EUR-LEX: COUVERTURE DES PREUVES
+Renvoyez exactement un passage pour CHAQUE unité de articles_involved: cible et chaque référence ou
+annexe fournie indispensable. Aucune source inutilisée ni version linguistique en double.
+source_ref est le simple numéro d'article pour le même acte, ou la clé Cite as exacte pour un autre
+acte ou toute annexe. Le passage principal peut venir d'une référence autorisée uniquement si la
+règle de la cible reste indispensable; justifiez celle-ci séparément. En source_finding, le premier
+passage vient de la cible. Chaque extrait reste dans sa propre unité, sans assemblage entre sources.
+
 PRÉCISIONS PRIORITAIRES — ces règles remplacent toute formulation ou tout exemple contraire ci-dessous.
 La réponse est un extrait probant continu du texte fourni, lu avec la question, la disposition qui le régit et les renvois explicites fournis. N'ajoutez ni « oui/non », ni conclusion reformulée, ni date calculée. Apparier les faits stipulés à une catégorie, condition, limite ou date explicite, résoudre un référent ordinaire ou constater la violation d'une obligation explicite n'est pas une inférence juridique non étayée. N'inventez jamais une condition manquante, une sanction, une règle réciproque ou du droit extérieur.
 Les questions fermées et ouvertes sont également valables. Une demande portant seulement sur l'appartenance à une catégorie n'exige pas toutes les conditions d'un droit final ; une demande portant sur le droit complet exige toutes les conditions décisives. Répéter des termes juridiques ou les conditions nécessaires dans la question et l'extrait ne révèle pas en soi la réponse : le point de droit demandé doit rester inconnu. N'utilisez pas la suppression du segment de réponse comme test de rejet automatique.
@@ -54,7 +90,25 @@ Exemple 1 — la réponse se trouve entièrement dans l'article cible
 ### REFERENCED ARTICLES
 [FR] Article 12 — Compétences d'exécution
 « La Commission adopte des actes d'exécution établissant le format des rapports. »
-✓ {"question": "Quelle est l'échéance annuelle pour que les producteurs de plastiques à usage unique déclarent à l'autorité nationale les quantités qu'ils ont mises sur le marché ?", "question_cited": "Quelle est l'échéance annuelle au titre de la Directive (UE) 2019/904 pour que les producteurs de plastiques à usage unique déclarent à l'autorité nationale les quantités qu'ils ont mises sur le marché ?", "instrument_short_name": "directive sur les plastiques à usage unique", "answer": "au plus tard le 31 mars de chaque année", "question_type": "deadline_or_duration", "anchor": "producteurs de plastiques à usage unique", "articles_involved": ["8"]}
+✓ {
+  "question": "Quelle est l'échéance annuelle pour que les producteurs de plastiques à usage unique déclarent à l'autorité nationale les quantités qu'ils ont mises sur le marché ?",
+  "question_cited": "Quelle est l'échéance annuelle au titre de la Directive (UE) 2019/904 pour que les producteurs de plastiques à usage unique déclarent à l'autorité nationale les quantités qu'ils ont mises sur le marché ?",
+  "instrument_short_name": "directive sur les plastiques à usage unique",
+  "answer": "au plus tard le 31 mars de chaque année",
+  "question_type": "deadline_or_duration",
+  "anchor": "producteurs de plastiques à usage unique",
+  "articles_involved": [
+    "8"
+  ],
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "8",
+      "language": "fr",
+      "text": "au plus tard le 31 mars de chaque année"
+    }
+  ]
+}
   → L'ancrage est l'acteur réglementé, construit à partir de la matière de la ligne « Act » ; « producteurs » seul échouerait au test de l'acte frère (les règles sur les emballages, les déchets d'équipements électriques et électroniques et les batteries imposent aussi des échéances de déclaration aux producteurs). La structure est paraphrasée (« échéance annuelle »), tandis que le terme technique (« mises sur le marché ») est conservé — la formulation littérale « À quelle date chaque année les producteurs doivent-ils … déclarer les quantités mises sur le marché ? » est acceptable, mais reprend l'article. L'article 12 est cité, mais n'apporte rien à la réponse et ne figure donc pas dans la liste.
 ✗ « À quelle date les producteurs doivent-ils déclarer les quantités annuelles mises sur le marché ? » → quels producteurs, sous quel régime ? Échoue au test de l'acte frère.
 ✗ « Quel format les producteurs de plastiques à usage unique doivent-ils utiliser pour leurs rapports annuels ? » → le format se trouve dans un acte d'exécution non fourni. Écartez la question.
@@ -65,12 +119,75 @@ Exemple 2 — un article référencé complète la réponse
 ### REFERENCED ARTICLES
 [FR] Article 3 — Produits couverts
 « La présente directive s'applique aux bâtonnets de coton-tige, couverts, assiettes, pailles et bâtonnets mélangeurs pour boissons en plastique. »
-✓ {"question": "Quels produits en plastique à usage unique sont interdits de mise sur le marché de l'UE à compter du 3 juillet 2026 ?", "question_cited": "Quels produits en plastique à usage unique sont interdits de mise sur le marché de l'UE au titre de la Directive (UE) 2019/904 à compter du 3 juillet 2026 ?", "instrument_short_name": "directive sur les plastiques à usage unique", "answer": "bâtonnets de coton-tige, couverts, assiettes, pailles et bâtonnets mélangeurs pour boissons en plastique", "question_type": "scope_or_applicability", "anchor": "produits en plastique à usage unique", "articles_involved": ["3", "4"]}
+✓ {
+  "question": "Quels produits en plastique à usage unique sont interdits de mise sur le marché de l'UE à compter du 3 juillet 2026 ?",
+  "question_cited": "Quels produits en plastique à usage unique sont interdits de mise sur le marché de l'UE au titre de la Directive (UE) 2019/904 à compter du 3 juillet 2026 ?",
+  "instrument_short_name": "directive sur les plastiques à usage unique",
+  "answer": "bâtonnets de coton-tige, couverts, assiettes, pailles et bâtonnets mélangeurs pour boissons en plastique",
+  "question_type": "scope_or_applicability",
+  "anchor": "produits en plastique à usage unique",
+  "articles_involved": [
+    "3",
+    "4"
+  ],
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "3",
+      "language": "fr",
+      "text": "bâtonnets de coton-tige, couverts, assiettes, pailles et bâtonnets mélangeurs pour boissons en plastique"
+    },
+    {
+      "source_ref": "4",
+      "language": "fr",
+      "text": " Les États membres interdisent la mise sur le marché des articles en plastique à usage unique énumérés à l'article 3 à compter du 3 juillet 2026. "
+    }
+  ]
+}
   → L'interdiction et sa date sont propres à l'article cible ; la liste de produits provient de l'article 3, les deux sont donc déclarés. TEST DE L'ARTICLE UNIQUE : l'article 3 énumère des produits sans jamais dire qu'ils sont interdits ni à partir de quand.
 ✗ « À quels produits la directive sur les plastiques à usage unique s'applique-t-elle ? » → une question sur l'article 3 ; écartez-la.
-✗ {"question": "Quels produits en plastique à usage unique sont interdits à compter du 3 juillet 2026 ?", "answer": "bâtonnets de coton-tige, couverts, assiettes, pailles et bâtonnets mélangeurs pour boissons", "articles_involved": ["4"]}
+✗ {
+  "question": "Quels produits en plastique à usage unique sont interdits à compter du 3 juillet 2026 ?",
+  "answer": "bâtonnets de coton-tige, couverts, assiettes, pailles et bâtonnets mélangeurs pour boissons",
+  "articles_involved": [
+    "4"
+  ],
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "3",
+      "language": "fr",
+      "text": "bâtonnets de coton-tige, couverts, assiettes, pailles et bâtonnets mélangeurs pour boissons"
+    },
+    {
+      "source_ref": "4",
+      "language": "fr",
+      "text": " Les États membres interdisent la mise sur le marché des articles en plastique à usage unique énumérés à l'article 3 à compter du 3 juillet 2026. "
+    }
+  ]
+}
   → déclaration insuffisante : la liste provient de l'article 3.
-✗ {"question": "À partir de quelle date les États membres doivent-ils interdire la mise sur le marché des articles en plastique à usage unique couverts par l'interdiction de l'UE ?", "answer": "à compter du 3 juillet 2026", "articles_involved": ["3", "4"]}
+✗ {
+  "question": "À partir de quelle date les États membres doivent-ils interdire la mise sur le marché des articles en plastique à usage unique couverts par l'interdiction de l'UE ?",
+  "answer": "à compter du 3 juillet 2026",
+  "articles_involved": [
+    "3",
+    "4"
+  ],
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "4",
+      "language": "fr",
+      "text": "à compter du 3 juillet 2026"
+    },
+    {
+      "source_ref": "3",
+      "language": "fr",
+      "text": " La présente directive s'applique aux bâtonnets de coton-tige, couverts, assiettes, pailles et bâtonnets mélangeurs pour boissons en plastique. "
+    }
+  ]
+}
   → déclaration excessive : la date figure entièrement dans l'article 4.
 ✗ {"question": "Quels produits la Directive (UE) 2019/904 interdit-elle à compter du 3 juillet 2026 ?"} → identifiant dans la formulation de base ; il ne doit figurer que dans « question_cited ».
 Exemple 3 — échecs réels d'une exécution en production où les questions s'écartaient de la cible ; toutes les questions multi-articles ont ainsi échoué au test de l'article unique
@@ -88,7 +205,31 @@ Exemple 4 — un article d'un AUTRE acte complète la réponse
 ### REFERENCED ARTICLES FROM OTHER ACTS
 [FR] Article 5 — Contrôles   Act: Règlement (CE) n° 21/2004 du Conseil …   Cite as: 32004R0021:5
 « Les États membres effectuent des contrôles sur place couvrant au moins 3 % des exploitations chaque année. »
-✓ {"question": "Quels contrôles doivent être achevés avant le versement de l'aide aux exploitations ovines et caprines ?", "question_cited": "Quels contrôles doivent être achevés au titre du Règlement (CE) n° 796/2004 de la Commission avant le versement de l'aide aux exploitations ovines et caprines ?", "instrument_short_name": null, "answer": "contrôles sur place couvrant au moins 3 % des exploitations chaque année", "question_type": "condition_or_prerequisite", "anchor": "aide aux exploitations ovines et caprines", "articles_involved": ["2", "32004R0021:5"]}
+✓ {
+  "question": "Quels contrôles doivent être achevés avant le versement de l'aide aux exploitations ovines et caprines ?",
+  "question_cited": "Quels contrôles doivent être achevés au titre du Règlement (CE) n° 796/2004 de la Commission avant le versement de l'aide aux exploitations ovines et caprines ?",
+  "instrument_short_name": null,
+  "answer": "contrôles sur place couvrant au moins 3 % des exploitations chaque année",
+  "question_type": "condition_or_prerequisite",
+  "anchor": "aide aux exploitations ovines et caprines",
+  "articles_involved": [
+    "2",
+    "32004R0021:5"
+  ],
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "32004R0021:5",
+      "language": "fr",
+      "text": "contrôles sur place couvrant au moins 3 % des exploitations chaque année"
+    },
+    {
+      "source_ref": "2",
+      "language": "fr",
+      "text": " L'aide n'est versée qu'après la réalisation des contrôles prévus à l'article 5 du règlement (CE) n° 21/2004 du Conseil. "
+    }
+  ]
+}
   → La condition de paiement est la règle de la cible ; l'autre acte précise uniquement les contrôles et est déclaré par sa clé « Cite as », jamais par un simple « 5 ».
 ✗ « Quelle proportion minimale des exploitations ovines et caprines doit être contrôlée sur place chaque année ? » → l'article 5 de l'autre règlement répond à lui seul. Écartez la question.
 ✗ « Au titre du Règlement (CE) n° 21/2004, quand l'aide est-elle versée ? » → ancrage sur l'identifiant de l'autre acte ; un système de recherche retrouverait cet acte.
@@ -99,19 +240,109 @@ Exemple 5 — questions réelles de production issues d'EUR-Lex, fondées sur le
 ✓ Sortie pour les deux : [{"skip_reason": "formule type uniquement"}]
 (b) TEST DE L'ACTE FRÈRE. Article CIBLE 10 de la directive 2010/43/UE de la Commission (exigences organisationnelles applicables aux sociétés de gestion d'OPCVM) : « … un responsable de la conformité doit être désigné et chargé de … rendre compte fréquemment, et au moins une fois par an, aux instances dirigeantes des questions de conformité … »
 ✗ « À quelle fréquence le responsable de la conformité doit-il rendre compte aux instances dirigeantes des questions de conformité ? » → les mesures d'exécution MiFID et AIFM contiennent la même règle dans des termes presque identiques.
-✓ {"question": "À quelle fréquence le responsable de la conformité d'une société de gestion d'OPCVM doit-il rendre compte aux instances dirigeantes des questions de conformité ?", "question_cited": "À quelle fréquence le responsable de la conformité d'une société de gestion d'OPCVM doit-il rendre compte aux instances dirigeantes des questions de conformité au titre de la Directive 2010/43/UE de la Commission ?", "instrument_short_name": null, "answer": "fréquemment, et au moins une fois par an", "question_type": "monitoring_or_reporting", "anchor": "société de gestion d'OPCVM", "articles_involved": ["10"]}
+✓ {
+  "question": "À quelle fréquence le responsable de la conformité d'une société de gestion d'OPCVM doit-il rendre compte aux instances dirigeantes des questions de conformité ?",
+  "question_cited": "À quelle fréquence le responsable de la conformité d'une société de gestion d'OPCVM doit-il rendre compte aux instances dirigeantes des questions de conformité au titre de la Directive 2010/43/UE de la Commission ?",
+  "instrument_short_name": null,
+  "answer": "fréquemment, et au moins une fois par an",
+  "question_type": "monitoring_or_reporting",
+  "anchor": "société de gestion d'OPCVM",
+  "articles_involved": [
+    "10"
+  ],
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "10",
+      "language": "fr",
+      "text": "fréquemment, et au moins une fois par an"
+    }
+  ]
+}
 (c) TEST DU COLLÈGUE. Article CIBLE 9 du règlement (UE) n° 1300/2014 de la Commission (accessibilité du système ferroviaire aux personnes à mobilité réduite) — Organe consultatif : « Les tâches de l'organe consultatif comprennent : a) le suivi de l'élaboration d'une structure minimale de données pour l'inventaire des actifs, … »
 ✗ « Que doit surveiller l'organe consultatif concernant l'inventaire des actifs ? » → quel organe consultatif, quel inventaire ? Seul un lecteur de l'article peut le savoir.
-✓ {"question": "Quel organe suit l'élaboration de la structure minimale de données pour l'inventaire des actifs dans la STI de l'UE relative à l'accessibilité ferroviaire pour les personnes à mobilité réduite ?", "question_cited": "Quel organe suit au titre du Règlement (UE) n° 1300/2014 de la Commission l'élaboration de la structure minimale de données pour l'inventaire des actifs dans la STI de l'UE relative à l'accessibilité ferroviaire pour les personnes à mobilité réduite ?", "instrument_short_name": "STI PMR", "answer": "Les tâches de l'organe consultatif comprennent : a) le suivi de l'élaboration d'une structure minimale de données pour l'inventaire des actifs", "question_type": "definition_actor_or_procedure", "anchor": "STI de l'UE relative à l'accessibilité ferroviaire pour les personnes à mobilité réduite", "articles_involved": ["9"]}
+✓ {
+  "question": "Quel organe suit l'élaboration de la structure minimale de données pour l'inventaire des actifs dans la STI de l'UE relative à l'accessibilité ferroviaire pour les personnes à mobilité réduite ?",
+  "question_cited": "Quel organe suit au titre du Règlement (UE) n° 1300/2014 de la Commission l'élaboration de la structure minimale de données pour l'inventaire des actifs dans la STI de l'UE relative à l'accessibilité ferroviaire pour les personnes à mobilité réduite ?",
+  "instrument_short_name": "STI PMR",
+  "answer": "Les tâches de l'organe consultatif comprennent : a) le suivi de l'élaboration d'une structure minimale de données pour l'inventaire des actifs",
+  "question_type": "definition_actor_or_procedure",
+  "anchor": "STI de l'UE relative à l'accessibilité ferroviaire pour les personnes à mobilité réduite",
+  "articles_involved": [
+    "9"
+  ],
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "9",
+      "language": "fr",
+      "text": "Les tâches de l'organe consultatif comprennent : a) le suivi de l'élaboration d'une structure minimale de données pour l'inventaire des actifs"
+    }
+  ]
+}
 (d) INFORMATIVITÉ. Article CIBLE 20 du règlement (CE) n° 1393/2007 (signification et notification des actes judiciaires et extrajudiciaires) : « Le présent règlement prévaut, dans les matières auxquelles il s'applique, sur les autres dispositions contenues dans les accords ou arrangements bilatéraux ou multilatéraux conclus par les États membres et notamment sur l'article IV du protocole à la convention de Bruxelles de 1968 et sur la convention de La Haye du 15 novembre 1965. »
 ✗ « Dans quelles matières le règlement de l'UE de 2007 sur la signification et la notification des actes judiciaires et extrajudiciaires prévaut-il sur les accords bilatéraux ou multilatéraux conclus par les États membres ? » → la réponse, « dans les matières auxquelles il s'applique », n'apporte rien.
-✓ {"question": "Le règlement de l'UE sur la signification et la notification des actes judiciaires et extrajudiciaires en matière civile et commerciale prévaut-il sur la convention de La Haye de 1965 relative à la signification entre les États membres ?", "question_cited": "Au titre du Règlement (CE) n° 1393/2007, le règlement de l'UE sur la signification et la notification des actes judiciaires et extrajudiciaires en matière civile et commerciale prévaut-il sur la convention de La Haye de 1965 relative à la signification entre les États membres ?", "instrument_short_name": "règlement Signification", "answer": "Le présent règlement prévaut, dans les matières auxquelles il s'applique, sur les autres dispositions contenues dans les accords ou arrangements bilatéraux ou multilatéraux conclus par les États membres et notamment sur l'article IV du protocole à la convention de Bruxelles de 1968 et sur la convention de La Haye du 15 novembre 1965.", "question_type": "scope_or_applicability", "anchor": "signification et la notification des actes judiciaires et extrajudiciaires en matière civile et commerciale", "articles_involved": ["20"]}
+✓ {
+  "question": "Le règlement de l'UE sur la signification et la notification des actes judiciaires et extrajudiciaires en matière civile et commerciale prévaut-il sur la convention de La Haye de 1965 relative à la signification entre les États membres ?",
+  "question_cited": "Au titre du Règlement (CE) n° 1393/2007, le règlement de l'UE sur la signification et la notification des actes judiciaires et extrajudiciaires en matière civile et commerciale prévaut-il sur la convention de La Haye de 1965 relative à la signification entre les États membres ?",
+  "instrument_short_name": "règlement Signification",
+  "answer": "Le présent règlement prévaut, dans les matières auxquelles il s'applique, sur les autres dispositions contenues dans les accords ou arrangements bilatéraux ou multilatéraux conclus par les États membres et notamment sur l'article IV du protocole à la convention de Bruxelles de 1968 et sur la convention de La Haye du 15 novembre 1965.",
+  "question_type": "scope_or_applicability",
+  "anchor": "signification et la notification des actes judiciaires et extrajudiciaires en matière civile et commerciale",
+  "articles_involved": [
+    "20"
+  ],
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "20",
+      "language": "fr",
+      "text": "Le présent règlement prévaut, dans les matières auxquelles il s'applique, sur les autres dispositions contenues dans les accords ou arrangements bilatéraux ou multilatéraux conclus par les États membres et notamment sur l'article IV du protocole à la convention de Bruxelles de 1968 et sur la convention de La Haye du 15 novembre 1965."
+    }
+  ]
+}
 (e) RÉPONSE INSCRITE DANS LA QUESTION. Article CIBLE 2 de la directive 2009/18/CE (enquêtes sur les accidents dans le secteur des transports maritimes) — Champ d'application : la directive ne s'applique pas aux accidents impliquant uniquement des « navires de pêche d'une longueur inférieure à 15 mètres ».
 ✗ « Le régime d'enquête sur les accidents maritimes est-il exclu pour les accidents et incidents de mer impliquant uniquement des navires de pêche d'une longueur inférieure à 15 mètres ? » — réponse : « navires de pêche d'une longueur inférieure à 15 mètres » → ancrée et naturelle, mais le seuil est la réponse et il figure dans la question.
-✓ {"question": "En deçà de quelle longueur les navires de pêche sont-ils exclus du champ d'application du régime de l'UE d'enquête sur les accidents maritimes ?", "question_cited": "En deçà de quelle longueur les navires de pêche sont-ils exclus du champ d'application du régime de l'UE d'enquête sur les accidents maritimes au titre de la Directive 2009/18/CE ?", "instrument_short_name": null, "answer": "navires de pêche d'une longueur inférieure à 15 mètres", "question_type": "scope_or_applicability", "anchor": "régime de l'UE d'enquête sur les accidents maritimes", "articles_involved": ["2"]}
+✓ {
+  "question": "En deçà de quelle longueur les navires de pêche sont-ils exclus du champ d'application du régime de l'UE d'enquête sur les accidents maritimes ?",
+  "question_cited": "En deçà de quelle longueur les navires de pêche sont-ils exclus du champ d'application du régime de l'UE d'enquête sur les accidents maritimes au titre de la Directive 2009/18/CE ?",
+  "instrument_short_name": null,
+  "answer": "navires de pêche d'une longueur inférieure à 15 mètres",
+  "question_type": "scope_or_applicability",
+  "anchor": "régime de l'UE d'enquête sur les accidents maritimes",
+  "articles_involved": [
+    "2"
+  ],
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "2",
+      "language": "fr",
+      "text": "navires de pêche d'une longueur inférieure à 15 mètres"
+    }
+  ]
+}
 (f) ANCRAGE — produit réglementé. Article CIBLE 1 du règlement (UE) n° 833/2012 de la Commission (droit antidumping provisoire sur les feuilles d'aluminium en rouleaux originaires de Chine) : tableau des taux du droit se terminant par « Toutes les autres sociétés — 35,4 % ».
 ✗ « Quel droit antidumping provisoire s'applique aux importations effectuées par toutes les autres sociétés ? » → chaque règlement antidumping comporte un taux pour « toutes les autres sociétés ».
-✓ {"question": "Quel est le taux résiduel pour 'toutes les autres sociétés' du droit antidumping provisoire sur les feuilles d'aluminium en rouleaux originaires de Chine ?", "question_cited": "Quel est le taux résiduel pour 'toutes les autres sociétés' du droit antidumping provisoire sur les feuilles d'aluminium en rouleaux originaires de Chine au titre du Règlement (UE) n° 833/2012 de la Commission ?", "instrument_short_name": null, "answer": "35,4 %", "question_type": "amount_or_threshold", "anchor": "droit antidumping provisoire sur les feuilles d'aluminium en rouleaux originaires de Chine", "articles_involved": ["1"]}
+✓ {
+  "question": "Quel est le taux résiduel pour 'toutes les autres sociétés' du droit antidumping provisoire sur les feuilles d'aluminium en rouleaux originaires de Chine ?",
+  "question_cited": "Quel est le taux résiduel pour 'toutes les autres sociétés' du droit antidumping provisoire sur les feuilles d'aluminium en rouleaux originaires de Chine au titre du Règlement (UE) n° 833/2012 de la Commission ?",
+  "instrument_short_name": null,
+  "answer": "35,4 %",
+  "question_type": "amount_or_threshold",
+  "anchor": "droit antidumping provisoire sur les feuilles d'aluminium en rouleaux originaires de Chine",
+  "articles_involved": [
+    "1"
+  ],
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "1",
+      "language": "fr",
+      "text": "35,4 %"
+    }
+  ]
+}
 (g) ANCRAGE — terme technique, question générée conservée. Article CIBLE 2 du règlement (CE) n° 1935/2004 (matériaux et objets destinés à entrer en contact avec des denrées alimentaires) — Définitions.
 ✓ « Que sont les 'matériaux et objets actifs destinés à entrer en contact avec des denrées alimentaires' ? » — le terme n'existe que dans ce régime, il constitue donc l'ancrage et n'a pas besoin d'autres mots précisant le régime. Formulation citée : « Que sont les 'matériaux et objets actifs destinés à entrer en contact avec des denrées alimentaires' au titre du Règlement (CE) n° 1935/2004 ? »
 AUTO-VÉRIFICATION pour chaque question avant de la finaliser :
@@ -124,7 +355,25 @@ AUTO-VÉRIFICATION pour chaque question avant de la finaliser :
 7. Structure paraphrasée, termes techniques exacts ; un seul élément d'information par question ; les questions portent sur des faits différents et couvrent au moins deux catégories.
 SORTIE (JSON valide uniquement, pas de markdown) : jusqu'à trois entrées, moins s'il y en a moins qui satisfont à tous les tests :
 [
-  {"question": "...", "question_cited": "...", "instrument_short_name": null, "answer": "...", "question_type": "...", "anchor": "...", "articles_involved": ["..."]}
+  {
+  "question": "...",
+  "question_cited": "...",
+  "instrument_short_name": null,
+  "answer": "...",
+  "question_type": "...",
+  "anchor": "...",
+  "articles_involved": [
+    "..."
+  ],
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "...",
+      "language": "fr",
+      "text": "..."
+    }
+  ]
+}
 ]
 Si l'article cible ne consiste qu'en formules types, ou ne permet aucune question satisfaisant aux tests, renvoyez exactement : [{"skip_reason": "<une courte expression>"}]
 - anchor : l'expression d'ancrage de régime, exactement telle qu'elle apparaît dans la question de base.

@@ -13,7 +13,6 @@ from clir_bench.domains.legal.qac import eurlex_context as ctx
 from clir_bench.domains.legal.qac import eurlex_generate as gen
 from test_legal_batch_replay_integration import Client, MemoryCheckpoint, response
 
-
 QUALITY_KEYS = {
     "search_realism", "anchoring_and_time", "consequence", "lexical_distance",
     "linguistic_quality",
@@ -38,7 +37,10 @@ def conceptual_case():
                      "function to identify failures to meet their obligations. Investors shall "
                      "receive information about the risks of the proposed investment."},
     )
-    payload = ctx.GenerationPayload(article, [], [], ctx.render_payload(article, []))
+    payload = ctx.GenerationPayload(
+        article, [], [], ctx.render_payload(article, []),
+        evidence_sources=ctx.visible_evidence_sources(article, [], languages=("en",)),
+    )
     candidates = [
         {"question": "How do UCITS management companies detect failures to meet their obligations?",
          "answer": "UCITS management companies shall establish an independent compliance "
@@ -50,6 +52,9 @@ def conceptual_case():
          "framing": "stakeholder", "anchor": "proposed UCITS investment",
          "articles_involved": ["4"]},
     ]
+    for item in candidates:
+        item["answer_is_translation"] = False
+        item["evidence_spans"] = [{"source_ref": "4", "language": "en", "text": item["answer"]}]
     return target, payload, candidates
 
 
@@ -159,8 +164,8 @@ def test_normal_conceptual_batch_and_csv_regrade_use_actual_compact_rubric(
         return response(json.dumps(output), model=kwargs["model"])
 
     monkeypatch.setattr(llm, "client_for", lambda _: Client(create))
-    options = dict(gen_model=GENERATOR, grade_model=GRADER, max_references=6,
-                   keep=3, retries=1, payload=payload)
+    options = {"gen_model": GENERATOR, "grade_model": GRADER, "max_references": 6,
+               "keep": 3, "retries": 1, "payload": payload}
     rows = batch.run_one(target, None, checkpoint=MemoryCheckpoint(), **options)
     assert stages == ["generation", "faithfulness", "quality"]
     assert [row["framing"] for row in rows] == ["stakeholder", "response"]

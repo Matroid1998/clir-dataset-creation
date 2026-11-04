@@ -9,6 +9,7 @@ from pathlib import Path
 
 import pyarrow as pa
 
+from .evidence import saved_spans
 from .records import article_references, dumps, identifiers, source_identity, unit_id
 
 CORPUS_SCHEMA = pa.schema(
@@ -94,13 +95,22 @@ class SourceIndex:
             yield json.loads(payload)
 
 
-def targets(generations) -> dict[str, set[str]]:
+def targets(
+    generations, *, evidence_languages: dict[str, set[str]] | None = None
+) -> dict[str, set[str]]:
     wanted: dict[str, set[str]] = {}
     for corpus, row, _ in generations:
         selected = wanted.setdefault(corpus, set())
         selected.add(source_identity(corpus, row)[0])
         if corpus == "eurlex":
             selected.update(article_references(row))
+        for span in saved_spans(row):
+            source = span.get("doc_id") if corpus == "un" else span["source_id"]
+            if not source:
+                raise ValueError("UN evidence is missing its original document ID")
+            selected.add(source)
+            if evidence_languages is not None:
+                evidence_languages.setdefault(corpus, set()).add(span["language"])
     return wanted
 
 

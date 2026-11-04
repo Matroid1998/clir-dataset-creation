@@ -14,6 +14,7 @@ import pyarrow.parquet as pq
 from clir_bench import domains
 from clir_bench.core.publish import card_yaml, hf_token
 
+from .evidence import evidence_rows
 from .records import QA_SCHEMA, dumps, normalize, read_generations
 from .sources import CORPUS_SCHEMA, SourceIndex, load_chemistry, load_eurlex, load_un, targets
 
@@ -37,9 +38,20 @@ EVIDENCE_SCHEMA = pa.schema(
             "text",
             "origin",
             "match_status",
+            "source_ref",
+            "generation_source_id",
         )
     ]
-    + [(key, pa.int64()) for key in ("start", "end")]
+    + [
+        (key, pa.int64())
+        for key in (
+            "start",
+            "end",
+            "span_index",
+            "generation_start",
+            "generation_end",
+        )
+    ]
 )
 
 
@@ -122,7 +134,8 @@ def prepare(
         for corpus, spec in specs.items():
             yield from read_generations(corpus, spec, root)
 
-    wanted = targets(generations())
+    evidence_languages: dict[str, set[str]] = {}
+    wanted = targets(generations(), evidence_languages=evidence_languages)
     if set(specs) - wanted.keys():
         raise ValueError("every selected corpus must have generation rows")
     with tempfile.TemporaryDirectory(prefix=".generation-export-", dir=output.parent) as temporary:
@@ -143,6 +156,18 @@ def prepare(
         try:
             for corpus, spec in specs.items():
                 print(f"Loading {corpus} source units ({scope})...", flush=True)
+                if evidence_languages.get(corpus):
+                    spec = {
+                        **spec,
+                        "languages": list(
+                            dict.fromkeys(
+                                [
+                                    *spec.get("languages", []),
+                                    *sorted(evidence_languages[corpus]),
+                                ]
+                            )
+                        ),
+                    }
                 loaders[corpus](
                     index, spec, root, wanted[corpus] if scope == "referenced" else None
                 )
@@ -170,18 +195,8 @@ def prepare(
                     continue
                 seen[row["_id"]] = digest
                 writers["qas"].add(row)
-                writers["evidence"].add(
-                    {
-                        "query_id": row["_id"],
-                        "source_unit_id": row["source_unit_id"],
-                        "language": row["evidence_language"],
-                        "text": row["supporting_text"],
-                        "origin": row["supporting_text_origin"],
-                        "match_status": row["support_match_status"],
-                        "start": row["support_start"],
-                        "end": row["support_end"],
-                    }
-                )
+                for evidence in evidence_rows(row):
+                    writers["evidence"].add(evidence)
                 links = {}
                 for identifier in row["involved_source_unit_ids"]:
                     doc = index.get(identifier)
@@ -288,10 +303,13 @@ translation partners to avoid source and generator leakage.
   grading responses, routing decisions and generation references. `provenance_json` identifies
   the input file and row/task. CSV metadata preserves its original string types.
 - `evidence`: canonical supporting text: explicit `evidence` where present, otherwise `answer`.
-  `origin` distinguishes the two. `start` and `end` refer to the original corpus unit's `text`,
-  in Unicode code points, end-exclusive; only the first exact match receives offsets.
-  Matching checks only presence (exact or whitespace-normalized), not factual entailment.
-  Support is checked against the primary source, not every involved/translated document.
+  Legacy rows use this fallback and first-match offsets. For future legal rows with the
+  `legal_evidence_spans_v1` contract, emit one record per saved span, identified by `span_index`,
+  and validate each against its own source and language. `start` and `end` refer to that
+  `source_unit_id`'s corpus text in Unicode code points, end-exclusive. UN offsets are mapped
+  through the saved block line range, never a whole-document search. `generation_source_id`,
+  `generation_start` and `generation_end` preserve the original article/block coordinates.
+  Matching checks text and source identity, not factual entailment or semantic minimality.
 - `corpus`: `_id`, text, language, source/parent IDs, unit type and original metadata. EUR-Lex
   units are full articles (or explicitly involved annexes); patent units are title + abstract;
   UN units are entire documents joined from the original aligned lines. UN block IDs/ranges
@@ -311,6 +329,16 @@ means involvement across acts; `multi_source_unit` also covers an article plus a
 A translation into another language does not count as another involved article.
 UN and chemistry have no article-involvement annotation, so their `multi_article` is false
 and `multi_article_declared` is null; supplied UN references are retained only as metadata.
+
+Future legal QAs retain their complete ordered `evidence_spans` list. Its `start`/`end` remain
+relative to the generation source; `document_start`/`document_end` map into the exported corpus
+unit. The first span supplies scalar `evidence`, `evidence_language`, `supporting_text` and
+`support_start`/`support_end`; `support_source_unit_id` identifies the corpus text those offsets
+refer to. It can differ from the QA's target `source_unit_id`, for example when a supplied
+EUR-Lex reference provides the direct answer. `document_text` continues to contain the target.
+Explicit evidence languages are loaded even when omitted from the manifest's language list.
+Source hashes, offsets and multi-article coverage are checked; invalid new-contract evidence
+aborts export instead of falling back to the answer. Legacy rows are not backfilled.
 
 These source units have **not yet been chunked**. Create retrieval chunks with a pinned tokenizer
 (e.g. BAAI/bge-m3), preserve parent IDs and character ranges, and align evidence to those chunks.

@@ -264,6 +264,20 @@ for the six personas. The templates are packaged in each legal prompt pack's `de
 
 ### Legal prompt versions in local MLflow
 
+New legal generations require minimal, verbatim supporting passages under the
+`legal_evidence_spans_v1` contract. Every mode returns source-tagged `evidence_spans`;
+EUR-Lex covers every involved article or annex, and UN uses only its generation
+target block. Code validates the visible source text and computes offsets. Grading
+checks sufficiency and removable padding; entire articles are not valid excerpts.
+Answers retain their quotation, translation, or source-identifier rules.
+
+The active bundle is `legal-evidence-spans-v1-20261104`. Existing data and published
+datasets are unchanged. To resume an older run, select its original pinned manifest
+with `CLIR_PROMPT_MANIFEST`; the previous active snapshot is preserved at
+`reports/prompt_versions/legal-decider-score32-optimized-20261007.json`. Saved legacy
+candidates remain readable without evidence backfilling. Future exports preserve
+every span and map UN block offsets into the complete source document.
+
 The [MLflow Prompt Registry](https://mlflow.org/docs/latest/api_reference/python_api/mlflow.client.html#mlflow.client.MlflowClient.register_prompt)
 runs locally with SQLite and requires no account, API key, or server. Install its
 optional dependencies with `uv sync --extra prompts`. The default database is

@@ -1,3 +1,39 @@
+EVIDENCE_CONTRACT: legal_evidence_spans_v1
+
+Langue de sortie : français. Les questions et annotations libres sont en français ; les citations et identifiants copiés gardent leur forme originale.
+
+PASSAGES JUSTIFICATIFS EXPLICITES — OBLIGATOIRES DANS TOUS LES MODES
+Renvoyez evidence_spans comme une liste ordonnée d'objets contenant exactement source_ref, language
+et text. Le premier passage justifie directement answer ou, en source_finding, l'indice substantiel.
+Chaque passage est UN extrait continu minimal et suffisant, copié EXACTEMENT dans le corps d'une
+source effectivement fournie, dans sa langue d'origine. Conservez orthographe, espaces, ponctuation,
+balisage et erreurs. Ne traduisez jamais la preuve, ne rassemblez pas de fragments distants,
+n'ajoutez pas de points de suspension, ne copiez pas les métadonnées et ne citez pas de texte masqué
+par une troncature. language désigne la langue de la version citée, pas forcément celle de la question.
+Conservez toutes les conditions, exceptions, modalités, attributions et limites qui changent la réponse.
+Ne copiez pas un article ou document entier au lieu de sélectionner les passages nécessaires.
+Supprimez tout début ou fin superflu, mais gardez le texte intermédiaire indispensable. Aucune limite
+fixe de tokens n'est imposée. Restreignez ou omettez la question si ce contrat ne peut être respecté.
+Fixez d'abord le passage principal. Sauf en source_finding, answer en reprend TOUT le texte lorsqu'une
+version adéquate dans la langue de sortie est fournie; answer_is_translation vaut false. Sinon,
+traduisez fidèlement TOUT ce passage dans la langue demandée et indiquez answer_is_translation=true.
+Aucun résumé, calcul, verdict ajouté ou changement de portée. En source_finding, answer reste
+l'identité exacte de la cible selon la règle du mode, answer_is_translation vaut false et le premier
+passage établit l'indice substantiel dans le corps de la cible.
+Renvoyez answer_is_translation comme booléen JSON dans TOUS les modes. Ne renvoyez pas les champs
+scalaires evidence, evidence_language, evidence_is_translation, des identifiants canoniques ou des
+positions de caractères: le parseur les déduit du premier passage et des sources. Conservez les
+champs propres au mode à côté de evidence_spans. Les extraits illustratifs sont uniquement du
+matériel pédagogique. Même si la réponse est traduite, la preuve reste dans la langue montrée.
+
+EUR-LEX: COUVERTURE DES PREUVES
+Renvoyez exactement un passage pour CHAQUE unité de articles_involved: cible et chaque référence ou
+annexe fournie indispensable. Aucune source inutilisée ni version linguistique en double.
+source_ref est le simple numéro d'article pour le même acte, ou la clé Cite as exacte pour un autre
+acte ou toute annexe. Le passage principal peut venir d'une référence autorisée uniquement si la
+règle de la cible reste indispensable; justifiez celle-ci séparément. En source_finding, le premier
+passage vient de la cible. Chaque extrait reste dans sa propre unité, sans assemblage entre sources.
+
 PRÉCISIONS PRIORITAIRES — ces règles remplacent toute formulation ou tout exemple contraire ci-dessous.
 La réponse est un extrait probant continu du texte fourni, lu avec la question, la disposition qui le régit et les renvois explicites fournis. N'ajoutez ni « oui/non », ni conclusion reformulée, ni date calculée. Apparier les faits stipulés à une catégorie, condition, limite ou date explicite, résoudre un référent ordinaire ou constater la violation d'une obligation explicite n'est pas une inférence juridique non étayée. N'inventez jamais une condition manquante, une sanction, une règle réciproque ou du droit extérieur.
 Les questions fermées et ouvertes sont également valables. Une demande portant seulement sur l'appartenance à une catégorie n'exige pas toutes les conditions d'un droit final ; une demande portant sur le droit complet exige toutes les conditions décisives. Répéter des termes juridiques ou les conditions nécessaires dans la question et l'extrait ne révèle pas en soi la réponse : le point de droit demandé doit rester inconnu. N'utilisez pas la suppression du segment de réponse comme test de rejet automatique.
@@ -47,7 +83,27 @@ Exemple 1 — réponse entièrement dans l'article cible
 ### REFERENCED ARTICLES
 [FR] Article 12 — Compétences d'exécution
 "La Commission adopte des actes d'exécution établissant le format des rapports."
-✓ {"question": "Un producteur a mis sur le marché espagnol 40 tonnes de couverts en plastique à usage unique l'année dernière et n'a pas encore déclaré la quantité à l'autorité espagnole. Dans quel délai doit-il le faire ?", "answer": "au plus tard le 31 mars de chaque année", "question_type": "deadline_or_duration", "particulars": ["producteur", "mis sur le marché espagnol 40 tonnes de couverts en plastique à usage unique l'année dernière", "n'a pas encore déclaré la quantité"], "articles_involved": ["8"]}
+✓ {
+  "question": "Un producteur a mis sur le marché espagnol 40 tonnes de couverts en plastique à usage unique l'année dernière et n'a pas encore déclaré la quantité à l'autorité espagnole. Dans quel délai doit-il le faire ?",
+  "answer": "au plus tard le 31 mars de chaque année",
+  "question_type": "deadline_or_duration",
+  "particulars": [
+    "producteur",
+    "mis sur le marché espagnol 40 tonnes de couverts en plastique à usage unique l'année dernière",
+    "n'a pas encore déclaré la quantité"
+  ],
+  "articles_involved": [
+    "8"
+  ],
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "8",
+      "language": "fr",
+      "text": "au plus tard le 31 mars de chaque année"
+    }
+  ]
+}
   → Les éléments de fait fixent le régime (plastique à usage unique) et le comportement ; le délai propre à l'article répond à la question. L'article 12 est cité mais n'a rien apporté, il ne figure donc pas dans la liste.
 ✗ « Une entreprise soumise aux règles sur les plastiques souhaite connaître son délai de déclaration. » → ni acteur, ni produit, ni comportement : une amorce déguisée.
 ✗ « Un fabricant qui a vendu 40 tonnes de fourchettes jetables en plastique l'année dernière … » → « vendu » n'est pas « mis sur le marché » et « fabricant » n'est pas « producteur » ; la question décrit désormais une autre règle.
@@ -59,11 +115,57 @@ Exemple 2 — réponse complétée par un article référencé
 ### REFERENCED ARTICLES
 [FR] Article 3 — Produits couverts
 "La présente directive s'applique aux bâtonnets de coton-tige, couverts, assiettes, pailles et bâtonnets mélangeurs pour boissons en plastique."
-✓ {"question": "En août 2026, un détaillant en Espagne entend continuer à mettre sur le marché des assiettes et des pailles en plastique. Font-elles partie des produits en plastique à usage unique que l'UE a interdits ?", "answer": "bâtonnets de coton-tige, couverts, assiettes, pailles et bâtonnets mélangeurs pour boissons en plastique", "question_type": "scope_or_applicability", "particulars": ["août 2026", "détaillant en Espagne", "continuer à mettre sur le marché des assiettes et des pailles en plastique"], "articles_involved": ["3", "4"]}
+✓ {
+  "question": "En août 2026, un détaillant en Espagne entend continuer à mettre sur le marché des assiettes et des pailles en plastique. Font-elles partie des produits en plastique à usage unique que l'UE a interdits ?",
+  "answer": "bâtonnets de coton-tige, couverts, assiettes, pailles et bâtonnets mélangeurs pour boissons en plastique",
+  "question_type": "scope_or_applicability",
+  "particulars": [
+    "août 2026",
+    "détaillant en Espagne",
+    "continuer à mettre sur le marché des assiettes et des pailles en plastique"
+  ],
+  "articles_involved": [
+    "3",
+    "4"
+  ],
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "3",
+      "language": "fr",
+      "text": "bâtonnets de coton-tige, couverts, assiettes, pailles et bâtonnets mélangeurs pour boissons en plastique"
+    },
+    {
+      "source_ref": "4",
+      "language": "fr",
+      "text": "Les États membres interdisent la mise sur le marché des articles en plastique à usage unique énumérés à l'article 3 à partir du 3 juillet 2026."
+    }
+  ]
+}
   → L'interdiction est la règle propre à l'article cible ; la liste des produits vient de l'article 3, les deux sont donc déclarés. La situation nomme deux des cinq produits, pas toute la liste : une question qui copie l'énumération de l'article retrouve le texte par recoupement de mots et ne décrit aucun véritable client.
     TEST DE L'ARTICLE UNIQUE : l'article 3 énumère les produits mais ne dit jamais qu'ils sont interdits — l'interdiction est le fait normatif de la cible.
 ✗ « Un détaillant espagnol vend de la vaisselle en plastique. Quels produits la directive sur les plastiques à usage unique couvre-t-elle ? » → une question sur l'article 3 ; écartez-la.
-✗ {"question": "Un détaillant espagnol a encore en stock des articles en plastique à usage unique couverts par l'interdiction de l'UE. À partir de quelle date ne peut-il plus les mettre sur le marché ?", "answer": "à partir du 3 juillet 2026", "articles_involved": ["3", "4"]}
+✗ {
+  "question": "Un détaillant espagnol a encore en stock des articles en plastique à usage unique couverts par l'interdiction de l'UE. À partir de quelle date ne peut-il plus les mettre sur le marché ?",
+  "answer": "à partir du 3 juillet 2026",
+  "articles_involved": [
+    "3",
+    "4"
+  ],
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "4",
+      "language": "fr",
+      "text": "à partir du 3 juillet 2026"
+    },
+    {
+      "source_ref": "3",
+      "language": "fr",
+      "text": "La présente directive s'applique aux bâtonnets de coton-tige, couverts, assiettes, pailles et bâtonnets mélangeurs pour boissons en plastique."
+    }
+  ]
+}
   → Déclaration excessive : la date figure entièrement dans l'article 4.
 Exemple 3 — un article d'un AUTRE acte complète la réponse
 ### TARGET ARTICLE
@@ -73,24 +175,128 @@ Exemple 3 — un article d'un AUTRE acte complète la réponse
 ### REFERENCED ARTICLES FROM OTHER ACTS
 [FR] Article 5 — Contrôles   Act: Règlement (CE) nº 21/2004 du Conseil …   Cite as: 32004R0021:5
 "Les États membres effectuent chaque année des contrôles sur place portant sur au moins 3 % des exploitations."
-✓ {"question": "Un éleveur ovin en Irlande a demandé l'aide de cette année aux exploitations ovines et caprines. Quels contrôles doivent être achevés avant que l'aide puisse être versée ?", "answer": "chaque année des contrôles sur place portant sur au moins 3 % des exploitations", "question_type": "condition_or_prerequisite", "particulars": ["éleveur ovin en Irlande", "a demandé l'aide de cette année aux exploitations ovines et caprines"], "articles_involved": ["2", "32004R0021:5"]}
+✓ {
+  "question": "Un éleveur ovin en Irlande a demandé l'aide de cette année aux exploitations ovines et caprines. Quels contrôles doivent être achevés avant que l'aide puisse être versée ?",
+  "answer": "chaque année des contrôles sur place portant sur au moins 3 % des exploitations",
+  "question_type": "condition_or_prerequisite",
+  "particulars": [
+    "éleveur ovin en Irlande",
+    "a demandé l'aide de cette année aux exploitations ovines et caprines"
+  ],
+  "articles_involved": [
+    "2",
+    "32004R0021:5"
+  ],
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "32004R0021:5",
+      "language": "fr",
+      "text": "chaque année des contrôles sur place portant sur au moins 3 % des exploitations"
+    },
+    {
+      "source_ref": "2",
+      "language": "fr",
+      "text": "L'aide n'est versée qu'après la réalisation des contrôles prévus à l'article 5 du règlement (CE) nº 21/2004 du Conseil."
+    }
+  ]
+}
   → La condition de paiement est la règle de la cible ; l'autre acte indique seulement en quoi consistent les contrôles. La réponse est un segment continu de l'article référencé. Les deux articles sont déclarés, celui de l'autre acte par sa clé « Cite as » ; la question ne contient aucun identifiant.
 ✗ « Un organisme payeur irlandais planifie les inspections du bétail de cette année. Quelle proportion des exploitations ovines et caprines doit-il contrôler sur place ? » → L'article 5 de l'autre règlement y répond à lui seul ; la question retrouverait cet autre règlement. Écartez-la.
 Exemple 4 — questions réelles de production corrigées en cas d'espèce
 (a) ARTICLE CIBLE 1 du règlement Euratom exemptant les petites quantités de minerais, de matières brutes et de matières fissiles spéciales du chapitre du traité consacré à l'approvisionnement : « (a) les transferts à l'intérieur de la Communauté et les importations dans la Communauté de quantités n'excédant pas, par transaction, une tonne d'uranium et de thorium (ou d'uranium ou de thorium), dans la limite de cinq tonnes par an et par utilisateur pour chacune de ces matières ; … »
 ✗ Générée : « Quelle quantité d'uranium ou de thorium peut être transférée à l'intérieur de la Communauté ou y être introduite lors d'une seule transaction avant que l'exemption ne cesse de s'appliquer ? » → une amorce paraphrasée ; aucune situation.
-✓ {"question": "Une entreprise importe dans l'Union un seul envoi de minerai d'uranium contenant 800 kg d'uranium et prévoit d'importer environ quatre tonnes d'uranium au total cette année. L'envoi est-il exempté du chapitre du traité Euratom consacré à l'approvisionnement ?", "answer": "les transferts à l'intérieur de la Communauté et les importations dans la Communauté de quantités n'excédant pas, par transaction, une tonne d'uranium et de thorium (ou d'uranium ou de thorium), dans la limite de cinq tonnes par an et par utilisateur pour chacune de ces matières", "question_type": "scope_or_applicability", "particulars": ["un seul envoi de minerai d'uranium", "800 kg d'uranium", "environ quatre tonnes d'uranium au total cette année"], "articles_involved": ["1"]}
+✓ {
+  "question": "Une entreprise importe dans l'Union un seul envoi de minerai d'uranium contenant 800 kg d'uranium et prévoit d'importer environ quatre tonnes d'uranium au total cette année. L'envoi est-il exempté du chapitre du traité Euratom consacré à l'approvisionnement ?",
+  "answer": "les transferts à l'intérieur de la Communauté et les importations dans la Communauté de quantités n'excédant pas, par transaction, une tonne d'uranium et de thorium (ou d'uranium ou de thorium), dans la limite de cinq tonnes par an et par utilisateur pour chacune de ces matières",
+  "question_type": "scope_or_applicability",
+  "particulars": [
+    "un seul envoi de minerai d'uranium",
+    "800 kg d'uranium",
+    "environ quatre tonnes d'uranium au total cette année"
+  ],
+  "articles_involved": [
+    "1"
+  ],
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "1",
+      "language": "fr",
+      "text": "les transferts à l'intérieur de la Communauté et les importations dans la Communauté de quantités n'excédant pas, par transaction, une tonne d'uranium et de thorium (ou d'uranium ou de thorium), dans la limite de cinq tonnes par an et par utilisateur pour chacune de ces matières"
+    }
+  ]
+}
   → Les deux seuils sont instanciés du côté intérieur, de sorte que le segment tranche sans inférence. Avec 1,2 tonne dans un seul envoi, le résultat serait un verdict que vous déduisez, et non un segment — écartez un tel cas.
 (b) ARTICLE CIBLE 98 de la directive sur les marchés des secteurs spéciaux — Décisions du jury : « Le jury examine les plans et projets présentés par les candidats de manière anonyme et uniquement sur la base des critères indiqués dans l'avis de concours. »
 ✗ Générée : « Sur quelle base le jury doit-il évaluer les plans et projets présentés ? » → La même règle figure dans la directive classique sur les marchés publics ; « le jury » ne permet aucune distinction.
-✓ {"question": "Une entité adjudicatrice du secteur de l'eau organise un concours pour une nouvelle station de traitement, et le jury souhaite classer les propositions en partie sur des critères qui ne figuraient pas dans l'avis de concours. Est-ce permis ?", "answer": "uniquement sur la base des critères indiqués dans l'avis de concours", "question_type": "obligation_or_prohibition", "particulars": ["entité adjudicatrice du secteur de l'eau", "concours", "critères qui ne figuraient pas dans l'avis de concours"], "articles_involved": ["98"]}
+✓ {
+  "question": "Une entité adjudicatrice du secteur de l'eau organise un concours pour une nouvelle station de traitement, et le jury souhaite classer les propositions en partie sur des critères qui ne figuraient pas dans l'avis de concours. Est-ce permis ?",
+  "answer": "uniquement sur la base des critères indiqués dans l'avis de concours",
+  "question_type": "obligation_or_prohibition",
+  "particulars": [
+    "entité adjudicatrice du secteur de l'eau",
+    "concours",
+    "critères qui ne figuraient pas dans l'avis de concours"
+  ],
+  "articles_involved": [
+    "98"
+  ],
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "98",
+      "language": "fr",
+      "text": "uniquement sur la base des critères indiqués dans l'avis de concours"
+    }
+  ]
+}
 ✗ « Un pouvoir adjudicateur organisant un concours souhaite … » → Convient tout autant à la directive classique ; « entité adjudicatrice du secteur de l'eau » fixe le régime.
 (c) ARTICLE CIBLE 24 du règlement d'exécution relatif à l'agriculture dans les régions ultrapériphériques : « … Pour assurer la représentativité, les États membres sélectionnent de manière aléatoire entre 20 et 25 % du nombre minimal de demandeurs d'aide devant faire l'objet de contrôles sur place. »
 ✗ Générée : « Quelle proportion du nombre minimal de demandeurs d'aide les États membres doivent-ils sélectionner de manière aléatoire pour assurer la représentativité ? » → La même règle existe dans le règlement général de contrôle de la PAC ; aucune situation.
-✓ {"question": "Un organisme payeur d'une région ultrapériphérique de l'Union sélectionne les demandeurs d'aide pour les contrôles sur place uniquement sur la base d'une analyse des risques, sans élément aléatoire. Est-ce permis ?", "answer": "les États membres sélectionnent de manière aléatoire entre 20 et 25 % du nombre minimal de demandeurs d'aide devant faire l'objet de contrôles sur place.", "question_type": "obligation_or_prohibition", "particulars": ["organisme payeur d'une région ultrapériphérique", "uniquement sur la base d'une analyse des risques", "sans élément aléatoire"], "articles_involved": ["24"]}
+✓ {
+  "question": "Un organisme payeur d'une région ultrapériphérique de l'Union sélectionne les demandeurs d'aide pour les contrôles sur place uniquement sur la base d'une analyse des risques, sans élément aléatoire. Est-ce permis ?",
+  "answer": "les États membres sélectionnent de manière aléatoire entre 20 et 25 % du nombre minimal de demandeurs d'aide devant faire l'objet de contrôles sur place.",
+  "question_type": "obligation_or_prohibition",
+  "particulars": [
+    "organisme payeur d'une région ultrapériphérique",
+    "uniquement sur la base d'une analyse des risques",
+    "sans élément aléatoire"
+  ],
+  "articles_involved": [
+    "24"
+  ],
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "24",
+      "language": "fr",
+      "text": "les États membres sélectionnent de manière aléatoire entre 20 et 25 % du nombre minimal de demandeurs d'aide devant faire l'objet de contrôles sur place."
+    }
+  ]
+}
 (d) ARTICLE CIBLE 111 de la directive TVA : « Sous réserve des conditions prévues au deuxième alinéa de l'article 110, des exonérations avec droit à déduction de la TVA payée au stade antérieur peuvent continuer à être accordées dans les cas suivants : (a) par la Finlande pour la livraison de journaux et de périodiques vendus par abonnement et … ; (b) par la Suède … »
 ✗ Générée : « Quelles livraisons finlandaises peuvent continuer à bénéficier d'exonérations de TVA avec droit à déduction ? » → une amorce, pas une situation.
-✓ {"question": "Un éditeur finlandais vend des périodiques à ses lecteurs par abonnement. Ces livraisons relèvent-elles d'une des catégories énumérées pour le maintien d'une exonération de TVA avec droit à déduction de la TVA en amont ?", "answer": "par la Finlande pour la livraison de journaux et de périodiques vendus par abonnement", "question_type": "scope_or_applicability", "particulars": ["éditeur finlandais", "vend des périodiques à ses lecteurs par abonnement"], "articles_involved": ["111"]}
+✓ {
+  "question": "Un éditeur finlandais vend des périodiques à ses lecteurs par abonnement. Ces livraisons relèvent-elles d'une des catégories énumérées pour le maintien d'une exonération de TVA avec droit à déduction de la TVA en amont ?",
+  "answer": "par la Finlande pour la livraison de journaux et de périodiques vendus par abonnement",
+  "question_type": "scope_or_applicability",
+  "particulars": [
+    "éditeur finlandais",
+    "vend des périodiques à ses lecteurs par abonnement"
+  ],
+  "articles_involved": [
+    "111"
+  ],
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "111",
+      "language": "fr",
+      "text": "par la Finlande pour la livraison de journaux et de périodiques vendus par abonnement"
+    }
+  ]
+}
   → « Finlande » et « vendus par abonnement » instancient les critères de la catégorie énumérée. La question demande seulement d'identifier cette catégorie, sans décider si toutes les conditions de l'exonération sont remplies. Une question portant sur les conditions de l'article 110 nécessiterait que cet article soit fourni et que ["111", "110"] soient déclarés ; sans lui, écartez-la.
 Exemple 5 — questions réelles de production à écarter
 ✗ « Un fonctionnaire de la Commission est chargé d'aider deux cellules de renseignement financier de différents États membres à coordonner une affaire transfrontière et à échanger des informations au sein de l'Union. La Commission peut-elle apporter cette assistance ? » → Le protagoniste est la Commission et la situation reformule la conséquence de la règle ; la clause ne correspond à aucun cas de personne privée. Écartez-la ou utilisez une autre disposition de l'article.
@@ -106,7 +312,26 @@ AUTO-VÉRIFICATION pour chaque question avant de la finaliser :
 7. Pas de formule type ; une seule demande ; le registre d'un praticien à la troisième personne ; les questions reposent sur des faits différents et, si vous renvoyez deux ou trois questions, couvrent au moins deux catégories.
 SORTIE (JSON valide uniquement, pas de markdown) : jusqu'à trois entrées, moins s'il y en a moins qui satisfont à tous les tests :
 [
-  {"question": "...", "answer": "...", "question_type": "...", "particulars": ["...", "..."], "articles_involved": ["..."]}
+  {
+  "question": "...",
+  "answer": "...",
+  "question_type": "...",
+  "particulars": [
+    "...",
+    "..."
+  ],
+  "articles_involved": [
+    "..."
+  ],
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "...",
+      "language": "fr",
+      "text": "..."
+    }
+  ]
+}
 ]
 Si l'article cible ne consiste qu'en des formules types, ou ne permet aucune question satisfaisant aux tests, renvoyez exactement : [{"skip_reason": "<une courte expression>"}]
 - answer : le segment continu le plus court qui tranche la question pour la situation décrite, strictement ancré dans le texte fourni.

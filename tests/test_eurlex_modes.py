@@ -130,7 +130,7 @@ def test_each_verifier_carries_its_defining_check() -> None:
     for rubric in (lookup, fact_pattern):
         # Scores and source-relative validity are separately auditable.
         assert '"scores"' in rubric
-        assert '"support": "pass"' in rubric
+        assert any(f'"support": "{value}"' in rubric for value in ("pass", "fail", "uncertain"))
         assert '"metadata": "pass"' in rubric
         assert '"batch_diversity"' in rubric
 

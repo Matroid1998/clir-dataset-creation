@@ -1,3 +1,41 @@
+EVIDENCE_CONTRACT: legal_evidence_spans_v1
+
+Ausgabesprache: Deutsch. Fragen und Freitextannotationen sind deutsch; Quellenzitate und kopierte Kennungen behalten ihre ursprüngliche Form.
+
+AUSDRÜCKLICHE BELEGSPANNEN — IN JEDEM MODUS ERFORDERLICH
+Geben Sie evidence_spans als geordnete Liste von Objekten mit genau source_ref, language und text
+zurück. Die erste Spanne belegt answer unmittelbar, bei source_finding den materiellen Suchhinweis.
+Jede Spanne ist EIN kleinstmöglicher ausreichender zusammenhängender Ausschnitt, WÖRTLICH aus dem
+tatsächlich mitgelieferten Quellenkörper in dessen Originalsprache kopiert. Bewahren Sie Schreibweise,
+Leerraum, Zeichensetzung, Markup und Fehler. Übersetzen Sie Belege niemals; verbinden Sie keine
+getrennten Stellen, fügen Sie keine Auslassungszeichen ein, kopieren Sie keine Metadaten und zitieren
+Sie nichts hinter einer Kürzungsgrenze. language bezeichnet die Sprache der zitierten Fassung.
+Bewahren Sie alle antwortrelevanten Bedingungen, Ausnahmen, Akteure, Modalitäten und Geltungsgrenzen.
+Kopieren Sie keine ganzen Artikel oder Dokumente anstelle der benötigten Belegstellen.
+Entfernen Sie entbehrlichen Anfangs- und Endtext, bewahren Sie aber notwendige Zwischenpassagen.
+Es gibt keine feste Tokenobergrenze. Grenzen Sie die Frage ein oder überspringen Sie sie, wenn diese
+Beleganforderungen nicht erfüllbar sind.
+Legen Sie zuerst die primäre Belegspanne fest. Außer bei source_finding übernimmt answer deren
+vollständigen Text, wenn eine passende Fassung in der Ausgabesprache mitgeliefert wurde;
+answer_is_translation ist dann false. Andernfalls übersetzen Sie die gesamte Spanne sinngenau in
+die Ausgabesprache und setzen answer_is_translation auf true. Keine Zusammenfassung, Berechnung,
+zusätzliche Ja/Nein-Antwort oder Bedeutungsänderung. Bei source_finding bleibt answer die genaue
+Zielidentität nach der bestehenden Modusregel, answer_is_translation ist false, und die erste Spanne
+belegt den materiellen Hinweis im Zieltext.
+Geben Sie answer_is_translation in JEDEM Modus als JSON-Boolean zurück. Geben Sie keine skalaren
+Felder evidence, evidence_language, evidence_is_translation, kanonischen Quellenkennungen oder
+Zeichenpositionen aus: Diese werden aus erster Spanne und Quelldaten berechnet. Die bestehenden
+modusspezifischen Felder bleiben neben evidence_spans erhalten. Beispielauszüge sind nur Lehrmaterial.
+Auch bei übersetzten Beispielantworten bleibt der Beleg in der tatsächlich gezeigten Quellsprache.
+
+EUR-LEX: BELEGABDECKUNG
+Geben Sie genau eine Spanne für JEDE Einheit in articles_involved zurück: Ziel und jede notwendige
+mitgelieferte Referenz oder Anlage. Keine ungenutzten Quellen oder doppelten Sprachfassungen.
+source_ref ist bei Ziel und eigenem Rechtsakt die bloße Artikelnummer, bei fremdem Rechtsakt oder
+jeder Anlage der exakt mitgelieferte Cite as-Schlüssel. Die erste Spanne darf nur dann aus einer
+zulässigen Referenz stammen, wenn die Regel des Ziels unverzichtbar bleibt; belegen Sie diese separat.
+Bei source_finding muss die erste Spanne aus dem Ziel stammen. Jede Spanne bleibt in ihrer Einheit.
+
 Sie erstellen konzeptuelle Suchfragen aus EU-Rechtsvorschriften. Die suchende Person kennt eine geregelte Frage oder Tätigkeit, aber weder den maßgeblichen Rechtsakt noch dessen genauen Wortlaut. Fragen Sie nach einem in der Vorschrift ausdrücklich bezeichneten Problem, einer rechtlichen Reaktion oder einem Mechanismus oder der Stellung eines Betroffenen. Eine konzeptuelle Frage ist nicht grundsätzlich besser als eine präzise Faktenabfrage oder ein konkreter Fall.
 
 QUELLE UND BELEGE
@@ -23,7 +61,23 @@ Formulieren Sie die gewöhnliche Sprache der Frage natürlich um und behalten Si
 NUTZEN UND AUSGABE
 Bevorzugen Sie materiellen Regelungsgehalt. Überspringen Sie reine Bestimmungen zur Umsetzung von Richtlinien in nationales Recht, allgemeine Inkrafttretens- oder Aufhebungsvorschriften und allgemeine Überprüfungs- oder Sanktionsklauseln ohne aufschlussreichen Regelungszusammenhang. Eine konkrete Schutzvorkehrung, Übergangsregelung oder ein Durchsetzungsmechanismus ist nicht allein aufgrund der Überschrift eine Standardfloskel. Nutzen Sie bei einem Artikel mit gemischtem Inhalt den materiell gehaltvollen Teil.
 Geben Sie bis zu drei unterschiedliche Fragen aus; eine einzige gute Frage genügt. Erzwingen Sie weder sämtliche Perspektiven noch eine feste Anzahl von Kandidaten. Geben Sie ausschließlich gültiges JSON aus:
-[{"question":"...","answer":"...","framing":"situation|response|stakeholder","anchor":"...","articles_involved":["..."]}]
+[{
+  "question": "...",
+  "answer": "...",
+  "framing": "situation|response|stakeholder",
+  "anchor": "...",
+  "articles_involved": [
+    "..."
+  ],
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "...",
+      "language": "de",
+      "text": "..."
+    }
+  ]
+}]
 Wählen Sie einen einzelnen gültigen Wert für framing. anchor ist eine inhaltlich aussagekräftige Wendung, die exakt aus der Frage kopiert wird. Die Felder question_cited und particulars werden nicht benötigt. Wenn keine Frage geeignet ist, geben Sie [{"skip_reason":"ein kurzer Grund"}] aus.
 
 BEISPIEL (erfundener Wortlaut, kein Gesetzeszitat)

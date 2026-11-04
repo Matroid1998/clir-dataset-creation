@@ -300,6 +300,9 @@ _CANDIDATE_EXTRAS = (
     ("source_article", "source_article"),
     ("evidence", "evidence"),
     ("evidence_language", "evidence_language"),
+    ("evidence_source_id", "evidence_source_id"),
+    ("evidence_contract", "evidence_contract"),
+    ("evidence_spans", "evidence_spans"),
     ("process_kind", "process_kind"),
     ("process_start", "process_start"),
     ("process_goal", "process_goal"),
@@ -336,7 +339,9 @@ def candidates_block(qa_pairs: Sequence[Mapping[str, Any]]) -> str:
             value = qa.get(key)
             if not value and value is not False:
                 continue
-            if isinstance(value, (list, tuple)):
+            if key == "evidence_spans":
+                value = json.dumps(value, ensure_ascii=False)
+            elif isinstance(value, (list, tuple)):
                 value = "; ".join(str(v) for v in value)
             entry += f"\n  {label}: {value}"
         entry += f"\n  Answer: {qa.get('answer', '')}"
@@ -438,7 +443,8 @@ _CANDIDATE_INPUT_FIELDS = (
     "instrument_slot_cited", "instrument_description",
     "comparison_entities", "comparison_aspect", "claim", "claim_status",
     "answer_is_translation", "source_identifier", "source_article", "evidence",
-    "evidence_is_translation",
+    "evidence_is_translation", "evidence_language", "evidence_source_id",
+    "evidence_contract", "evidence_spans",
 )
 _CHEMISTRY_CANDIDATE_INPUT_FIELDS = (
     "candidate_id", "mode", "question_language", "question", "answer", "anchor",
@@ -768,6 +774,14 @@ def _normalize_legal_quality(data: Any, prompt: str, envelope: Mapping[str, Any]
     return rows
 
 
+def _verification_reuse_identity(qa_pairs, reuse_identity):
+    """Evidence-aware candidates must retain their complete verification identity."""
+    identity = dict(reuse_identity or {})
+    if any(qa.get("evidence_contract") or qa.get("evidence_spans") for qa in qa_pairs):
+        identity.pop("deduplicate", None)
+    return identity
+
+
 def grade_faithfulness(
     client: Any,
     config: GraderConfig,
@@ -800,7 +814,7 @@ def grade_faithfulness(
     reuse = getattr(client, "reuse_verification", None)
     if strict and reuse is not None and want == len(qa_pairs):
         return reuse({"config": asdict(config), "prompt": prompt, "passages": passages,
-                      **(dict(reuse_identity) if reuse_identity else {})},
+                      **_verification_reuse_identity(qa_pairs, reuse_identity)},
                      qa_pairs, lambda unique: grade_faithfulness(
                          SimpleNamespace(chat=client.chat), config, prompt, passages, unique, strict=True))
     if chemistry_version:
@@ -870,7 +884,7 @@ def grade_quality(
         return reuse({"config": asdict(config), "prompt": prompt, "passages": passages,
                       "mode": mode, "sources": sources, "target_source_id": target_source_id,
                       "policies": policies, "rubric_mode": rubric_mode,
-                      **(dict(reuse_identity) if reuse_identity else {})},
+                      **_verification_reuse_identity(qa_pairs, reuse_identity)},
                      qa_pairs, lambda unique: grade_quality(
                          SimpleNamespace(chat=client.chat), config, prompt, passages, unique, mode,
                          sources=sources, target_source_id=target_source_id, policies=policies,
@@ -905,6 +919,12 @@ def grade_quality(
         # Keep every source boundary and identifier in the canonical passage,
         # and serialize all declared candidate metadata without model/score leaks.
         envelope = {"passages": passages, "candidates": candidates}
+        if sources and any(qa.get("evidence_contract") or qa.get("evidence_spans")
+                           for qa in qa_pairs):
+            # Preserve language/body boundaries for evidence-span checks. Older
+            # compact contracts keep their original request envelope.
+            envelope.update(sources=list(sources), target_source_id=target_source_id,
+                            policies=dict(policies or {}))
         raw = _invoke(client, config, prompt, json.dumps(envelope, ensure_ascii=False))
         return _normalize_compact_quality(parse_json_response(raw), rubric_keys(prompt), candidates, mode)
     raw = _invoke(client, config, prompt, f"{passages}\n\n{candidates_block(qa_pairs)}")

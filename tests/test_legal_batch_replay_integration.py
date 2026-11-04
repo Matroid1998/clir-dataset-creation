@@ -85,10 +85,12 @@ def case(corpus):
 def legacy_prompts(monkeypatch, generator, mode):
     """Replay transport tests deliberately exercise the supported flat rubric."""
     original = generator.PROMPTS
+    from clir_bench.domains.legal.qac.evidence import MARKER
     prompt = "Legacy quality rubric\n" + "\n".join(
         f'"{key}": <1-5>' for key in grading.quality_keys(mode))
     monkeypatch.setattr(generator, "PROMPTS", SimpleNamespace(
-        generation=original.generation, faithfulness=original.faithfulness,
+        generation=lambda *args: original.generation(*args).replace(MARKER + "\n", ""),
+        faithfulness=original.faithfulness,
         quality=lambda *args: prompt))
 
 

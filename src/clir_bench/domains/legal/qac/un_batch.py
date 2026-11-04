@@ -197,20 +197,29 @@ def prepare_payload(target: Target, index: ctx.BlockIndex, *,
                        languages=ctx.payload_languages(target.language))
 
 
-def quality_sources(payload: ctx.GenerationPayload, language: str) -> list[dict[str, Any]]:
+def quality_sources(payload: ctx.GenerationPayload, language: str, *,
+                    evidence_contract: bool = False) -> list[dict[str, Any]]:
     """Separate answer-bearing target text from understanding-only supplied material."""
     languages = [lg for lg in ctx.payload_languages(language) if payload.target.texts.get(lg)]
     sources = []
     for unit, role in ([(payload.target, "target")]
                        + [(unit, "context") for unit in payload.context_blocks]):
-        sources.append({
+        source = {
             "source_id": unit.block_id, "role": role,
             "text": "\n\n".join(
                 (ctx._metadata(unit, lg) + "\n" if role == "target" else "") + unit.texts[lg]
                 for lg in languages if unit.texts.get(lg)),
             "metadata": {"doc_id": unit.doc_id, "symbol": unit.symbol, "title": unit.title,
                          "block_index": unit.block_index, "languages": languages},
-        })
+        }
+        if role == "target" and evidence_contract and getattr(payload, "evidence_sources", None):
+            visible = [body for body in payload.evidence_sources.values()
+                       if body.source_id == unit.block_id]
+            source["texts"] = {body.language: body.text for body in visible}
+            source["text"] = "\n\n".join(
+                f"[{body.language.upper()}]\n{body.text}" for body in visible)
+            source["metadata"].update(languages=list(source["texts"]), source_ref="target")
+        sources.append(source)
     for unit in payload.references:
         sources.append({
             "source_id": unit.doc_id, "role": "reference",
@@ -429,8 +438,10 @@ def run_one(target: Target, index: ctx.BlockIndex, *, gen_model: str,
                                 ["un", target.block_id, target.mode, target.language, gen_model,
                                  position, c.question, c.answer], ensure_ascii=False).encode()).hexdigest()[:24]),
            "question_language": target.language} for position, c in enumerate(candidates)]
-    if target.mode in gen.NEW_MODES:
-        for pair, candidate in zip(qa, candidates):
+    evidence_contract = any(getattr(c, "evidence_contract", "")
+                            or getattr(c, "evidence_spans", []) for c in candidates)
+    for pair, candidate in zip(qa, candidates):
+        if target.mode in gen.NEW_MODES or evidence_contract:
             pair.update(mode=target.mode, **gen.annotations.metadata(candidate))
     # The quality rubrics run consistency checks ON the mode's own fields -- is
     # the declared anchor actually a substring of the question, does the cited
@@ -450,13 +461,15 @@ def run_one(target: Target, index: ctx.BlockIndex, *, gen_model: str,
     ]
     faith_prompt = gen.PROMPTS.faithfulness("batch")
     quality_prompt = gen.PROMPTS.quality(target.mode, "batch")
+    reuse_identity = ({"deduplicate": "exact_question"}
+                      if deduplicate_exact_questions and not evidence_contract else None)
     errors = []
     faith = quality = None
     try:
         faith = stage("faithfulness", lambda: grade_faithfulness(
             client("faithfulness", grade_model), grader, faith_prompt, payload.text, qa,
             strict=enhanced,
-            reuse_identity={"deduplicate": "exact_question"} if deduplicate_exact_questions else None))
+            reuse_identity=reuse_identity))
     except Exception as error:
         if not enhanced:
             raise
@@ -464,13 +477,14 @@ def run_one(target: Target, index: ctx.BlockIndex, *, gen_model: str,
     try:
         quality = stage("quality", lambda: grade_quality(
             client("quality", grade_model), grader, quality_prompt, payload.text, qa_quality,
-            target.mode, strict=enhanced, sources=quality_sources(payload, target.language),
+            target.mode, strict=enhanced, sources=quality_sources(
+                payload, target.language, evidence_contract=bool(evidence_contract)),
             target_source_id=target.block_id, rubric_mode="un_practitioner" if target.mode == gen.MODE_PRACTITIONERS else f"un_{target.mode}",
             policies={"target_granularity": "block", "reference_policy": "target_only",
                       "answer_role": ("source_identity" if target.mode == gen.MODE_SOURCE_FINDING
                                       else "evidence_span"), "source_time_policy": "supplied_version",
                       "require_unique_gold": False},
-            reuse_identity={"deduplicate": "exact_question"} if deduplicate_exact_questions else None))
+            reuse_identity=reuse_identity))
     except Exception as error:
         if not enhanced:
             raise

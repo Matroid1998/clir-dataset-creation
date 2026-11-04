@@ -1,3 +1,37 @@
+EVIDENCE_CONTRACT: legal_evidence_spans_v1
+
+Langue de sortie : français. Les questions et annotations libres sont en français ; les citations et identifiants copiés gardent leur forme originale.
+
+PASSAGES JUSTIFICATIFS EXPLICITES — OBLIGATOIRES DANS TOUS LES MODES
+Renvoyez evidence_spans comme une liste ordonnée d'objets contenant exactement source_ref, language
+et text. Le premier passage justifie directement answer ou, en source_finding, l'indice substantiel.
+Chaque passage est UN extrait continu minimal et suffisant, copié EXACTEMENT dans le corps d'une
+source effectivement fournie, dans sa langue d'origine. Conservez orthographe, espaces, ponctuation,
+balisage et erreurs. Ne traduisez jamais la preuve, ne rassemblez pas de fragments distants,
+n'ajoutez pas de points de suspension, ne copiez pas les métadonnées et ne citez pas de texte masqué
+par une troncature. language désigne la langue de la version citée, pas forcément celle de la question.
+Conservez toutes les conditions, exceptions, modalités, attributions et limites qui changent la réponse.
+Ne copiez pas un article ou document entier au lieu de sélectionner les passages nécessaires.
+Supprimez tout début ou fin superflu, mais gardez le texte intermédiaire indispensable. Aucune limite
+fixe de tokens n'est imposée. Restreignez ou omettez la question si ce contrat ne peut être respecté.
+Fixez d'abord le passage principal. Sauf en source_finding, answer en reprend TOUT le texte lorsqu'une
+version adéquate dans la langue de sortie est fournie; answer_is_translation vaut false. Sinon,
+traduisez fidèlement TOUT ce passage dans la langue demandée et indiquez answer_is_translation=true.
+Aucun résumé, calcul, verdict ajouté ou changement de portée. En source_finding, answer reste
+l'identité exacte de la cible selon la règle du mode, answer_is_translation vaut false et le premier
+passage établit l'indice substantiel dans le corps de la cible.
+Renvoyez answer_is_translation comme booléen JSON dans TOUS les modes. Ne renvoyez pas les champs
+scalaires evidence, evidence_language, evidence_is_translation, des identifiants canoniques ou des
+positions de caractères: le parseur les déduit du premier passage et des sources. Conservez les
+champs propres au mode à côté de evidence_spans. Les extraits illustratifs sont uniquement du
+matériel pédagogique. Même si la réponse est traduite, la preuve reste dans la langue montrée.
+
+ONU: COUVERTURE DES PREUVES
+Renvoyez exactement un passage avec source_ref="target", tiré du corps de TARGET BLOCK. Ni REFERENCED
+DOCUMENTS ni DOCUMENT CONTEXT ne fournissent de preuve. L'identité du document n'autorise pas ses
+autres blocs comme sources de preuve. Préservez le rôle du locuteur et le statut de l'énoncé.
+Un court bloc cible peut être cité en entier uniquement si chaque partie est nécessaire ; ne le remplacez jamais par le document complet.
+
 Vous créez des questions de recherche documentaire pour des praticiens travaillant sur les Nations Unies, à partir de situations concrètes. Le praticien dispose d'une situation ou d'une tâche, pas d'une référence documentaire. Décrivez cette situation et demandez la règle, la procédure, l'action sollicitée ou le constat attribué nécessaire pour la traiter. Le système de recherche doit identifier les éléments pertinents des documents de l'ONU à partir de la situation.
 
 SOURCE ET LANGUE
@@ -32,7 +66,22 @@ Réponse : « des inondations avaient bloqué l'itinéraire oriental d'acheminem
 
 SORTIE
 Renvoyez uniquement une liste JSON contenant au plus TROIS paires différentes et utiles. Une seule bonne paire suffit ; n'en ajoutez pas pour atteindre trois ni pour imposer une diversité de catégories. Si aucune ne convient, renvoyez exactement [{"skip_reason":"<one short phrase>"}].
-[{"question":"...","answer":"...","question_type":"...","anchors":["..."]}]
+[{
+  "question": "...",
+  "answer": "...",
+  "question_type": "...",
+  "anchors": [
+    "..."
+  ],
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "target",
+      "language": "fr",
+      "text": "..."
+    }
+  ]
+}]
 Conservez ces clés inchangées. Choisissez le question_type le plus descriptif parmi : sanction_condition_or_consequence, date_deadline_or_mandate, quantity_force_or_finance, reporting_monitoring_or_verification, actor_body_or_procedure, situation_scope_or_coverage, operative_action, finding_event_or_assessment. Aucun type n'est prioritaire.
 « anchors » contient une ou plusieurs sous-chaînes distinctes, substantielles et littérales de la question, dans leur ordre d'apparition, qui identifient la situation. Aucun nombre fixe n'est exigé ; la liste ne peut pas réparer un contexte manquant dans la question.
 Voici l'entrée :

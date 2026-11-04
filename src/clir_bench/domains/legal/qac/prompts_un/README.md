@@ -175,13 +175,13 @@ Markdown source at the repository root. Existing corpus-language eligibility and
 batch defaults are unchanged; select these modes explicitly with `--modes` or
 use either decider, which now supports all six current personas.
 
-All three modes preserve `anchor`. Comparison also stores `comparison_entities`
+The legacy scalar contract preserves `anchor` in these three modes. Comparison also stores `comparison_entities`
 (as a JSON array in CSV) and `comparison_aspect`; claim verification stores
 `claim` and `claim_status`. Both store `answer_is_translation`. Source finding
 stores `source_identifier`, `evidence`, and `evidence_is_translation`; EUR-Lex
 also stores `source_article`. Its answer identifies the source, while the
 separate contiguous target evidence establishes the clue. The selected article
-or block remains the retrieval unit. These annotations are retained in checkpoints
+or block identifies the generation target. These annotations are retained in checkpoints
 and CSV export, and passed through to graders and regrading. The shared faithfulness
 rubric checks source-finding identity against target metadata and its separate
 evidence against the target text.
@@ -189,3 +189,25 @@ evidence against the target text.
 Prompt bundles are immutable: an older active bundle will not contain these
 modes. Use `CLIR_PROMPT_SOURCE=local` to run the edited files, or publish and
 activate a new bundle with the existing prompt-registry workflow.
+
+
+## Explicit evidence spans for future generations
+
+Generation templates declare `EVIDENCE_CONTRACT: legal_evidence_spans_v1`. Every mode and
+language returns `evidence_spans`: an ordered list of `{source_ref, language, text}` objects,
+plus `answer_is_translation`. The first span supplies the answer passage or source-finding
+clue; each further span supplies indispensable support from a different involved EUR-Lex unit.
+Exactly one span covers each involved unit. EUR-Lex uses existing article/Cite-as keys;
+UN uses `source_ref="target"` and never takes answer substance from context or references.
+
+Quotes stay verbatim in the actual source language. They must be the smallest sufficient
+continuous excerpts, with material qualifications retained. Whole-article copying and stitched
+passages are invalid; no arbitrary token cap replaces the sufficiency/minimality judgment.
+Answers retain their existing quotation, translation, or source-identity roles. Scalar evidence
+fields, canonical IDs and character offsets are derived by code, not returned by the model.
+
+Both verifiers inspect span coverage, provenance and semantic sufficiency and judge removable
+padding through their existing checks and score dimensions. Their original grade schemas stay
+unchanged. Legacy records without the versioned contract remain readable and are not backfilled.
+Activate a new immutable prompt bundle after validation; editing these files alone does not
+replace already pinned prompts or change existing generated QAs and Hugging Face datasets.

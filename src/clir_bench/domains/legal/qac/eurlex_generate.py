@@ -38,6 +38,7 @@ from typing import Any
 
 from clir_bench.core.prompts import PromptPack
 from clir_bench.domains.legal.qac import eurlex_context as ctx
+from clir_bench.domains.legal.qac import evidence
 from clir_bench.domains.legal.qac import generation_metadata as annotations
 from clir_bench.domains.legal.qac.env import load_env
 
@@ -116,7 +117,7 @@ def skip_reason(data: Any) -> str:
 
 
 def parse_candidates(data: Any, payload: ctx.GenerationPayload,
-                     mode: str) -> list[Candidate]:
+                     mode: str, *, require_evidence: bool = False) -> list[Candidate]:
     """Validate the model's JSON, including the ``articles_involved`` field.
 
     ``mode`` selects which of the prompts' extra fields are read, so a field
@@ -125,7 +126,11 @@ def parse_candidates(data: Any, payload: ctx.GenerationPayload,
     carries ``particulars``; ``conceptual`` carries ``framing`` and ``anchor``.
     The new modes retain their own annotations through the shared metadata
     parser; source-finding keeps its identifier answer and separate evidence.
+    Versioned prompts additionally require exact source-tagged spans in every
+    mode; direct legacy parsing remains permissive for saved response replay.
     """
+    if require_evidence:
+        data = evidence.validate_envelope(data)
     if isinstance(data, Mapping):
         data = [data]
     out: list[Candidate] = []
@@ -137,11 +142,19 @@ def parse_candidates(data: Any, payload: ctx.GenerationPayload,
         if not question or not answer:
             continue
         involved, rejected = ctx.normalise_involved(item.get("articles_involved"), payload)
+        metadata = annotations.parse_metadata(item, mode, eurlex=True)
+        if require_evidence:
+            if rejected or not isinstance(item.get("articles_involved"), list):
+                raise ValueError("articles_involved must list only supplied source keys")
+            metadata.update(evidence.validate_spans(
+                item, payload.evidence_sources, involved,
+                primary_ref=payload.target.article_number if mode == MODE_SOURCE_FINDING else None,
+            ))
         raw_particulars = item.get("particulars")
         if isinstance(raw_particulars, str):
             raw_particulars = [raw_particulars]
         out.append(Candidate(
-            **annotations.parse_metadata(item, mode, eurlex=True),
+            **metadata,
             question=question,
             answer=answer,
             classification=str(item.get("framing" if mode == MODE_CONCEPTUAL else "question_type", "other")).strip(),
@@ -178,9 +191,11 @@ def generate(payload: ctx.GenerationPayload, *, mode: str, language: str,
              model: str, client: Any, reasoning_effort: str = "medium") -> list[Candidate]:
     from clir_bench.core.llm import chat, parse_json_response
 
-    raw = chat(client, model, build_messages(payload, mode, language),
+    messages = build_messages(payload, mode, language)
+    raw = chat(client, model, messages,
                reasoning_effort=reasoning_effort)
-    return parse_candidates(parse_json_response(raw), payload, mode)
+    return parse_candidates(parse_json_response(raw), payload, mode,
+                            require_evidence=evidence.uses_contract(messages[0]["content"]))
 
 
 def rows_for(payload: ctx.GenerationPayload, candidates: Sequence[Candidate], *,

@@ -1,3 +1,31 @@
+EVIDENCE_CONTRACT: legal_evidence_spans_v1
+
+输出语言：简体中文。问题和自由文本注释使用简体中文；来源引文和复制的标识符保留原样。
+
+明确支持片段——所有模式均必填
+返回 evidence_spans 有序数组，每项恰含 source_ref、language、text。第一项直接支持 answer；
+在 source_finding 中，第一项支持识别来源所依据的实质线索。每项必须是从实际提供的来源正文中
+逐字复制的、足以支持答案的最小连续片段，保留来源原文的拼写、空白、标点、标记和错误。
+绝不翻译证据，不拼接不连续内容，不添加省略号，不复制元数据，不引用截断处之后的不可见文字。
+language 标明所引用版本的实际语言，不自动等于问题语言。保留影响答案的条件、例外、主体、
+情态和适用范围。不得复制整个条文，也不得用整篇文档代替选择证据；删除无关的开头或结尾，
+保留必要的中间文字。不设固定 token 上限。若无法满足这些要求，应缩小问题或跳过。
+先确定主要证据片段。除 source_finding 外，如已提供适当的输出语言版本，answer 应复制该片段的
+全部文字，并设置 answer_is_translation=false；否则将整个片段忠实翻译为输出语言，并设置为 true。
+不得概括、计算、增加是非判定或改变适用范围。在 source_finding 中，answer 仍按原有模式规则给出
+目标的准确身份，answer_is_translation=false；第一项证据必须来自目标正文并证明实质线索。
+所有模式均须返回 JSON 布尔值 answer_is_translation。不要输出标量字段 evidence、evidence_language、
+evidence_is_translation、规范化来源 ID 或字符位置；解析器会从第一项及来源数据推导这些字段。
+保留各模式原有字段，并加入 evidence_spans。样例中的来源摘录仅用于教学，不是实际输入的证据。
+即使样例答案需要翻译，证据也必须保持样例中实际提供的来源语言。
+
+EUR-Lex 证据覆盖
+articles_involved 中每个必需单位均须恰好对应一个证据片段，包括目标及不可或缺的已提供引用条文
+或附件。不要加入未使用的来源，也不要重复列出同一单位的不同语言版本。source_ref 对于同一法案
+的条文使用纯条号，对于其他法案的条文或任何附件使用原样提供的 Cite as 键。主要片段仅在目标
+规则仍不可或缺时才能来自允许的引用来源，并须另列目标的支持片段；source_finding 的第一项必须
+来自目标。每项必须限于其自己的来源单位，不得跨单位拼接。
+
 优先澄清——以下规则优先于后文任何相反表述或示例。
 答案是所提供文本中的连续证据片段，须结合问题、支配该片段的条款及已提供的明确交叉引用阅读。不得另加“是／否”、改写后的个案结论或计算出的日期。将假定事实对应到明示类别、条件、阈值或日期，解析普通指代，或识别对明示义务的违反，均不属于缺乏依据的法律推论。不得补充缺失的决定性事实、未规定的制裁、逆命题或外部法律。
 是非问句和开放问句同样有效。仅问是否属于某一类别时，无须证明取得最终权利的所有条件；若问完整权利或适用结果，则必须具备所有影响结果的条件。问题与证据重复必要法律术语或条件，本身不构成答案泄露，只要所问法律关系仍未知。不得以删除答案片段后能否写出问题作为自动排除标准。
@@ -54,7 +82,25 @@
 ### REFERENCED ARTICLES
 [ZH] 第 12 条 —— 实施权力
 “欧盟委员会应通过实施法案，规定报告格式。”
-✓ {"question": "一次性塑料生产者向国家主管机关报告其投放市场数量的年度截止日期是什么时候？", "question_cited": "根据第 (EU) 2019/904 号指令，一次性塑料生产者向国家主管机关报告其投放市场数量的年度截止日期是什么时候？", "instrument_short_name": "一次性塑料指令", "answer": "每年 3 月 31 日前", "question_type": "deadline_or_duration", "anchor": "一次性塑料生产者", "articles_involved": ["8"]}
+✓ {
+  "question": "一次性塑料生产者向国家主管机关报告其投放市场数量的年度截止日期是什么时候？",
+  "question_cited": "根据第 (EU) 2019/904 号指令，一次性塑料生产者向国家主管机关报告其投放市场数量的年度截止日期是什么时候？",
+  "instrument_short_name": "一次性塑料指令",
+  "answer": "每年 3 月 31 日前",
+  "question_type": "deadline_or_duration",
+  "anchor": "一次性塑料生产者",
+  "articles_involved": [
+    "8"
+  ],
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "8",
+      "language": "zh",
+      "text": "每年 3 月 31 日前"
+    }
+  ]
+}
   → 锚点是受规制主体，根据“Act”行的主题事项构成；仅用“生产者”无法通过姊妹法测试（包装、废弃电气电子设备和电池制度也规定了生产者报告的截止日期）。句子骨架已改写（“年度截止日期”），专业术语（“投放市场”）则保留原样 —— 直译式问句“每年最迟在什么日期前，生产者必须……报告投放市场的数量？”可以接受，但照搬了条款措辞。第 12 条虽被引用，却未对答案作出贡献，因此不列入。
 ✗ “生产者必须在什么日期前报告每年投放市场的数量？” → 哪些生产者，根据什么制度？无法通过姊妹法测试。
 ✗ “一次性塑料生产者的年度报告必须使用什么格式？” → 格式规定在一个未被提供的实施法案中。丢弃。
@@ -65,12 +111,75 @@
 ### REFERENCED ARTICLES
 [ZH] 第 3 条 —— 所涵盖产品
 “本指令适用于塑料制成的棉签棒、餐具、餐盘、吸管和饮料搅拌棒。”
-✓ {"question": "哪些一次性塑料产品自 2026 年 7 月 3 日起被禁止投放欧盟市场？", "question_cited": "根据第 (EU) 2019/904 号指令，哪些一次性塑料产品自 2026 年 7 月 3 日起被禁止投放欧盟市场？", "instrument_short_name": "一次性塑料指令", "answer": "塑料制成的棉签棒、餐具、餐盘、吸管和饮料搅拌棒", "question_type": "scope_or_applicability", "anchor": "一次性塑料产品", "articles_involved": ["3", "4"]}
+✓ {
+  "question": "哪些一次性塑料产品自 2026 年 7 月 3 日起被禁止投放欧盟市场？",
+  "question_cited": "根据第 (EU) 2019/904 号指令，哪些一次性塑料产品自 2026 年 7 月 3 日起被禁止投放欧盟市场？",
+  "instrument_short_name": "一次性塑料指令",
+  "answer": "塑料制成的棉签棒、餐具、餐盘、吸管和饮料搅拌棒",
+  "question_type": "scope_or_applicability",
+  "anchor": "一次性塑料产品",
+  "articles_involved": [
+    "3",
+    "4"
+  ],
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "3",
+      "language": "zh",
+      "text": "塑料制成的棉签棒、餐具、餐盘、吸管和饮料搅拌棒"
+    },
+    {
+      "source_ref": "4",
+      "language": "zh",
+      "text": "成员国应自 2026 年 7 月 3 日起禁止将第 3 条所列的一次性塑料制品投放市场。"
+    }
+  ]
+}
   → 禁令及其日期是目标条款自身的事实；产品清单来自第 3 条，因此两条均须声明。单条款测试：第 3 条列举产品，但并未说明它们被禁止，也未说明禁令从何时开始。
 ✗ “一次性塑料指令适用于哪些产品？” → 这是关于第 3 条的问题；丢弃。
-✗ {"question": "哪些一次性塑料产品自 2026 年 7 月 3 日起被禁止？", "answer": "棉签棒、餐具、餐盘、吸管和饮料搅拌棒", "articles_involved": ["4"]}
+✗ {
+  "question": "哪些一次性塑料产品自 2026 年 7 月 3 日起被禁止？",
+  "answer": "棉签棒、餐具、餐盘、吸管和饮料搅拌棒",
+  "articles_involved": [
+    "4"
+  ],
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "3",
+      "language": "zh",
+      "text": "棉签棒、餐具、餐盘、吸管和饮料搅拌棒"
+    },
+    {
+      "source_ref": "4",
+      "language": "zh",
+      "text": "成员国应自 2026 年 7 月 3 日起禁止将第 3 条所列的一次性塑料制品投放市场。"
+    }
+  ]
+}
   → 声明不足：清单来自第 3 条。
-✗ {"question": "成员国必须从什么日期起禁止将欧盟禁令所涵盖的一次性塑料制品投放市场？", "answer": "自 2026 年 7 月 3 日起", "articles_involved": ["3", "4"]}
+✗ {
+  "question": "成员国必须从什么日期起禁止将欧盟禁令所涵盖的一次性塑料制品投放市场？",
+  "answer": "自 2026 年 7 月 3 日起",
+  "articles_involved": [
+    "3",
+    "4"
+  ],
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "4",
+      "language": "zh",
+      "text": "自 2026 年 7 月 3 日起"
+    },
+    {
+      "source_ref": "3",
+      "language": "zh",
+      "text": "本指令适用于塑料制成的棉签棒、餐具、餐盘、吸管和饮料搅拌棒。"
+    }
+  ]
+}
   → 声明过多：日期完全位于第 4 条内。
 ✗ {"question": "第 (EU) 2019/904 号指令自 2026 年 7 月 3 日起禁止哪些产品？"} → 标识符出现在基础表述中；它只能出现在“question_cited”中。
 示例 3 —— 一次生产运行中实际出现的偏离目标问题；所有多条款问题都是这样未能通过单条款测试的
@@ -88,7 +197,31 @@
 ### REFERENCED ARTICLES FROM OTHER ACTS
 [ZH] 第 5 条 —— 检查   Act: 理事会第 (EC) 21/2004 号条例……   Cite as: 32004R0021:5
 “成员国应每年开展覆盖至少 3 % 养殖场的现场检查。”
-✓ {"question": "在支付绵羊和山羊养殖场补助前，必须完成哪些检查？", "question_cited": "根据欧盟委员会第 (EC) 796/2004 号条例，在支付绵羊和山羊养殖场补助前，必须完成哪些检查？", "instrument_short_name": null, "answer": "每年开展覆盖至少 3 % 养殖场的现场检查", "question_type": "condition_or_prerequisite", "anchor": "绵羊和山羊养殖场补助", "articles_involved": ["2", "32004R0021:5"]}
+✓ {
+  "question": "在支付绵羊和山羊养殖场补助前，必须完成哪些检查？",
+  "question_cited": "根据欧盟委员会第 (EC) 796/2004 号条例，在支付绵羊和山羊养殖场补助前，必须完成哪些检查？",
+  "instrument_short_name": null,
+  "answer": "每年开展覆盖至少 3 % 养殖场的现场检查",
+  "question_type": "condition_or_prerequisite",
+  "anchor": "绵羊和山羊养殖场补助",
+  "articles_involved": [
+    "2",
+    "32004R0021:5"
+  ],
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "32004R0021:5",
+      "language": "zh",
+      "text": "每年开展覆盖至少 3 % 养殖场的现场检查"
+    },
+    {
+      "source_ref": "2",
+      "language": "zh",
+      "text": "只有在完成理事会第 (EC) 21/2004 号条例第 5 条规定的检查后，方可支付补助。"
+    }
+  ]
+}
   → 支付条件是目标条款的规则；另一法案只是说明检查内容，并须以其“Cite as”键声明，绝不能只写“5”。
 ✗ “每年至少有多大比例的绵羊和山羊养殖场必须接受现场检查？” → 另一条例的第 5 条可独立回答。丢弃。
 ✗ “根据第 (EC) 21/2004 号条例，何时支付补助？” → 以另一法案的标识符为锚点；检索系统会返回那部法案。
@@ -99,19 +232,109 @@
 ✓ 两者均输出：[{"skip_reason": "仅有套语条款"}]
 (b) 姊妹法测试。目标为欧盟委员会第 2010/43/EU 号指令第 10 条（UCITS 管理公司的组织要求）：“……必须任命一名合规官，负责……经常且至少每年向高级管理层报告合规事项……”
 ✗ “合规官必须多久向高级管理层报告一次合规事项？” → MiFID 和 AIFMD 的实施措施包含几乎一字不差的相同规则。
-✓ {"question": "UCITS 管理公司的合规官必须多久向高级管理层报告一次合规事项？", "question_cited": "根据欧盟委员会第 2010/43/EU 号指令，UCITS 管理公司的合规官必须多久向高级管理层报告一次合规事项？", "instrument_short_name": null, "answer": "经常且至少每年", "question_type": "monitoring_or_reporting", "anchor": "UCITS 管理公司", "articles_involved": ["10"]}
+✓ {
+  "question": "UCITS 管理公司的合规官必须多久向高级管理层报告一次合规事项？",
+  "question_cited": "根据欧盟委员会第 2010/43/EU 号指令，UCITS 管理公司的合规官必须多久向高级管理层报告一次合规事项？",
+  "instrument_short_name": null,
+  "answer": "经常且至少每年",
+  "question_type": "monitoring_or_reporting",
+  "anchor": "UCITS 管理公司",
+  "articles_involved": [
+    "10"
+  ],
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "10",
+      "language": "zh",
+      "text": "经常且至少每年"
+    }
+  ]
+}
 (c) 同事测试。目标为欧盟委员会第 (EU) 1300/2014 号条例第 9 条（行动不便人士使用铁路系统的无障碍要求）—— 咨询机构：“咨询机构的任务包括：(a) 监督资产清单最低数据结构的制定，……”
 ✗ “咨询机构就资产清单必须监督什么？” → 哪个咨询机构，哪个清单？只有读过该条款的人才知道。
-✓ {"question": "在欧盟面向行动不便人士的铁路无障碍互操作性技术规范中，哪个机构负责监督资产清单最低数据结构的制定？", "question_cited": "根据欧盟委员会第 (EU) 1300/2014 号条例，在欧盟面向行动不便人士的铁路无障碍互操作性技术规范中，哪个机构负责监督资产清单最低数据结构的制定？", "instrument_short_name": "PRM TSI", "answer": "咨询机构的任务包括：(a) 监督资产清单最低数据结构的制定", "question_type": "definition_actor_or_procedure", "anchor": "欧盟面向行动不便人士的铁路无障碍互操作性技术规范", "articles_involved": ["9"]}
+✓ {
+  "question": "在欧盟面向行动不便人士的铁路无障碍互操作性技术规范中，哪个机构负责监督资产清单最低数据结构的制定？",
+  "question_cited": "根据欧盟委员会第 (EU) 1300/2014 号条例，在欧盟面向行动不便人士的铁路无障碍互操作性技术规范中，哪个机构负责监督资产清单最低数据结构的制定？",
+  "instrument_short_name": "PRM TSI",
+  "answer": "咨询机构的任务包括：(a) 监督资产清单最低数据结构的制定",
+  "question_type": "definition_actor_or_procedure",
+  "anchor": "欧盟面向行动不便人士的铁路无障碍互操作性技术规范",
+  "articles_involved": [
+    "9"
+  ],
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "9",
+      "language": "zh",
+      "text": "咨询机构的任务包括：(a) 监督资产清单最低数据结构的制定"
+    }
+  ]
+}
 (d) 信息量。目标为第 (EC) 1393/2007 号条例第 20 条（司法和司法外文书的送达）：“本条例在其适用事项范围内，优先于成员国缔结的双边或多边协定或安排中的其他规定，特别是《1968 年布鲁塞尔公约》议定书第 IV 条以及《1965 年 11 月 15 日海牙公约》。”
 ✗ “2007 年欧盟关于司法和司法外文书送达的条例在哪些事项上优先于成员国缔结的双边或多边协定？” → 答案“在其适用事项范围内”没有提供任何信息。
-✓ {"question": "欧盟关于民商事司法和司法外文书送达的条例，在成员国之间是否优先于《1965 年海牙送达公约》适用？", "question_cited": "根据第 (EC) 1393/2007 号条例，欧盟关于民商事司法和司法外文书送达的条例，在成员国之间是否优先于《1965 年海牙送达公约》适用？", "instrument_short_name": "送达条例", "answer": "本条例在其适用事项范围内，优先于成员国缔结的双边或多边协定或安排中的其他规定，特别是《1968 年布鲁塞尔公约》议定书第 IV 条以及《1965 年 11 月 15 日海牙公约》。", "question_type": "scope_or_applicability", "anchor": "民商事司法和司法外文书送达", "articles_involved": ["20"]}
+✓ {
+  "question": "欧盟关于民商事司法和司法外文书送达的条例，在成员国之间是否优先于《1965 年海牙送达公约》适用？",
+  "question_cited": "根据第 (EC) 1393/2007 号条例，欧盟关于民商事司法和司法外文书送达的条例，在成员国之间是否优先于《1965 年海牙送达公约》适用？",
+  "instrument_short_name": "送达条例",
+  "answer": "本条例在其适用事项范围内，优先于成员国缔结的双边或多边协定或安排中的其他规定，特别是《1968 年布鲁塞尔公约》议定书第 IV 条以及《1965 年 11 月 15 日海牙公约》。",
+  "question_type": "scope_or_applicability",
+  "anchor": "民商事司法和司法外文书送达",
+  "articles_involved": [
+    "20"
+  ],
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "20",
+      "language": "zh",
+      "text": "本条例在其适用事项范围内，优先于成员国缔结的双边或多边协定或安排中的其他规定，特别是《1968 年布鲁塞尔公约》议定书第 IV 条以及《1965 年 11 月 15 日海牙公约》。"
+    }
+  ]
+}
 (e) 答案被写进问题。目标为第 2009/18/EC 号指令第 2 条（海上运输领域事故调查）—— 适用范围：指令不适用于仅涉及“长度不足 15 米的渔船”的事故。
 ✗ “海上事故调查制度是否不适用于仅涉及长度不足 15 米渔船的海上事故和事件？” —— 答案为“长度不足 15 米的渔船” → 有锚点且自然，但门槛就是答案，而且已出现在问题中。
-✓ {"question": "长度低于多少的渔船不在欧盟海上事故调查制度的适用范围内？", "question_cited": "根据第 2009/18/EC 号指令，长度低于多少的渔船不在欧盟海上事故调查制度的适用范围内？", "instrument_short_name": null, "answer": "长度不足 15 米的渔船", "question_type": "scope_or_applicability", "anchor": "欧盟海上事故调查制度", "articles_involved": ["2"]}
+✓ {
+  "question": "长度低于多少的渔船不在欧盟海上事故调查制度的适用范围内？",
+  "question_cited": "根据第 2009/18/EC 号指令，长度低于多少的渔船不在欧盟海上事故调查制度的适用范围内？",
+  "instrument_short_name": null,
+  "answer": "长度不足 15 米的渔船",
+  "question_type": "scope_or_applicability",
+  "anchor": "欧盟海上事故调查制度",
+  "articles_involved": [
+    "2"
+  ],
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "2",
+      "language": "zh",
+      "text": "长度不足 15 米的渔船"
+    }
+  ]
+}
 (f) 锚点 —— 受规制产品。目标为欧盟委员会第 (EU) 833/2012 号条例第 1 条（对原产于中国的卷装铝箔征收临时反倾销税）：税率表以“所有其他公司 —— 35,4 %”结尾。
 ✗ “所有其他公司的进口适用多少临时反倾销税？” → 每一部反倾销条例都有“所有其他公司”税率。
-✓ {"question": "对原产于中国的卷装铝箔征收的临时反倾销税中，'所有其他公司'适用的剩余税率是多少？", "question_cited": "根据欧盟委员会第 (EU) 833/2012 号条例，对原产于中国的卷装铝箔征收的临时反倾销税中，'所有其他公司'适用的剩余税率是多少？", "instrument_short_name": null, "answer": "35,4 %", "question_type": "amount_or_threshold", "anchor": "对原产于中国的卷装铝箔征收的临时反倾销税", "articles_involved": ["1"]}
+✓ {
+  "question": "对原产于中国的卷装铝箔征收的临时反倾销税中，'所有其他公司'适用的剩余税率是多少？",
+  "question_cited": "根据欧盟委员会第 (EU) 833/2012 号条例，对原产于中国的卷装铝箔征收的临时反倾销税中，'所有其他公司'适用的剩余税率是多少？",
+  "instrument_short_name": null,
+  "answer": "35,4 %",
+  "question_type": "amount_or_threshold",
+  "anchor": "对原产于中国的卷装铝箔征收的临时反倾销税",
+  "articles_involved": [
+    "1"
+  ],
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "1",
+      "language": "zh",
+      "text": "35,4 %"
+    }
+  ]
+}
 (g) 锚点 —— 专业术语，保留生成的问题。目标为第 (EC) 1935/2004 号条例第 2 条（拟与食品接触的材料和制品）—— 定义。
 ✓ “什么是'活性食品接触材料和制品'？” —— 该术语只存在于这一制度中，因此它就是锚点，无须再加其他制度名称。带引证的表述：“根据第 (EC) 1935/2004 号条例，什么是'活性食品接触材料和制品'？”
 每个问题最终确定前的自检：
@@ -124,7 +347,25 @@
 7. 骨架已改写，专业术语严格准确；每个问题只含一条信息；这些问题针对不同的事实，并覆盖至少两个类别。
 输出（只输出有效 JSON，不要 markdown）：最多三个条目，如果通过全部测试的条目更少，则返回更少：
 [
-  {"question": "...", "question_cited": "...", "instrument_short_name": null, "answer": "...", "question_type": "...", "anchor": "...", "articles_involved": ["..."]}
+  {
+  "question": "...",
+  "question_cited": "...",
+  "instrument_short_name": null,
+  "answer": "...",
+  "question_type": "...",
+  "anchor": "...",
+  "articles_involved": [
+    "..."
+  ],
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "...",
+      "language": "zh",
+      "text": "..."
+    }
+  ]
+}
 ]
 如果目标条款仅为套语，或不能支撑任何通过这些测试的问题，请恰好返回：[{"skip_reason": "<一个简短短语>"}]
 - anchor：制度锚点短语，与其在基础问句中出现的形式完全一致。

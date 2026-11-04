@@ -1,3 +1,37 @@
+EVIDENCE_CONTRACT: legal_evidence_spans_v1
+
+Langue de sortie : français. Les questions et annotations libres sont en français ; les citations et identifiants copiés gardent leur forme originale.
+
+PASSAGES JUSTIFICATIFS EXPLICITES — OBLIGATOIRES DANS TOUS LES MODES
+Renvoyez evidence_spans comme une liste ordonnée d'objets contenant exactement source_ref, language
+et text. Le premier passage justifie directement answer ou, en source_finding, l'indice substantiel.
+Chaque passage est UN extrait continu minimal et suffisant, copié EXACTEMENT dans le corps d'une
+source effectivement fournie, dans sa langue d'origine. Conservez orthographe, espaces, ponctuation,
+balisage et erreurs. Ne traduisez jamais la preuve, ne rassemblez pas de fragments distants,
+n'ajoutez pas de points de suspension, ne copiez pas les métadonnées et ne citez pas de texte masqué
+par une troncature. language désigne la langue de la version citée, pas forcément celle de la question.
+Conservez toutes les conditions, exceptions, modalités, attributions et limites qui changent la réponse.
+Ne copiez pas un article ou document entier au lieu de sélectionner les passages nécessaires.
+Supprimez tout début ou fin superflu, mais gardez le texte intermédiaire indispensable. Aucune limite
+fixe de tokens n'est imposée. Restreignez ou omettez la question si ce contrat ne peut être respecté.
+Fixez d'abord le passage principal. Sauf en source_finding, answer en reprend TOUT le texte lorsqu'une
+version adéquate dans la langue de sortie est fournie; answer_is_translation vaut false. Sinon,
+traduisez fidèlement TOUT ce passage dans la langue demandée et indiquez answer_is_translation=true.
+Aucun résumé, calcul, verdict ajouté ou changement de portée. En source_finding, answer reste
+l'identité exacte de la cible selon la règle du mode, answer_is_translation vaut false et le premier
+passage établit l'indice substantiel dans le corps de la cible.
+Renvoyez answer_is_translation comme booléen JSON dans TOUS les modes. Ne renvoyez pas les champs
+scalaires evidence, evidence_language, evidence_is_translation, des identifiants canoniques ou des
+positions de caractères: le parseur les déduit du premier passage et des sources. Conservez les
+champs propres au mode à côté de evidence_spans. Les extraits illustratifs sont uniquement du
+matériel pédagogique. Même si la réponse est traduite, la preuve reste dans la langue montrée.
+
+ONU: COUVERTURE DES PREUVES
+Renvoyez exactement un passage avec source_ref="target", tiré du corps de TARGET BLOCK. Ni REFERENCED
+DOCUMENTS ni DOCUMENT CONTEXT ne fournissent de preuve. L'identité du document n'autorise pas ses
+autres blocs comme sources de preuve. Préservez le rôle du locuteur et le statut de l'énoncé.
+Un court bloc cible peut être cité en entier uniquement si chaque partie est nécessaire ; ne le remplacez jamais par le document complet.
+
 PRÉCISIONS PRIORITAIRES — ces règles remplacent toute règle ou tout exemple contraire ci-dessous, sans changer la langue de sortie ni les clés JSON.
 La réponse est un extrait continu du bloc cible qui résout entièrement la question dans son contexte. Gardez les conditions, exceptions, modalités et attributions nécessaires ; plusieurs propositions ou phrases adjacentes sont permises. Le contexte et les références servent à identifier noms, dates et locuteurs, jamais à fournir une partie manquante de la réponse.
 Une demande, recommandation, proposition ou constat attribué peut être utile : conservez son statut et son auteur réel. Un verbe de parole ne suffit pas à l'exclure. N'inférez ni obligation contraignante, ni adoption, ni mise en œuvre absente du texte. Jugez la proposition concrète, pas un verbe isolé ni l'importance politique. Un contenu récurrent identifié par son régime et sa période peut convenir ; n'exigez ni changement annuel ni doublons supposés.
@@ -49,15 +83,57 @@ QUE DEMANDER — huit catégories (« question_type »), par ordre de priorité,
 Les questions par oui ou non sont bienvenues et fréquentes ; leur réponse reste le segment du bloc qui tranche la question, jamais « oui » ni « non ». Un emplacement nu (« Que devait-on envisager... ? », « Qu'a demandé l'Assemblée... ? », sans sujet nommé) n'est pas une question.
 EXEMPLES — les bons cas canoniques, dans les deux formulations, avec le texte du bloc dont ils sont tirés :
 Bloc cible : S/RES/918 (1994), adoptée le 17 mai 1994 : "3. Décide d'élargir le mandat de la MINUAR pour y inclure la protection des personnes déplacées, des réfugiés et des civils en danger au Rwanda ... ; 4. Autorise dans ce contexte un accroissement de l'effectif de la MINUAR jusqu'à 5,500 soldats ;"
-✓ {"question": "Quel effectif le Conseil de sécurité autorisa-t-il pour la MINUAR dans la résolution du Conseil de sécurité de mai 1994 élargissant son mandat ?", "question_cited": "Quel effectif le Conseil de sécurité autorisa-t-il pour la MINUAR dans la résolution 918 (1994) ?", "answer": "jusqu'à 5,500 soldats", "question_type": "quantity_force_or_finance", "anchor": "MINUAR"}
+✓ {
+  "question": "Quel effectif le Conseil de sécurité autorisa-t-il pour la MINUAR dans la résolution du Conseil de sécurité de mai 1994 élargissant son mandat ?",
+  "question_cited": "Quel effectif le Conseil de sécurité autorisa-t-il pour la MINUAR dans la résolution 918 (1994) ?",
+  "answer": "jusqu'à 5,500 soldats",
+  "question_type": "quantity_force_or_finance",
+  "anchor": "MINUAR",
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "target",
+      "language": "fr",
+      "text": "jusqu'à 5,500 soldats"
+    }
+  ]
+}
   → Identiques mot pour mot hors de l'emplacement ; l'organe agit, l'instrument situe ; la description contient organe + année + sujet et distingue 918 parmi les résolutions sur le Rwanda de 1994 ; l'ancrage reste hors de l'emplacement.
 Bloc cible (tiré du rapport du Secrétaire général de fin 2005 sur la souveraineté libanaise, S/2005/673) : "Dans sa résolution 1559 (2004), le Conseil de sécurité a réitéré son appel au strict respect de la souveraineté du Liban. Les exigences énoncées dans la résolution n'ont pas encore été entièrement satisfaites." Référence fournie : S/RES/1559 (2004), qui énumère les exigences.
-✓ {"question": "Fin 2005, les exigences concernant la souveraineté libanaise étaient-elles pleinement satisfaites selon le rapport du Secrétaire général de fin 2005 sur la souveraineté libanaise ?", "question_cited": "Fin 2005, les exigences concernant la souveraineté libanaise étaient-elles pleinement satisfaites selon le rapport du Secrétaire général S/2005/673 ?", "answer": "Les exigences énoncées dans la résolution n'ont pas encore été entièrement satisfaites", "question_type": "finding_event_or_assessment", "anchor": "la souveraineté libanaise"}
+✓ {
+  "question": "Fin 2005, les exigences concernant la souveraineté libanaise étaient-elles pleinement satisfaites selon le rapport du Secrétaire général de fin 2005 sur la souveraineté libanaise ?",
+  "question_cited": "Fin 2005, les exigences concernant la souveraineté libanaise étaient-elles pleinement satisfaites selon le rapport du Secrétaire général S/2005/673 ?",
+  "answer": "Les exigences énoncées dans la résolution n'ont pas encore été entièrement satisfaites",
+  "question_type": "finding_event_or_assessment",
+  "anchor": "la souveraineté libanaise",
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "target",
+      "language": "fr",
+      "text": "Les exigences énoncées dans la résolution n'ont pas encore été entièrement satisfaites"
+    }
+  ]
+}
   → Une question par oui ou non à laquelle répond le segment décisif ; l'attribution à la fonction est conservée ; l'ancrage reste hors de l'emplacement et survit donc à la substitution. L'emplacement situe la source du constat, S/2005/673, et non la résolution 1559 (2004), qui ne contient pas l'évaluation.
 ✗ « Quelles exigences de la résolution de 2004 sur la souveraineté libanaise demeuraient insatisfaites fin 2005 ? » → La liste figure uniquement dans le document référencé ; le TEST DU BLOC échoue. Écarter.
 Bloc cible : A/60/758, note verbale datée du 4 avril 2006 adressée au Secrétariat par la Mission permanente de la France auprès de l'Organisation des Nations Unies (candidature française au Conseil des droits de l'homme) : "La France a ratifié les principaux instruments internationaux relatifs aux droits de l'homme et reconnaît la compétence des organes conventionnels pour recevoir des plaintes individuelles."
 ✗ Générée : « Quelle compétence la France a-t-elle reconnue aux organes conventionnels dans la note verbale de sa Mission permanente au Secrétariat de 2006 sur sa candidature au Conseil des droits de l'homme ? » → Échafaudage de la réponse : la question reprend le segment en lui coupant la fin, et « quelle compétence » n'est pas une manière naturelle de demander. Reconstruite à partir du besoin — un analyste vérifiant un engagement de candidature :
-✓ {"question": "En 2006, la France reconnut-elle la compétence des organes conventionnels concernant les plaintes individuelles dans sa note verbale d'avril 2006 de candidature au CDH ?", "question_cited": "En 2006, la France reconnut-elle la compétence des organes conventionnels concernant les plaintes individuelles dans A/60/758 ?", "answer": "reconnaît la compétence des organes conventionnels pour recevoir des plaintes individuelles", "question_type": "actor_body_or_procedure", "anchor": "organes conventionnels"}
+✓ {
+  "question": "En 2006, la France reconnut-elle la compétence des organes conventionnels concernant les plaintes individuelles dans sa note verbale d'avril 2006 de candidature au CDH ?",
+  "question_cited": "En 2006, la France reconnut-elle la compétence des organes conventionnels concernant les plaintes individuelles dans A/60/758 ?",
+  "answer": "reconnaît la compétence des organes conventionnels pour recevoir des plaintes individuelles",
+  "question_type": "actor_body_or_procedure",
+  "anchor": "organes conventionnels",
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "target",
+      "language": "fr",
+      "text": "reconnaît la compétence des organes conventionnels pour recevoir des plaintes individuelles"
+    }
+  ]
+}
 ÉCHECS RÉELS DES EXÉCUTIONS PRÉCÉDENTES — ne reproduisez jamais ces schémas :
 ✗ « Quel anniversaire le Haut-Commissariat était-il prié de continuer à commémorer en 2011 selon la résolution de l'Assemblée générale de 2011 sur le droit au développement ? » — réponse « le vingt-cinquième anniversaire de la Déclaration sur le droit au développement » → Le segment dit « Réaffirme la demande ... de poursuivre la commémoration » (DISQUALIFIÉ) ; la série est annuelle et le paragraphe se répète ; la réponse est prévisible. S'abstenir.
 ✗ « Sur quelle base le Secrétaire général devait-il préparer le projet de budget-programme 2014-2015 selon la résolution de l'Assemblée générale de 2012 sur la planification des programmes ? » — réponse « les priorités énoncées ci-dessus et le cadre stratégique tel qu'adopté dans la présente résolution » → Réponse déictique ; en outre, la série biennale répète la clause en ne modifiant que l'exercice biennal. S'abstenir.
@@ -80,7 +156,21 @@ AUTO-VÉRIFICATION de chaque question, dans cet ordre :
 8. Moins de trois questions ont-elles satisfait à tout cela ? Produisez-en moins. Aucune ? Produisez la sortie d'abstention.
 SORTIE (JSON valide uniquement, pas de markdown) : une liste d'au plus TROIS objets :
 [
-  {"question": "...", "question_cited": "...", "answer": "...", "question_type": "...", "anchor": "..."}
+  {
+  "question": "...",
+  "question_cited": "...",
+  "answer": "...",
+  "question_type": "...",
+  "anchor": "...",
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "target",
+      "language": "fr",
+      "text": "..."
+    }
+  ]
+}
 ]
 Si aucune question ne satisfait à tous les tests, renvoyez exactement : [{"skip_reason": "<one short phrase>"}]
 - answer : le segment le plus court qui répond entièrement et directement à la question — pour une question par oui ou non, le segment le plus court qui la tranche — strictement ancré dans le bloc cible.

@@ -1,3 +1,39 @@
+EVIDENCE_CONTRACT: legal_evidence_spans_v1
+
+Ausgabesprache: Deutsch. Fragen und Freitextannotationen sind deutsch; Quellenzitate und kopierte Kennungen behalten ihre ursprüngliche Form.
+
+AUSDRÜCKLICHE BELEGSPANNEN — IN JEDEM MODUS ERFORDERLICH
+Geben Sie evidence_spans als geordnete Liste von Objekten mit genau source_ref, language und text
+zurück. Die erste Spanne belegt answer unmittelbar, bei source_finding den materiellen Suchhinweis.
+Jede Spanne ist EIN kleinstmöglicher ausreichender zusammenhängender Ausschnitt, WÖRTLICH aus dem
+tatsächlich mitgelieferten Quellenkörper in dessen Originalsprache kopiert. Bewahren Sie Schreibweise,
+Leerraum, Zeichensetzung, Markup und Fehler. Übersetzen Sie Belege niemals; verbinden Sie keine
+getrennten Stellen, fügen Sie keine Auslassungszeichen ein, kopieren Sie keine Metadaten und zitieren
+Sie nichts hinter einer Kürzungsgrenze. language bezeichnet die Sprache der zitierten Fassung.
+Bewahren Sie alle antwortrelevanten Bedingungen, Ausnahmen, Akteure, Modalitäten und Geltungsgrenzen.
+Kopieren Sie keine ganzen Artikel oder Dokumente anstelle der benötigten Belegstellen.
+Entfernen Sie entbehrlichen Anfangs- und Endtext, bewahren Sie aber notwendige Zwischenpassagen.
+Es gibt keine feste Tokenobergrenze. Grenzen Sie die Frage ein oder überspringen Sie sie, wenn diese
+Beleganforderungen nicht erfüllbar sind.
+Legen Sie zuerst die primäre Belegspanne fest. Außer bei source_finding übernimmt answer deren
+vollständigen Text, wenn eine passende Fassung in der Ausgabesprache mitgeliefert wurde;
+answer_is_translation ist dann false. Andernfalls übersetzen Sie die gesamte Spanne sinngenau in
+die Ausgabesprache und setzen answer_is_translation auf true. Keine Zusammenfassung, Berechnung,
+zusätzliche Ja/Nein-Antwort oder Bedeutungsänderung. Bei source_finding bleibt answer die genaue
+Zielidentität nach der bestehenden Modusregel, answer_is_translation ist false, und die erste Spanne
+belegt den materiellen Hinweis im Zieltext.
+Geben Sie answer_is_translation in JEDEM Modus als JSON-Boolean zurück. Geben Sie keine skalaren
+Felder evidence, evidence_language, evidence_is_translation, kanonischen Quellenkennungen oder
+Zeichenpositionen aus: Diese werden aus erster Spanne und Quelldaten berechnet. Die bestehenden
+modusspezifischen Felder bleiben neben evidence_spans erhalten. Beispielauszüge sind nur Lehrmaterial.
+Auch bei übersetzten Beispielantworten bleibt der Beleg in der tatsächlich gezeigten Quellsprache.
+
+UN: BELEGABDECKUNG
+Geben Sie genau eine Spanne mit source_ref="target" aus dem Körper von TARGET BLOCK zurück.
+REFERENCED DOCUMENTS und DOCUMENT CONTEXT liefern keine Belegsubstanz. Die Dokumentidentität macht
+andere Blöcke nicht zu zulässigen Belegen. Bewahren Sie Sprecherrolle und Status der Aussage.
+Ein kurzer Zielblock darf nur vollständig zitiert werden, wenn jeder Teil notwendig ist; niemals das ganze Dokument als Beleg übernehmen.
+
 VORRANGIGE KLARSTELLUNGEN — diese Regeln ersetzen alle widersprechenden Regeln oder Beispiele unten; Ausgabesprache und JSON-Schlüssel bleiben unverändert.
 Die Antwort ist ein zusammenhängender Abschnitt des Zielblocks, der die Frage in ihrem Kontext vollständig beantwortet. Notwendige Bedingungen, Ausnahmen, Modalität und Zuschreibungen bleiben erhalten; mehrere benachbarte Satzteile oder Sätze sind zulässig. Kontext und Verweise klären Namen, Daten und Sprecher, liefern aber niemals fehlenden Antwortinhalt.
 Eine Bitte, Empfehlung, ein Vorschlag oder zugeschriebener Befund kann nützlich sein: Status und tatsächlichen Urheber bewahren. Ein Sprechaktverb allein ist kein Ausschlussgrund. Keine nicht belegte Verbindlichkeit, Annahme oder Umsetzung unterstellen. Die konkrete Aussage zählt, nicht ein einzelnes Verb oder politische Bedeutung. Wiederkehrender Inhalt kann mit bestimmtem Regelungsbereich und Zeitraum geeignet sein; keine jährliche Neuerung verlangen oder ungesehene Duplikate behaupten.
@@ -49,15 +85,57 @@ WONACH FRAGEN — acht Kategorien ("question_type"), in der Prioritätsreihenfol
 Ja/Nein-Fragen sind erwünscht und häufig; ihre Antwort ist weiterhin die Spanne des Blocks, die die Frage entscheidet, niemals das Wort „ja" oder „nein". Eine bloße Leerstelle („Was war zu prüfen ...?", „Worum ersuchte die Generalversammlung ...?" ohne benannten Gegenstand) ist keine Frage.
 BEISPIELE — kanonisch gut, beide Fassungen, mit dem Blocktext, aus dem sie stammen:
 Zielblock: S/RES/918 (1994), verabschiedet am 17. Mai 1994: "3. beschließt, das Mandat der UNAMIR um den Schutz von Vertriebenen, Flüchtlingen und gefährdeten Zivilpersonen in Ruanda zu erweitern ...; 4. genehmigt in diesem Zusammenhang eine Aufstockung der UNAMIR auf bis zu 5,500 Soldaten;"
-✓ {"question": "Welche Truppenstärke genehmigte der Sicherheitsrat für UNAMIR in der Resolution des Sicherheitsrats vom Mai 1994 zur Erweiterung des Mandats der Mission in Ruanda?", "question_cited": "Welche Truppenstärke genehmigte der Sicherheitsrat für UNAMIR in Resolution 918 (1994)?", "answer": "bis zu 5,500 Soldaten", "question_type": "quantity_force_or_finance", "anchor": "UNAMIR"}
+✓ {
+  "question": "Welche Truppenstärke genehmigte der Sicherheitsrat für UNAMIR in der Resolution des Sicherheitsrats vom Mai 1994 zur Erweiterung des Mandats der Mission in Ruanda?",
+  "question_cited": "Welche Truppenstärke genehmigte der Sicherheitsrat für UNAMIR in Resolution 918 (1994)?",
+  "answer": "bis zu 5,500 Soldaten",
+  "question_type": "quantity_force_or_finance",
+  "anchor": "UNAMIR",
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "target",
+      "language": "de",
+      "text": "bis zu 5,500 Soldaten"
+    }
+  ]
+}
   → Außerhalb der Instrumentenstelle wortwörtlich identisch; das Organ handelt, das Instrument gibt den Fundort an; die Beschreibung enthält Organ + Jahr + Thema und hebt 918 unter den Ruanda-Resolutionen von 1994 hervor; der Anker steht außerhalb der Instrumentenstelle.
 Zielblock (aus dem Bericht des Generalsekretärs von Ende 2005 zur Souveränität Libanons, S/2005/673): "In seiner Resolution 1559 (2004) wiederholte der Sicherheitsrat seine Forderung nach strikter Achtung der Souveränität Libanons. Die in der Resolution festgelegten Anforderungen sind noch nicht vollständig erfüllt." Bereitgestellte Referenz: S/RES/1559 (2004), in der die Anforderungen aufgeführt sind.
-✓ {"question": "Waren die Anforderungen zur Souveränität Libanons Ende 2005 laut dem Bericht des Generalsekretärs von Ende 2005 zur Souveränität Libanons vollständig erfüllt?", "question_cited": "Waren die Anforderungen zur Souveränität Libanons Ende 2005 laut dem Bericht des Generalsekretärs S/2005/673 vollständig erfüllt?", "answer": "Die in der Resolution festgelegten Anforderungen sind noch nicht vollständig erfüllt", "question_type": "finding_event_or_assessment", "anchor": "Souveränität Libanons"}
+✓ {
+  "question": "Waren die Anforderungen zur Souveränität Libanons Ende 2005 laut dem Bericht des Generalsekretärs von Ende 2005 zur Souveränität Libanons vollständig erfüllt?",
+  "question_cited": "Waren die Anforderungen zur Souveränität Libanons Ende 2005 laut dem Bericht des Generalsekretärs S/2005/673 vollständig erfüllt?",
+  "answer": "Die in der Resolution festgelegten Anforderungen sind noch nicht vollständig erfüllt",
+  "question_type": "finding_event_or_assessment",
+  "anchor": "Souveränität Libanons",
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "target",
+      "language": "de",
+      "text": "Die in der Resolution festgelegten Anforderungen sind noch nicht vollständig erfüllt"
+    }
+  ]
+}
   → Eine Ja/Nein-Frage, beantwortet durch die entscheidende Spanne; die Zuschreibung an das Amt bleibt erhalten; der Anker steht außerhalb der Instrumentenstelle und übersteht daher den Austausch; Die Instrumentenstelle verweist auf die Berichtsquelle S/2005/673, nicht auf Resolution 1559 (2004), die die Einschätzung nicht enthält.
 ✗ „Welche Anforderungen der Resolution von 2004 zur Souveränität Libanons waren Ende 2005 noch nicht erfüllt?“ → Die Liste steht nur im referenzierten Dokument; der BLOCK-TEST scheitert. Verwerfen.
 Zielblock: A/60/758, Verbalnote der Ständigen Vertretung Frankreichs bei den Vereinten Nationen vom 4. April 2006 an das Sekretariat (Frankreichs Kandidatur für den Menschenrechtsrat): "Frankreich hat die wichtigsten internationalen Menschenrechtsinstrumente ratifiziert und erkennt die Zuständigkeit der Vertragsorgane zur Entgegennahme von Individualbeschwerden an."
 ✗ Generiert: „Welche Zuständigkeit erkannte Frankreich für Vertragsorgane in der Verbalnote der Ständigen Vertretung Frankreichs von 2006 an das Sekretariat zur Kandidatur für den Menschenrechtsrat an?“ → Antwortgerüst: Die Frage ist die Spanne mit abgeschnittenem Ende, und „welche Zuständigkeit“ ist keine natürliche Frageform. Vom Bedarf her neu aufgebaut — ein Analyst prüft eine Zusage im Rahmen einer Kandidatur:
-✓ {"question": "Akzeptierte Frankreich 2006 die Zuständigkeit der Menschenrechtsvertragsorgane für Individualbeschwerden in seiner Verbalnote vom April 2006 zu seiner Kandidatur für den Menschenrechtsrat?", "question_cited": "Akzeptierte Frankreich 2006 die Zuständigkeit der Menschenrechtsvertragsorgane für Individualbeschwerden in A/60/758?", "answer": "erkennt die Zuständigkeit der Vertragsorgane zur Entgegennahme von Individualbeschwerden an", "question_type": "actor_body_or_procedure", "anchor": "Menschenrechtsvertragsorgane"}
+✓ {
+  "question": "Akzeptierte Frankreich 2006 die Zuständigkeit der Menschenrechtsvertragsorgane für Individualbeschwerden in seiner Verbalnote vom April 2006 zu seiner Kandidatur für den Menschenrechtsrat?",
+  "question_cited": "Akzeptierte Frankreich 2006 die Zuständigkeit der Menschenrechtsvertragsorgane für Individualbeschwerden in A/60/758?",
+  "answer": "erkennt die Zuständigkeit der Vertragsorgane zur Entgegennahme von Individualbeschwerden an",
+  "question_type": "actor_body_or_procedure",
+  "anchor": "Menschenrechtsvertragsorgane",
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "target",
+      "language": "de",
+      "text": "erkennt die Zuständigkeit der Vertragsorgane zur Entgegennahme von Individualbeschwerden an"
+    }
+  ]
+}
 TATSÄCHLICHE FEHLER AUS FRÜHEREN DURCHLÄUFEN — diese Muster niemals wiederholen:
 ✗ „Welchen Jahrestag sollte das Amt des Hohen Kommissars 2011 gemäß der Resolution der Generalversammlung von 2011 zum Recht auf Entwicklung weiter begehen?“ — Antwort „den fünfundzwanzigsten Jahrestag der Erklärung über das Recht auf Entwicklung“ → Die Spanne lautet „Bekräftigt das Ersuchen ... die Begehung fortzusetzen“ (DISQUALIFIZIERT); die Reihe ist jährlich und der Absatz wiederholt sich; die Antwort ist erratbar. Überspringen.
 ✗ „Auf welcher Grundlage sollte der Generalsekretär gemäß der Resolution der Generalversammlung von 2012 zur Programmplanung den vorgeschlagenen Programmhaushalt 2014-2015 erstellen?“ — Antwort „die vorstehenden Prioritäten und der mit dieser Resolution verabschiedete strategische Rahmen“ → Deiktische Antwort; zudem wiederholt die zweijährliche Reihe die Klausel, wobei sich nur der Zweijahreszeitraum ändert. Überspringen.
@@ -80,7 +158,21 @@ SELBSTPRÜFUNG jeder Frage, in dieser Reihenfolge:
 8. Haben weniger als drei bestanden? Geben Sie weniger aus. Keine? Geben Sie die Skip-Ausgabe aus.
 AUSGABE (nur gültiges JSON, kein Markdown): eine Liste von bis zu DREI Objekten:
 [
-  {"question": "...", "question_cited": "...", "answer": "...", "question_type": "...", "anchor": "..."}
+  {
+  "question": "...",
+  "question_cited": "...",
+  "answer": "...",
+  "question_type": "...",
+  "anchor": "...",
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "target",
+      "language": "de",
+      "text": "..."
+    }
+  ]
+}
 ]
 Wenn keine Frage jeden Test besteht, geben Sie genau Folgendes zurück: [{"skip_reason": "<one short phrase>"}]
 - answer: die kürzeste Spanne, die die Frage vollständig und direkt beantwortet — bei einer Ja/Nein-Frage die kürzeste Spanne, die sie entscheidet — streng im Zielblock verankert.

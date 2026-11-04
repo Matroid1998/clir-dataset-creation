@@ -1,3 +1,39 @@
+EVIDENCE_CONTRACT: legal_evidence_spans_v1
+
+Ausgabesprache: Deutsch. Fragen und Freitextannotationen sind deutsch; Quellenzitate und kopierte Kennungen behalten ihre ursprüngliche Form.
+
+AUSDRÜCKLICHE BELEGSPANNEN — IN JEDEM MODUS ERFORDERLICH
+Geben Sie evidence_spans als geordnete Liste von Objekten mit genau source_ref, language und text
+zurück. Die erste Spanne belegt answer unmittelbar, bei source_finding den materiellen Suchhinweis.
+Jede Spanne ist EIN kleinstmöglicher ausreichender zusammenhängender Ausschnitt, WÖRTLICH aus dem
+tatsächlich mitgelieferten Quellenkörper in dessen Originalsprache kopiert. Bewahren Sie Schreibweise,
+Leerraum, Zeichensetzung, Markup und Fehler. Übersetzen Sie Belege niemals; verbinden Sie keine
+getrennten Stellen, fügen Sie keine Auslassungszeichen ein, kopieren Sie keine Metadaten und zitieren
+Sie nichts hinter einer Kürzungsgrenze. language bezeichnet die Sprache der zitierten Fassung.
+Bewahren Sie alle antwortrelevanten Bedingungen, Ausnahmen, Akteure, Modalitäten und Geltungsgrenzen.
+Kopieren Sie keine ganzen Artikel oder Dokumente anstelle der benötigten Belegstellen.
+Entfernen Sie entbehrlichen Anfangs- und Endtext, bewahren Sie aber notwendige Zwischenpassagen.
+Es gibt keine feste Tokenobergrenze. Grenzen Sie die Frage ein oder überspringen Sie sie, wenn diese
+Beleganforderungen nicht erfüllbar sind.
+Legen Sie zuerst die primäre Belegspanne fest. Außer bei source_finding übernimmt answer deren
+vollständigen Text, wenn eine passende Fassung in der Ausgabesprache mitgeliefert wurde;
+answer_is_translation ist dann false. Andernfalls übersetzen Sie die gesamte Spanne sinngenau in
+die Ausgabesprache und setzen answer_is_translation auf true. Keine Zusammenfassung, Berechnung,
+zusätzliche Ja/Nein-Antwort oder Bedeutungsänderung. Bei source_finding bleibt answer die genaue
+Zielidentität nach der bestehenden Modusregel, answer_is_translation ist false, und die erste Spanne
+belegt den materiellen Hinweis im Zieltext.
+Geben Sie answer_is_translation in JEDEM Modus als JSON-Boolean zurück. Geben Sie keine skalaren
+Felder evidence, evidence_language, evidence_is_translation, kanonischen Quellenkennungen oder
+Zeichenpositionen aus: Diese werden aus erster Spanne und Quelldaten berechnet. Die bestehenden
+modusspezifischen Felder bleiben neben evidence_spans erhalten. Beispielauszüge sind nur Lehrmaterial.
+Auch bei übersetzten Beispielantworten bleibt der Beleg in der tatsächlich gezeigten Quellsprache.
+
+UN: BELEGABDECKUNG
+Geben Sie genau eine Spanne mit source_ref="target" aus dem Körper von TARGET BLOCK zurück.
+REFERENCED DOCUMENTS und DOCUMENT CONTEXT liefern keine Belegsubstanz. Die Dokumentidentität macht
+andere Blöcke nicht zu zulässigen Belegen. Bewahren Sie Sprecherrolle und Status der Aussage.
+Ein kurzer Zielblock darf nur vollständig zitiert werden, wenn jeder Teil notwendig ist; niemals das ganze Dokument als Beleg übernehmen.
+
 VORRANGIGE KLARSTELLUNGEN — diese Regeln ersetzen alle widersprechenden Regeln oder Beispiele unten; Ausgabesprache und JSON-Schlüssel bleiben unverändert.
 Die Antwort ist ein zusammenhängender Abschnitt des Zielblocks, der die Frage in ihrem Kontext vollständig beantwortet. Notwendige Bedingungen, Ausnahmen, Modalität und Zuschreibungen bleiben erhalten; mehrere benachbarte Satzteile oder Sätze sind zulässig. Kontext und Verweise klären Namen, Daten und Sprecher, liefern aber niemals fehlenden Antwortinhalt.
 Eine Bitte, Empfehlung, ein Vorschlag oder zugeschriebener Befund kann nützlich sein: Status und tatsächlichen Urheber bewahren. Ein Sprechaktverb allein ist kein Ausschlussgrund. Keine nicht belegte Verbindlichkeit, Annahme oder Umsetzung unterstellen. Die konkrete Aussage zählt, nicht ein einzelnes Verb oder politische Bedeutung. Wiederkehrender Inhalt kann mit bestimmtem Regelungsbereich und Zeitraum geeignet sein; keine jährliche Neuerung verlangen oder ungesehene Duplikate behaupten.
@@ -33,22 +69,101 @@ WONACH FRAGEN — drei Rahmungen ("framing"); die Fragen müssen auf unterscheid
   3. stakeholder — betroffene Partei oder Szenario: Wer wird gebunden, sanktioniert, geschützt oder unterstützt, und in welchem realen Szenario? Sowohl die Adressatenperspektive („Wozu war die Regierung von X verpflichtet ...") als auch die Begünstigtenperspektive („Welchen Schutz boten die Vereinten Nationen Zivilpersonen in ...") gehören hierher, ebenso die Position eines Staates zu einem konkreten Gegenstand.
 BEISPIELE — kanonisch gut, mit dem Blocktext, aus dem sie stammen:
 Zielblock: S/RES/918 (1994), verabschiedet am 17. Mai 1994: "3. beschließt eine Erweiterung des Mandats der UNAMIR um den Schutz von Vertriebenen, Flüchtlingen und gefährdeten Zivilpersonen in Ruanda sowie die Gewährleistung der Sicherheit humanitärer Hilfseinsätze; 4. genehmigt in diesem Zusammenhang eine Aufstockung der UNAMIR auf bis zu 5,500 Soldaten;" (Kontext: Präambel, die die Tötungen von Zivilpersonen in Ruanda verurteilt)
-✓ {"question": "Wie reagierte der Sicherheitsrat im Mai 1994 auf Angriffe auf vertriebene Zivilpersonen in Ruanda?", "answer": "beschließt eine Erweiterung des Mandats der UNAMIR um den Schutz von Vertriebenen, Flüchtlingen und gefährdeten Zivilpersonen in Ruanda", "framing": "response", "anchor": "Ruanda"}
-✓ {"question": "Welche Rolle erhielten UN-Friedenssoldaten 1994 beim Schutz von Menschen, die durch den Konflikt in Ruanda vertrieben worden waren?", "answer": "den Schutz von Vertriebenen, Flüchtlingen und gefährdeten Zivilpersonen in Ruanda sowie die Gewährleistung der Sicherheit humanitärer Hilfseinsätze", "framing": "stakeholder", "anchor": "den Konflikt in Ruanda"}
+✓ {
+  "question": "Wie reagierte der Sicherheitsrat im Mai 1994 auf Angriffe auf vertriebene Zivilpersonen in Ruanda?",
+  "answer": "beschließt eine Erweiterung des Mandats der UNAMIR um den Schutz von Vertriebenen, Flüchtlingen und gefährdeten Zivilpersonen in Ruanda",
+  "framing": "response",
+  "anchor": "Ruanda",
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "target",
+      "language": "de",
+      "text": "beschließt eine Erweiterung des Mandats der UNAMIR um den Schutz von Vertriebenen, Flüchtlingen und gefährdeten Zivilpersonen in Ruanda"
+    }
+  ]
+}
+✓ {
+  "question": "Welche Rolle erhielten UN-Friedenssoldaten 1994 beim Schutz von Menschen, die durch den Konflikt in Ruanda vertrieben worden waren?",
+  "answer": "den Schutz von Vertriebenen, Flüchtlingen und gefährdeten Zivilpersonen in Ruanda sowie die Gewährleistung der Sicherheit humanitärer Hilfseinsätze",
+  "framing": "stakeholder",
+  "anchor": "den Konflikt in Ruanda",
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "target",
+      "language": "de",
+      "text": "den Schutz von Vertriebenen, Flüchtlingen und gefährdeten Zivilpersonen in Ruanda sowie die Gewährleistung der Sicherheit humanitärer Hilfseinsätze"
+    }
+  ]
+}
   → „Angriffe auf vertriebene Zivilpersonen“, „UN-Friedenssoldaten“, „Menschen, die durch den Konflikt in Ruanda vertrieben worden waren“: die Worte eines Außenstehenden für die Formeln des Blocks; UNAMIR und der Begriff „Vertriebene“ bleiben in der Antwort. „Mai“ unterscheidet diese Reaktion von den anderen Entscheidungen des Sicherheitsrats zu Ruanda im Jahr 1994.
 Zielblock: Bericht S/1994/565: "Schätzungsweise 250,000 Flüchtlinge überquerten am 28. und 29. April die Grenze zur Vereinigten Republik Tansania." (Kontext: Flüchtlingsstrom aus Ruanda, April–Mai 1994)
-✓ {"question": "Wie schwerwiegend war laut UN-Berichterstattung der Flüchtlingsstrom aus Ruanda in die Nachbarländer im Frühjahr 1994?", "answer": "Schätzungsweise 250,000 Flüchtlinge überquerten am 28. und 29. April die Grenze zur Vereinigten Republik Tansania", "framing": "situation", "anchor": "Flüchtlingsstrom aus Ruanda"}
+✓ {
+  "question": "Wie schwerwiegend war laut UN-Berichterstattung der Flüchtlingsstrom aus Ruanda in die Nachbarländer im Frühjahr 1994?",
+  "answer": "Schätzungsweise 250,000 Flüchtlinge überquerten am 28. und 29. April die Grenze zur Vereinigten Republik Tansania",
+  "framing": "situation",
+  "anchor": "Flüchtlingsstrom aus Ruanda",
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "target",
+      "language": "de",
+      "text": "Schätzungsweise 250,000 Flüchtlinge überquerten am 28. und 29. April die Grenze zur Vereinigten Republik Tansania"
+    }
+  ]
+}
   → Eine konzeptuelle Frage („wie schwerwiegend“), die durch eine konkrete Spanne beantwortet wird; die Zahl wird nicht beim Namen abgefragt. Die Zuschreibung an die UN-Berichterstattung bleibt erhalten.
 Zielblock: S/RES/2148 (2014), Präambel: "In der Erkenntnis, dass die Fähigkeit der UNAMID, Fortschritte bei der Umsetzung des DDPD zu fördern, durch Verzögerungen seitens der Unterzeichnerparteien und das Fehlen einer alle Seiten einschließenden politischen Regelung zwischen der Regierung und den nicht unterzeichnenden Bewegungen beeinträchtigt wird"
-✓ {"question": "Warum hatte UNAMID 2014 Schwierigkeiten, das Doha-Dokument für Frieden in Darfur voranzubringen?", "answer": "die Fähigkeit der UNAMID, Fortschritte bei der Umsetzung des DDPD zu fördern, durch Verzögerungen seitens der Unterzeichnerparteien und das Fehlen einer alle Seiten einschließenden politischen Regelung zwischen der Regierung und den nicht unterzeichnenden Bewegungen beeinträchtigt wird", "framing": "situation", "anchor": "UNAMID"}
+✓ {
+  "question": "Warum hatte UNAMID 2014 Schwierigkeiten, das Doha-Dokument für Frieden in Darfur voranzubringen?",
+  "answer": "die Fähigkeit der UNAMID, Fortschritte bei der Umsetzung des DDPD zu fördern, durch Verzögerungen seitens der Unterzeichnerparteien und das Fehlen einer alle Seiten einschließenden politischen Regelung zwischen der Regierung und den nicht unterzeichnenden Bewegungen beeinträchtigt wird",
+  "framing": "situation",
+  "anchor": "UNAMID",
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "target",
+      "language": "de",
+      "text": "die Fähigkeit der UNAMID, Fortschritte bei der Umsetzung des DDPD zu fördern, durch Verzögerungen seitens der Unterzeichnerparteien und das Fehlen einer alle Seiten einschließenden politischen Regelung zwischen der Regierung und den nicht unterzeichnenden Bewegungen beeinträchtigt wird"
+    }
+  ]
+}
   → Eine EINSCHÄTZUNG in der Präambel — konkrete Hindernisse — ist für die Situationsrahmung zulässig; ein Erwägungsgrund wäre es nicht. „Schwierigkeiten, ... voranzubringen“ hält Abstand zu „Fähigkeit, Fortschritte ... zu fördern, ... beeinträchtigt wird“; DDPD wird mit seiner offiziellen ausgeschriebenen Bezeichnung benannt, nicht umbenannt.
 Zielblock: CD/1860, Schreiben des Stellvertretenden Ständigen Vertreters Frankreichs bei der Abrüstungskonferenz: "im Hinblick auf die bevorstehende Überprüfungskonferenz der Vertragsparteien des Vertrags über die Nichtverbreitung von Kernwaffen im Jahr 2010 und auf der Grundlage der in Cherbourg unterbreiteten Vorschläge legte Europa einen Aktionsplan zur Abrüstung vor, der im Dezember 2008 von 27 Staats- und Regierungschefs der Europäischen Union gebilligt wurde."
-✓ {"question": "Welche gemeinsame Abrüstungsinitiative entwickelte die Europäische Union im Vorfeld der NVV-Überprüfungskonferenz 2010?", "answer": "legte Europa einen Aktionsplan zur Abrüstung vor, der im Dezember 2008 von 27 Staats- und Regierungschefs der Europäischen Union gebilligt wurde", "framing": "response", "anchor": "die Europäische Union"}
+✓ {
+  "question": "Welche gemeinsame Abrüstungsinitiative entwickelte die Europäische Union im Vorfeld der NVV-Überprüfungskonferenz 2010?",
+  "answer": "legte Europa einen Aktionsplan zur Abrüstung vor, der im Dezember 2008 von 27 Staats- und Regierungschefs der Europäischen Union gebilligt wurde",
+  "framing": "response",
+  "anchor": "die Europäische Union",
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "target",
+      "language": "de",
+      "text": "legte Europa einen Aktionsplan zur Abrüstung vor, der im Dezember 2008 von 27 Staats- und Regierungschefs der Europäischen Union gebilligt wurde"
+    }
+  ]
+}
   → Eigene Handlung, kein Zuschreibungsvorbehalt: eine abgeschlossene Handlung der EU, über die in einem französischen Schreiben berichtet wird, konkret und datiert. Eine bestrittene Behauptung über eine andere Partei hätte „laut Frankreich“ erfordert.
 TATSÄCHLICHE FEHLER AUS FRÜHEREN DURCHLÄUFEN — diese Muster niemals wiederholen:
 ✗ „Zu welchem gemeinsamen Vorgehen wurden der Hohe Kommissar der Vereinten Nationen für Menschenrechte und der Menschenrechtsrat 2011 aufgefordert?“ — Antwort „die Zivilgesellschaft, den Privatsektor, die Wissenschaft, regionale Organisationen, die Medien und andere einschlägige Interessenträger zu unterstützen und eng mit ihnen zusammenzuarbeiten und zu kooperieren“ → Eine Zusammenarbeiten-und-Kooperieren-Liste (DISQUALIFIZIERT) in der jährlichen Reihe zum Erlernen der Menschenrechte. Überspringen.
 ✗ „Wie sollten sich die Vereinten Nationen und die Eurasische Wirtschaftsgemeinschaft 2007 abstimmen?“ — Antwort „ersucht den Generalsekretär der Vereinten Nationen, ... regelmäßige Konsultationen mit dem Generalsekretär der Eurasischen Wirtschaftsgemeinschaft ... abzuhalten“ → Die Konsultationsklausel jeder zweijährlichen Resolution zur Zusammenarbeit mit einer Organisation, ein äußerst unverbindlicher Mechanismus und ein ganzer Absatz. Überspringen.
-✗ „Welche Akteure wurden eingeladen, am Internationalen Tag des Sports für Entwicklung und Frieden mitzuwirken, ihn zu begehen und auf ihn aufmerksam zu machen?“ → Eine Einladungsliste, obwohl derselbe Block die materielle Handlung enthielt. Korrektur: {"question": "Wie verlieh die Generalversammlung Sport als Mittel für Entwicklung und Frieden im Jahr 2013 förmliche Anerkennung?", "answer": "beschließt, den 6. April zum Internationalen Tag des Sports für Entwicklung und Frieden zu erklären", "framing": "response", "anchor": "Sport als Mittel für Entwicklung und Frieden"}
+Lehrauszug des Zielblocks A/RES/67/296: beschließt, den 6. April zum Internationalen Tag des Sports für Entwicklung und Frieden zu erklären
+✗ „Welche Akteure wurden eingeladen, am Internationalen Tag des Sports für Entwicklung und Frieden mitzuwirken, ihn zu begehen und auf ihn aufmerksam zu machen?“ → Eine Einladungsliste, obwohl derselbe Block die materielle Handlung enthielt. Korrektur: {
+  "question": "Wie verlieh die Generalversammlung Sport als Mittel für Entwicklung und Frieden im Jahr 2013 förmliche Anerkennung?",
+  "answer": "beschließt, den 6. April zum Internationalen Tag des Sports für Entwicklung und Frieden zu erklären",
+  "framing": "response",
+  "anchor": "Sport als Mittel für Entwicklung und Frieden",
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "target",
+      "language": "de",
+      "text": "beschließt, den 6. April zum Internationalen Tag des Sports für Entwicklung und Frieden zu erklären"
+    }
+  ]
+}
 ✗ „Wie beschrieb Guyana die Krise im Kosovo?“ → Ein Redebericht, dessen Antwort ein Ausdruck der Besorgnis ist; kein Jahr. Nur eine Position zu einer konkreten Frage käme infrage — „Welche Position bezog Guyana 1999 zum Einsatz von Gewalt im Kosovo?“ — und nur, wenn der Block eine solche angibt.
 ✗ „Wem wurde die Hauptverantwortung für die Durchführung des Friedensübereinkommens für Bosnien und Herzegowina zugewiesen?“ → Ein ERWÄGUNGSGRUND der Präambel („In der Erkenntnis, dass ... die Hauptverantwortung ... bei den Behörden selbst liegt“), der seit 1996 in jeder jährlichen Bosnien-Resolution vorkommt; kein Jahr. Überspringen.
 ✗ „Welche rechtliche Grenze wurde Maßnahmen zur Terrorismusbekämpfung gesetzt?“ → Die allgemeine Einhaltungsklausel jedes Textes zur Terrorismusbekämpfung; kein Akteur, keine Situation, kein Jahr. Überspringen.
@@ -66,7 +181,20 @@ SELBSTPRÜFUNG jeder Frage, in dieser Reihenfolge:
 8. Haben weniger als drei bestanden? Geben Sie weniger aus. Keine? Geben Sie die Skip-Ausgabe aus.
 AUSGABE (nur gültiges JSON, kein Markdown): eine Liste von bis zu DREI Objekten:
 [
-  {"question": "...", "answer": "...", "framing": "...", "anchor": "..."}
+  {
+  "question": "...",
+  "answer": "...",
+  "framing": "...",
+  "anchor": "...",
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "target",
+      "language": "de",
+      "text": "..."
+    }
+  ]
+}
 ]
 Wenn keine Frage jeden Test besteht, geben Sie genau Folgendes zurück: [{"skip_reason": "<one short phrase>"}]
 - answer: der kürzeste zusammenhängende Abschnitt des Zielblocks, der die Frage vollständig und direkt beantwortet, auf Deutsch.

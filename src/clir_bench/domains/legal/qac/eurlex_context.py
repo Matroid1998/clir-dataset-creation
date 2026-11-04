@@ -40,6 +40,7 @@ share one cap, ranked by first mention.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 from collections import defaultdict
@@ -47,6 +48,7 @@ from collections.abc import Iterable, Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from clir_bench.domains.legal.qac.evidence import EvidenceSource
 from clir_bench.domains.legal.structure import ACT_LANGUAGES, paths
 
 # Beyond this the target stops being the subject of the payload. Measured over
@@ -135,6 +137,9 @@ class ArticleUnit:
     # "article" or "annex". An annex has no article_number; its heading
     # ("ANNEX I") is its label and its ELI subdivision is its citation key.
     unit_type: str = "article"
+    original_hashes: dict[str, str] = field(default_factory=dict)
+    original_lengths: dict[str, int] = field(default_factory=dict)
+    loaded_body_lengths: dict[str, int] = field(default_factory=dict)
 
     def languages(self) -> list[str]:
         return [lg for lg in ACT_LANGUAGES if self.texts.get(lg)]
@@ -158,6 +163,7 @@ class GenerationPayload:
     dropped_external_references: list[str] = field(default_factory=list)
     annexes: list[ArticleUnit] = field(default_factory=list)
     dropped_annex_references: list[str] = field(default_factory=list)
+    evidence_sources: dict[tuple[str, str], EvidenceSource] = field(default_factory=dict)
 
     @property
     def involved_universe(self) -> list[str]:
@@ -249,8 +255,16 @@ class ArticleIndex:
                     if unit_type == "article":
                         self.by_act[row["celex_id"]].append(row["eli_id"])
                 text = row["text"]
-                if unit_type == "annex" and len(text) > ANNEX_LOAD_CHARS:
-                    text = text[:ANNEX_LOAD_CHARS].rstrip() + " […truncated]"
+                if unit_type == "annex":
+                    language = row["language"]
+                    unit.original_hashes[language] = hashlib.sha256(text.encode("utf-8")).hexdigest()
+                    unit.original_lengths[language] = len(text)
+                    if len(text) > ANNEX_LOAD_CHARS:
+                        body = text[:ANNEX_LOAD_CHARS].rstrip()
+                        text = body + " […truncated]"
+                        unit.loaded_body_lengths[language] = len(body)
+                    else:
+                        unit.loaded_body_lengths[language] = len(text)
                 unit.texts[row["language"]] = text
                 unit.headings[row["language"]] = row.get("heading", "")
                 unit.act_titles[row["language"]] = row.get("act_title", "")
@@ -328,7 +342,10 @@ class ArticleIndex:
                                          for t, kind in dropped if kind == "external"],
             annexes=kept_annexes,
             dropped_annex_references=[external_key(self.by_eli[t])
-                                      for t, kind in dropped if kind == "annex"])
+                                      for t, kind in dropped if kind == "annex"],
+            evidence_sources=visible_evidence_sources(
+                target, references, external=externals, annexes=kept_annexes,
+                languages=languages, reference_chars=reference_chars))
 
 
 def structural_location(row: dict) -> str:
@@ -348,6 +365,30 @@ def structural_location(row: dict) -> str:
         elif number or title:
             parts.append(number or title)
     return " › ".join(parts)
+
+
+def visible_body(unit: ArticleUnit, language: str, limit: int | None) -> str:
+    """The exact body prefix sent to the model, without its truncation marker."""
+    body = unit.texts.get(language, "")
+    body = body[:unit.loaded_body_lengths.get(language, len(body))]
+    return body[:limit].rstrip() if limit and len(body) > limit else body
+
+
+def visible_evidence_sources(target, references, *, external=(), annexes=(),
+                             languages=ACT_LANGUAGES, reference_chars=DEFAULT_REFERENCE_CHARS):
+    sources = {}
+    units = ([(target, target.article_number, None)]
+             + [(unit, unit.article_number, reference_chars) for unit in references]
+             + [(unit, external_key(unit), reference_chars) for unit in (*external, *annexes)])
+    for unit, reference, limit in units:
+        for language in languages:
+            if unit.texts.get(language):
+                sources[reference, language] = EvidenceSource(
+                    reference, unit.eli_id, language, visible_body(unit, language, limit),
+                    visible_body(unit, language, None), unit.unit_type,
+                    original_sha256=unit.original_hashes.get(language, ""),
+                    original_length=unit.original_lengths.get(language))
+    return sources
 
 
 def _block(unit: ArticleUnit, language: str, *, limit: int | None,

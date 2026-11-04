@@ -24,6 +24,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from clir_bench.domains.legal.qac import un_references as refs
+from clir_bench.domains.legal.qac.evidence import EvidenceSource
 from clir_bench.domains.legal.un import paths
 
 # Whole-document context fits this budget for roughly three quarters of the
@@ -127,6 +128,7 @@ class GenerationPayload:
     references: list[ReferencedDoc]     # cited documents, first-mention order
     dropped_references: list[str]       # resolved but beyond the cap
     text: str
+    evidence_sources: dict[tuple[str, str], EvidenceSource] = field(default_factory=dict)
 
 
 class BlockIndex:
@@ -296,7 +298,8 @@ class BlockIndex:
         text = render_payload(target, chosen, references=references,
                               languages=languages)
         return GenerationPayload(target, chosen, len(blocks) - 1 - len(chosen),
-                                 references, dropped, text)
+                                 references, dropped, text,
+                                 evidence_sources=visible_evidence_sources(target, languages))
 
     def _render_reference(self, citation: refs.Citation, limit: int | None,
                           languages: tuple[str, ...] = ("en",)) -> ReferencedDoc:
@@ -357,6 +360,13 @@ class BlockIndex:
                              doc_id=citation.doc_id, title=doc["title"],
                              texts=texts, paragraph=paragraph,
                              part_label=part_label)
+
+
+def visible_evidence_sources(target, languages):
+    return {("target", language): EvidenceSource(
+        "target", target.block_id, language, target.texts[language], target.texts[language],
+        "block", doc_id=target.doc_id, line_start=target.line_start, line_end=target.line_end,
+    ) for language in languages if target.texts.get(language)}
 
 
 def _select_context(blocks: list[BlockUnit], target_index: int,

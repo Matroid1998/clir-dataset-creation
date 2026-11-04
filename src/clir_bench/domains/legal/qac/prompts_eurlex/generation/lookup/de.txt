@@ -1,3 +1,41 @@
+EVIDENCE_CONTRACT: legal_evidence_spans_v1
+
+Ausgabesprache: Deutsch. Fragen und Freitextannotationen sind deutsch; Quellenzitate und kopierte Kennungen behalten ihre ursprüngliche Form.
+
+AUSDRÜCKLICHE BELEGSPANNEN — IN JEDEM MODUS ERFORDERLICH
+Geben Sie evidence_spans als geordnete Liste von Objekten mit genau source_ref, language und text
+zurück. Die erste Spanne belegt answer unmittelbar, bei source_finding den materiellen Suchhinweis.
+Jede Spanne ist EIN kleinstmöglicher ausreichender zusammenhängender Ausschnitt, WÖRTLICH aus dem
+tatsächlich mitgelieferten Quellenkörper in dessen Originalsprache kopiert. Bewahren Sie Schreibweise,
+Leerraum, Zeichensetzung, Markup und Fehler. Übersetzen Sie Belege niemals; verbinden Sie keine
+getrennten Stellen, fügen Sie keine Auslassungszeichen ein, kopieren Sie keine Metadaten und zitieren
+Sie nichts hinter einer Kürzungsgrenze. language bezeichnet die Sprache der zitierten Fassung.
+Bewahren Sie alle antwortrelevanten Bedingungen, Ausnahmen, Akteure, Modalitäten und Geltungsgrenzen.
+Kopieren Sie keine ganzen Artikel oder Dokumente anstelle der benötigten Belegstellen.
+Entfernen Sie entbehrlichen Anfangs- und Endtext, bewahren Sie aber notwendige Zwischenpassagen.
+Es gibt keine feste Tokenobergrenze. Grenzen Sie die Frage ein oder überspringen Sie sie, wenn diese
+Beleganforderungen nicht erfüllbar sind.
+Legen Sie zuerst die primäre Belegspanne fest. Außer bei source_finding übernimmt answer deren
+vollständigen Text, wenn eine passende Fassung in der Ausgabesprache mitgeliefert wurde;
+answer_is_translation ist dann false. Andernfalls übersetzen Sie die gesamte Spanne sinngenau in
+die Ausgabesprache und setzen answer_is_translation auf true. Keine Zusammenfassung, Berechnung,
+zusätzliche Ja/Nein-Antwort oder Bedeutungsänderung. Bei source_finding bleibt answer die genaue
+Zielidentität nach der bestehenden Modusregel, answer_is_translation ist false, und die erste Spanne
+belegt den materiellen Hinweis im Zieltext.
+Geben Sie answer_is_translation in JEDEM Modus als JSON-Boolean zurück. Geben Sie keine skalaren
+Felder evidence, evidence_language, evidence_is_translation, kanonischen Quellenkennungen oder
+Zeichenpositionen aus: Diese werden aus erster Spanne und Quelldaten berechnet. Die bestehenden
+modusspezifischen Felder bleiben neben evidence_spans erhalten. Beispielauszüge sind nur Lehrmaterial.
+Auch bei übersetzten Beispielantworten bleibt der Beleg in der tatsächlich gezeigten Quellsprache.
+
+EUR-LEX: BELEGABDECKUNG
+Geben Sie genau eine Spanne für JEDE Einheit in articles_involved zurück: Ziel und jede notwendige
+mitgelieferte Referenz oder Anlage. Keine ungenutzten Quellen oder doppelten Sprachfassungen.
+source_ref ist bei Ziel und eigenem Rechtsakt die bloße Artikelnummer, bei fremdem Rechtsakt oder
+jeder Anlage der exakt mitgelieferte Cite as-Schlüssel. Die erste Spanne darf nur dann aus einer
+zulässigen Referenz stammen, wenn die Regel des Ziels unverzichtbar bleibt; belegen Sie diese separat.
+Bei source_finding muss die erste Spanne aus dem Ziel stammen. Jede Spanne bleibt in ihrer Einheit.
+
 VORRANGIGE KLARSTELLUNGEN — diese Regeln ersetzen widersprechende Formulierungen oder Beispiele unten.
 Die Antwort ist eine zusammenhängende Belegstelle des bereitgestellten Texts, gelesen mit Frage, maßgeblicher Regel und ausdrücklich verknüpften bereitgestellten Verweisen. Kein zusätzliches „Ja/Nein“, kein umgeschriebenes Ergebnis und kein berechnetes Kalenderdatum. Vorgegebene Tatsachen einer ausdrücklichen Kategorie, Bedingung, Schwelle oder Zeitangabe zuzuordnen, gewöhnliche Verweise aufzulösen oder einen Verstoß gegen eine ausdrückliche Pflicht zu erkennen, ist keine unbelegte rechtliche Schlussfolgerung. Keine fehlenden entscheidenden Tatsachen, Sanktionen, Umkehrschlüsse oder externes Recht erfinden.
 Ja/Nein- und W-Fragen sind gleichwertig. Eine reine Kategoriefrage verlangt nicht sämtliche Voraussetzungen eines endgültigen Anspruchs; eine Frage nach dem vollständigen Anspruch verlangt alle entscheidenden Voraussetzungen. Notwendige Rechtsbegriffe und Bedingungen dürfen in Frage und Beleg wiederkehren, solange die erfragte Rechtsfolge unbekannt bleibt. Das Entfernen der Antwortstelle ist kein automatischer Ausschlusstest.
@@ -54,7 +92,25 @@ Beispiel 1 — die Antwort steht vollständig im Zielartikel
 ### REFERENCED ARTICLES
 [DE] Artikel 12 — Durchführungsbefugnisse
 „Die Kommission erlässt Durchführungsrechtsakte zur Festlegung des Formats der Berichte.“
-✓ {"question": "Welche jährliche Frist gilt für Hersteller von Einwegkunststoffprodukten, um der nationalen Behörde die von ihnen in Verkehr gebrachten Mengen zu melden?", "question_cited": "Welche jährliche Frist gilt nach Richtlinie (EU) 2019/904 für Hersteller von Einwegkunststoffprodukten, um der nationalen Behörde die von ihnen in Verkehr gebrachten Mengen zu melden?", "instrument_short_name": "Einwegkunststoffrichtlinie", "answer": "bis zum 31. März jedes Jahres", "question_type": "deadline_or_duration", "anchor": "Hersteller von Einwegkunststoffprodukten", "articles_involved": ["8"]}
+✓ {
+  "question": "Welche jährliche Frist gilt für Hersteller von Einwegkunststoffprodukten, um der nationalen Behörde die von ihnen in Verkehr gebrachten Mengen zu melden?",
+  "question_cited": "Welche jährliche Frist gilt nach Richtlinie (EU) 2019/904 für Hersteller von Einwegkunststoffprodukten, um der nationalen Behörde die von ihnen in Verkehr gebrachten Mengen zu melden?",
+  "instrument_short_name": "Einwegkunststoffrichtlinie",
+  "answer": "bis zum 31. März jedes Jahres",
+  "question_type": "deadline_or_duration",
+  "anchor": "Hersteller von Einwegkunststoffprodukten",
+  "articles_involved": [
+    "8"
+  ],
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "8",
+      "language": "de",
+      "text": "bis zum 31. März jedes Jahres"
+    }
+  ]
+}
   → Der Anker ist der regulierte Akteur, abgeleitet aus dem Gegenstand der Zeile „Act“; „Hersteller“ allein würde den Geschwister-Test nicht bestehen (auch die Regelungen zu Verpackungen, Elektro- und Elektronik-Altgeräten und Batterien sehen Meldefristen für Hersteller vor). Das Gerüst wird paraphrasiert („jährliche Frist“), während der Fachbegriff („in Verkehr gebracht“) erhalten bleibt — die wörtliche Frage „Bis zu welchem Datum jedes Jahres müssen Hersteller … die in Verkehr gebrachten Mengen melden?“ ist zulässig, übernimmt aber den Artikelwortlaut. Artikel 12 wird zitiert, trägt jedoch nichts zur Antwort bei und wird daher nicht aufgeführt.
 ✗ „Bis zu welchem Datum müssen Hersteller die jährlich in Verkehr gebrachten Mengen melden?“ → welche Hersteller, in welchem Regelungsbereich? Besteht den Geschwister-Test nicht.
 ✗ „Welches Format müssen Hersteller von Einwegkunststoffprodukten für ihre jährlichen Berichte verwenden?“ → das Format steht in einem nicht bereitgestellten Durchführungsrechtsakt. Verwerfen.
@@ -65,12 +121,75 @@ Beispiel 2 — ein referenzierter Artikel vervollständigt die Antwort
 ### REFERENCED ARTICLES
 [DE] Artikel 3 — Erfasste Produkte
 „Diese Richtlinie gilt für Wattestäbchen, Besteck, Teller, Trinkhalme und Rührstäbchen für Getränke aus Kunststoff.“
-✓ {"question": "Welche Einwegkunststoffprodukte dürfen ab dem 3. Juli 2026 nicht mehr auf dem EU-Markt in Verkehr gebracht werden?", "question_cited": "Welche Einwegkunststoffprodukte dürfen nach Richtlinie (EU) 2019/904 ab dem 3. Juli 2026 nicht mehr auf dem EU-Markt in Verkehr gebracht werden?", "instrument_short_name": "Einwegkunststoffrichtlinie", "answer": "Wattestäbchen, Besteck, Teller, Trinkhalme und Rührstäbchen für Getränke aus Kunststoff", "question_type": "scope_or_applicability", "anchor": "Einwegkunststoffprodukte", "articles_involved": ["3", "4"]}
+✓ {
+  "question": "Welche Einwegkunststoffprodukte dürfen ab dem 3. Juli 2026 nicht mehr auf dem EU-Markt in Verkehr gebracht werden?",
+  "question_cited": "Welche Einwegkunststoffprodukte dürfen nach Richtlinie (EU) 2019/904 ab dem 3. Juli 2026 nicht mehr auf dem EU-Markt in Verkehr gebracht werden?",
+  "instrument_short_name": "Einwegkunststoffrichtlinie",
+  "answer": "Wattestäbchen, Besteck, Teller, Trinkhalme und Rührstäbchen für Getränke aus Kunststoff",
+  "question_type": "scope_or_applicability",
+  "anchor": "Einwegkunststoffprodukte",
+  "articles_involved": [
+    "3",
+    "4"
+  ],
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "3",
+      "language": "de",
+      "text": "Wattestäbchen, Besteck, Teller, Trinkhalme und Rührstäbchen für Getränke aus Kunststoff"
+    },
+    {
+      "source_ref": "4",
+      "language": "de",
+      "text": "Die Mitgliedstaaten verbieten ab dem 3. Juli 2026 das Inverkehrbringen der in Artikel 3 aufgeführten Einwegkunststoffartikel."
+    }
+  ]
+}
   → Das Verbot und sein Datum stehen im Zielartikel selbst; die Produktliste stammt aus Artikel 3, deshalb werden beide angegeben. EIN-ARTIKEL-TEST: Artikel 3 listet Produkte auf, sagt aber weder, dass sie verboten sind, noch ab wann.
 ✗ „Für welche Produkte gilt die Einwegkunststoffrichtlinie?“ → eine Frage zu Artikel 3; verwerfen.
-✗ {"question": "Welche Einwegkunststoffprodukte sind ab dem 3. Juli 2026 verboten?", "answer": "Wattestäbchen, Besteck, Teller, Trinkhalme und Rührstäbchen für Getränke", "articles_involved": ["4"]}
+✗ {
+  "question": "Welche Einwegkunststoffprodukte sind ab dem 3. Juli 2026 verboten?",
+  "answer": "Wattestäbchen, Besteck, Teller, Trinkhalme und Rührstäbchen für Getränke",
+  "articles_involved": [
+    "4"
+  ],
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "3",
+      "language": "de",
+      "text": "Wattestäbchen, Besteck, Teller, Trinkhalme und Rührstäbchen für Getränke"
+    },
+    {
+      "source_ref": "4",
+      "language": "de",
+      "text": "Die Mitgliedstaaten verbieten ab dem 3. Juli 2026 das Inverkehrbringen der in Artikel 3 aufgeführten Einwegkunststoffartikel."
+    }
+  ]
+}
   → zu wenige Artikel angegeben: Die Liste stammt aus Artikel 3.
-✗ {"question": "Ab welchem Datum müssen die Mitgliedstaaten das Inverkehrbringen der vom EU-Verbot erfassten Einwegkunststoffartikel verbieten?", "answer": "ab dem 3. Juli 2026", "articles_involved": ["3", "4"]}
+✗ {
+  "question": "Ab welchem Datum müssen die Mitgliedstaaten das Inverkehrbringen der vom EU-Verbot erfassten Einwegkunststoffartikel verbieten?",
+  "answer": "ab dem 3. Juli 2026",
+  "articles_involved": [
+    "3",
+    "4"
+  ],
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "4",
+      "language": "de",
+      "text": "ab dem 3. Juli 2026"
+    },
+    {
+      "source_ref": "3",
+      "language": "de",
+      "text": "Diese Richtlinie gilt für Wattestäbchen, Besteck, Teller, Trinkhalme und Rührstäbchen für Getränke aus Kunststoff."
+    }
+  ]
+}
   → zu viele Artikel angegeben: Das Datum steht vollständig in Artikel 4.
 ✗ {"question": "Welche Produkte verbietet Richtlinie (EU) 2019/904 ab dem 3. Juli 2026?"} → Kennung in der Grundfassung; sie gehört ausschließlich in „question_cited“.
 Beispiel 3 — tatsächliche Fehler aus einem Produktionslauf, bei denen die Frage am Zielartikel vorbeiging; jede artikelübergreifende Frage scheiterte auf diese Weise am Ein-Artikel-Test
@@ -88,7 +207,31 @@ Beispiel 4 — ein Artikel eines ANDEREN Rechtsakts vervollständigt die Antwort
 ### REFERENCED ARTICLES FROM OTHER ACTS
 [DE] Artikel 5 — Kontrollen   Act: Verordnung (EG) Nr. 21/2004 des Rates …   Cite as: 32004R0021:5
 „Die Mitgliedstaaten führen jährlich Vor-Ort-Kontrollen bei mindestens 3 % der Betriebe durch.“
-✓ {"question": "Welche Kontrollen müssen abgeschlossen sein, bevor die Beihilfe für Schaf- und Ziegenhaltungsbetriebe gezahlt wird?", "question_cited": "Welche Kontrollen müssen nach Verordnung (EG) Nr. 796/2004 der Kommission abgeschlossen sein, bevor die Beihilfe für Schaf- und Ziegenhaltungsbetriebe gezahlt wird?", "instrument_short_name": null, "answer": "jährlich Vor-Ort-Kontrollen bei mindestens 3 % der Betriebe", "question_type": "condition_or_prerequisite", "anchor": "Beihilfe für Schaf- und Ziegenhaltungsbetriebe", "articles_involved": ["2", "32004R0021:5"]}
+✓ {
+  "question": "Welche Kontrollen müssen abgeschlossen sein, bevor die Beihilfe für Schaf- und Ziegenhaltungsbetriebe gezahlt wird?",
+  "question_cited": "Welche Kontrollen müssen nach Verordnung (EG) Nr. 796/2004 der Kommission abgeschlossen sein, bevor die Beihilfe für Schaf- und Ziegenhaltungsbetriebe gezahlt wird?",
+  "instrument_short_name": null,
+  "answer": "jährlich Vor-Ort-Kontrollen bei mindestens 3 % der Betriebe",
+  "question_type": "condition_or_prerequisite",
+  "anchor": "Beihilfe für Schaf- und Ziegenhaltungsbetriebe",
+  "articles_involved": [
+    "2",
+    "32004R0021:5"
+  ],
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "32004R0021:5",
+      "language": "de",
+      "text": "jährlich Vor-Ort-Kontrollen bei mindestens 3 % der Betriebe"
+    },
+    {
+      "source_ref": "2",
+      "language": "de",
+      "text": "Die Beihilfe wird erst gezahlt, nachdem die in Artikel 5 der Verordnung (EG) Nr. 21/2004 des Rates vorgesehenen Kontrollen durchgeführt worden sind."
+    }
+  ]
+}
   → Die Zahlungsbedingung ist die Regel des Zielartikels; der andere Rechtsakt beschreibt nur die Kontrollen und wird mit seinem „Cite as“-Schlüssel angegeben, niemals mit einer bloßen „5“.
 ✗ „Welcher Mindestanteil der Schaf- und Ziegenhaltungsbetriebe muss jedes Jahr vor Ort kontrolliert werden?“ → Artikel 5 der anderen Verordnung beantwortet dies allein. Verwerfen.
 ✗ „Wann wird die Beihilfe nach Verordnung (EG) Nr. 21/2004 gezahlt?“ → an der Kennung des anderen Rechtsakts verankert; ein Retrieval-System würde jenen Rechtsakt zurückgeben.
@@ -99,19 +242,109 @@ Beispiel 5 — tatsächliche Produktionsfragen aus EUR-Lex, im Text gestützt un
 ✓ Ausgabe für beide: [{"skip_reason": "nur Standardklausel"}]
 (b) GESCHWISTER-TEST. ZIELARTIKEL 10 der Richtlinie 2010/43/EU der Kommission (organisatorische Anforderungen an OGAW-Verwaltungsgesellschaften): „… ein Compliance-Beauftragter muss benannt werden und dafür zuständig sein, … der Geschäftsleitung in kurzen Zeitabständen, mindestens jedoch einmal jährlich, über Compliance-Fragen Bericht zu erstatten …“
 ✗ „Wie oft muss der Compliance-Beauftragte der Geschäftsleitung über Compliance-Fragen Bericht erstatten?“ → die MiFID- und AIFM-Durchführungsmaßnahmen enthalten dieselbe Regel in nahezu identischen Worten.
-✓ {"question": "Wie oft muss der Compliance-Beauftragte einer OGAW-Verwaltungsgesellschaft der Geschäftsleitung über Compliance-Fragen Bericht erstatten?", "question_cited": "Wie oft muss der Compliance-Beauftragte einer OGAW-Verwaltungsgesellschaft nach Richtlinie 2010/43/EU der Kommission der Geschäftsleitung über Compliance-Fragen Bericht erstatten?", "instrument_short_name": null, "answer": "in kurzen Zeitabständen, mindestens jedoch einmal jährlich", "question_type": "monitoring_or_reporting", "anchor": "OGAW-Verwaltungsgesellschaft", "articles_involved": ["10"]}
+✓ {
+  "question": "Wie oft muss der Compliance-Beauftragte einer OGAW-Verwaltungsgesellschaft der Geschäftsleitung über Compliance-Fragen Bericht erstatten?",
+  "question_cited": "Wie oft muss der Compliance-Beauftragte einer OGAW-Verwaltungsgesellschaft nach Richtlinie 2010/43/EU der Kommission der Geschäftsleitung über Compliance-Fragen Bericht erstatten?",
+  "instrument_short_name": null,
+  "answer": "in kurzen Zeitabständen, mindestens jedoch einmal jährlich",
+  "question_type": "monitoring_or_reporting",
+  "anchor": "OGAW-Verwaltungsgesellschaft",
+  "articles_involved": [
+    "10"
+  ],
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "10",
+      "language": "de",
+      "text": "in kurzen Zeitabständen, mindestens jedoch einmal jährlich"
+    }
+  ]
+}
 (c) KOLLEGEN-TEST. ZIELARTIKEL 9 der Verordnung (EU) Nr. 1300/2014 der Kommission (Zugänglichkeit des Eisenbahnsystems für Personen mit eingeschränkter Mobilität) — Beratungsgremium: „Zu den Aufgaben des Beratungsgremiums gehören: a) die Überwachung der Entwicklung einer Mindestdatenstruktur für das Bestandsverzeichnis der Vermögenswerte, …“
 ✗ „Was muss das Beratungsgremium in Bezug auf das Bestandsverzeichnis der Vermögenswerte überwachen?“ → welches Beratungsgremium, welches Verzeichnis? Das weiß nur jemand, der den Artikel gelesen hat.
-✓ {"question": "Welche Stelle überwacht die Entwicklung der Mindestdatenstruktur für das Bestandsverzeichnis der Vermögenswerte in der EU-TSI zur Zugänglichkeit des Eisenbahnsystems für Personen mit eingeschränkter Mobilität?", "question_cited": "Welche Stelle überwacht nach Verordnung (EU) Nr. 1300/2014 der Kommission die Entwicklung der Mindestdatenstruktur für das Bestandsverzeichnis der Vermögenswerte in der EU-TSI zur Zugänglichkeit des Eisenbahnsystems für Personen mit eingeschränkter Mobilität?", "instrument_short_name": "TSI PRM", "answer": "Zu den Aufgaben des Beratungsgremiums gehören: a) die Überwachung der Entwicklung einer Mindestdatenstruktur für das Bestandsverzeichnis der Vermögenswerte", "question_type": "definition_actor_or_procedure", "anchor": "EU-TSI zur Zugänglichkeit des Eisenbahnsystems für Personen mit eingeschränkter Mobilität", "articles_involved": ["9"]}
+✓ {
+  "question": "Welche Stelle überwacht die Entwicklung der Mindestdatenstruktur für das Bestandsverzeichnis der Vermögenswerte in der EU-TSI zur Zugänglichkeit des Eisenbahnsystems für Personen mit eingeschränkter Mobilität?",
+  "question_cited": "Welche Stelle überwacht nach Verordnung (EU) Nr. 1300/2014 der Kommission die Entwicklung der Mindestdatenstruktur für das Bestandsverzeichnis der Vermögenswerte in der EU-TSI zur Zugänglichkeit des Eisenbahnsystems für Personen mit eingeschränkter Mobilität?",
+  "instrument_short_name": "TSI PRM",
+  "answer": "Zu den Aufgaben des Beratungsgremiums gehören: a) die Überwachung der Entwicklung einer Mindestdatenstruktur für das Bestandsverzeichnis der Vermögenswerte",
+  "question_type": "definition_actor_or_procedure",
+  "anchor": "EU-TSI zur Zugänglichkeit des Eisenbahnsystems für Personen mit eingeschränkter Mobilität",
+  "articles_involved": [
+    "9"
+  ],
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "9",
+      "language": "de",
+      "text": "Zu den Aufgaben des Beratungsgremiums gehören: a) die Überwachung der Entwicklung einer Mindestdatenstruktur für das Bestandsverzeichnis der Vermögenswerte"
+    }
+  ]
+}
 (d) INFORMATIVITÄT. ZIELARTIKEL 20 der Verordnung (EG) Nr. 1393/2007 (Zustellung gerichtlicher und außergerichtlicher Schriftstücke): „Diese Verordnung hat in ihrem Anwendungsbereich Vorrang vor anderen Bestimmungen, die in den von den Mitgliedstaaten geschlossenen bilateralen oder multilateralen Übereinkünften oder Vereinbarungen enthalten sind, insbesondere vor Artikel IV des Protokolls zum Brüsseler Übereinkommen von 1968 und vor dem Haager Übereinkommen vom 15. November 1965.“
 ✗ „In welchen Angelegenheiten hat die EU-Verordnung von 2007 über die Zustellung gerichtlicher und außergerichtlicher Schriftstücke Vorrang vor bilateralen oder multilateralen Übereinkünften der Mitgliedstaaten?“ → die Antwort „in ihrem Anwendungsbereich“ sagt nichts aus.
-✓ {"question": "Hat die EU-Verordnung über die Zustellung gerichtlicher und außergerichtlicher Schriftstücke in Zivil- und Handelssachen zwischen den Mitgliedstaaten Vorrang vor dem Haager Zustellungsübereinkommen von 1965?", "question_cited": "Hat die EU-Verordnung nach Verordnung (EG) Nr. 1393/2007 über die Zustellung gerichtlicher und außergerichtlicher Schriftstücke in Zivil- und Handelssachen zwischen den Mitgliedstaaten Vorrang vor dem Haager Zustellungsübereinkommen von 1965?", "instrument_short_name": "EU-Zustellungsverordnung", "answer": "Diese Verordnung hat in ihrem Anwendungsbereich Vorrang vor anderen Bestimmungen, die in den von den Mitgliedstaaten geschlossenen bilateralen oder multilateralen Übereinkünften oder Vereinbarungen enthalten sind, insbesondere vor Artikel IV des Protokolls zum Brüsseler Übereinkommen von 1968 und vor dem Haager Übereinkommen vom 15. November 1965.", "question_type": "scope_or_applicability", "anchor": "Zustellung gerichtlicher und außergerichtlicher Schriftstücke in Zivil- und Handelssachen", "articles_involved": ["20"]}
+✓ {
+  "question": "Hat die EU-Verordnung über die Zustellung gerichtlicher und außergerichtlicher Schriftstücke in Zivil- und Handelssachen zwischen den Mitgliedstaaten Vorrang vor dem Haager Zustellungsübereinkommen von 1965?",
+  "question_cited": "Hat die EU-Verordnung nach Verordnung (EG) Nr. 1393/2007 über die Zustellung gerichtlicher und außergerichtlicher Schriftstücke in Zivil- und Handelssachen zwischen den Mitgliedstaaten Vorrang vor dem Haager Zustellungsübereinkommen von 1965?",
+  "instrument_short_name": "EU-Zustellungsverordnung",
+  "answer": "Diese Verordnung hat in ihrem Anwendungsbereich Vorrang vor anderen Bestimmungen, die in den von den Mitgliedstaaten geschlossenen bilateralen oder multilateralen Übereinkünften oder Vereinbarungen enthalten sind, insbesondere vor Artikel IV des Protokolls zum Brüsseler Übereinkommen von 1968 und vor dem Haager Übereinkommen vom 15. November 1965.",
+  "question_type": "scope_or_applicability",
+  "anchor": "Zustellung gerichtlicher und außergerichtlicher Schriftstücke in Zivil- und Handelssachen",
+  "articles_involved": [
+    "20"
+  ],
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "20",
+      "language": "de",
+      "text": "Diese Verordnung hat in ihrem Anwendungsbereich Vorrang vor anderen Bestimmungen, die in den von den Mitgliedstaaten geschlossenen bilateralen oder multilateralen Übereinkünften oder Vereinbarungen enthalten sind, insbesondere vor Artikel IV des Protokolls zum Brüsseler Übereinkommen von 1968 und vor dem Haager Übereinkommen vom 15. November 1965."
+    }
+  ]
+}
 (e) ANTWORT IN DIE FRAGE GESCHRIEBEN. ZIELARTIKEL 2 der Richtlinie 2009/18/EG (Untersuchung von Unfällen im Seeverkehr) — Anwendungsbereich: Die Richtlinie gilt nicht für Unfälle, an denen ausschließlich „Fischereifahrzeuge mit einer Länge von weniger als 15 Metern“ beteiligt sind.
 ✗ „Ist die Regelung zur Untersuchung von Unfällen im Seeverkehr für Seeunfälle und Vorkommnisse ausgeschlossen, an denen ausschließlich Fischereifahrzeuge mit einer Länge von weniger als 15 Metern beteiligt sind?“ — Antwort „Fischereifahrzeuge mit einer Länge von weniger als 15 Metern“ → verankert und natürlich, aber der Schwellenwert ist die Antwort und steht bereits in der Frage.
-✓ {"question": "Unterhalb welcher Länge fallen Fischereifahrzeuge nicht in den Anwendungsbereich der EU-Regelung zur Untersuchung von Unfällen im Seeverkehr?", "question_cited": "Unterhalb welcher Länge fallen Fischereifahrzeuge nach Richtlinie 2009/18/EG nicht in den Anwendungsbereich der EU-Regelung zur Untersuchung von Unfällen im Seeverkehr?", "instrument_short_name": null, "answer": "Fischereifahrzeuge mit einer Länge von weniger als 15 Metern", "question_type": "scope_or_applicability", "anchor": "EU-Regelung zur Untersuchung von Unfällen im Seeverkehr", "articles_involved": ["2"]}
+✓ {
+  "question": "Unterhalb welcher Länge fallen Fischereifahrzeuge nicht in den Anwendungsbereich der EU-Regelung zur Untersuchung von Unfällen im Seeverkehr?",
+  "question_cited": "Unterhalb welcher Länge fallen Fischereifahrzeuge nach Richtlinie 2009/18/EG nicht in den Anwendungsbereich der EU-Regelung zur Untersuchung von Unfällen im Seeverkehr?",
+  "instrument_short_name": null,
+  "answer": "Fischereifahrzeuge mit einer Länge von weniger als 15 Metern",
+  "question_type": "scope_or_applicability",
+  "anchor": "EU-Regelung zur Untersuchung von Unfällen im Seeverkehr",
+  "articles_involved": [
+    "2"
+  ],
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "2",
+      "language": "de",
+      "text": "Fischereifahrzeuge mit einer Länge von weniger als 15 Metern"
+    }
+  ]
+}
 (f) ANKER — reguliertes Erzeugnis. ZIELARTIKEL 1 der Verordnung (EU) Nr. 833/2012 der Kommission (vorläufiger Antidumpingzoll auf Aluminiumfolie in Rollen aus China): Die Zollsatztabelle endet mit „Alle übrigen Unternehmen — 35,4 %“.
 ✗ „Welcher vorläufige Antidumpingzoll gilt für Einfuhren aller übrigen Unternehmen?“ → jede Antidumpingverordnung enthält einen Satz für „alle übrigen Unternehmen“.
-✓ {"question": "Wie hoch ist der Auffangsatz für 'alle übrigen Unternehmen' beim vorläufigen Antidumpingzoll auf Aluminiumfolie in Rollen aus China?", "question_cited": "Wie hoch ist nach Verordnung (EU) Nr. 833/2012 der Kommission der Auffangsatz für 'alle übrigen Unternehmen' beim vorläufigen Antidumpingzoll auf Aluminiumfolie in Rollen aus China?", "instrument_short_name": null, "answer": "35,4 %", "question_type": "amount_or_threshold", "anchor": "vorläufigen Antidumpingzoll auf Aluminiumfolie in Rollen aus China", "articles_involved": ["1"]}
+✓ {
+  "question": "Wie hoch ist der Auffangsatz für 'alle übrigen Unternehmen' beim vorläufigen Antidumpingzoll auf Aluminiumfolie in Rollen aus China?",
+  "question_cited": "Wie hoch ist nach Verordnung (EU) Nr. 833/2012 der Kommission der Auffangsatz für 'alle übrigen Unternehmen' beim vorläufigen Antidumpingzoll auf Aluminiumfolie in Rollen aus China?",
+  "instrument_short_name": null,
+  "answer": "35,4 %",
+  "question_type": "amount_or_threshold",
+  "anchor": "vorläufigen Antidumpingzoll auf Aluminiumfolie in Rollen aus China",
+  "articles_involved": [
+    "1"
+  ],
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "1",
+      "language": "de",
+      "text": "35,4 %"
+    }
+  ]
+}
 (g) ANKER — Fachbegriff, generierte Frage beibehalten. ZIELARTIKEL 2 der Verordnung (EG) Nr. 1935/2004 (Materialien und Gegenstände, die dazu bestimmt sind, mit Lebensmitteln in Berührung zu kommen) — Begriffsbestimmungen.
 ✓ „Was sind 'aktive Materialien und Gegenstände, die dazu bestimmt sind, mit Lebensmitteln in Berührung zu kommen'?“ — der Begriff kommt nur in diesem Regelungsbereich vor, bildet daher den Anker und benötigt keine weiteren Wörter zur Angabe des Regelungsbereichs. Fassung mit Kennung: „Was sind nach Verordnung (EG) Nr. 1935/2004 'aktive Materialien und Gegenstände, die dazu bestimmt sind, mit Lebensmitteln in Berührung zu kommen'?“
 SELBSTPRÜFUNG für jede Frage vor dem Finalisieren:
@@ -124,7 +357,25 @@ SELBSTPRÜFUNG für jede Frage vor dem Finalisieren:
 7. Gerüst paraphrasiert, Fachbegriffe exakt; eine Information pro Frage; die Fragen betreffen unterschiedliche Tatsachen und mindestens zwei Kategorien.
 AUSGABE (nur gültiges JSON, kein Markdown): bis zu drei Einträge, weniger, wenn weniger alle Tests bestehen:
 [
-  {"question": "...", "question_cited": "...", "instrument_short_name": null, "answer": "...", "question_type": "...", "anchor": "...", "articles_involved": ["..."]}
+  {
+  "question": "...",
+  "question_cited": "...",
+  "instrument_short_name": null,
+  "answer": "...",
+  "question_type": "...",
+  "anchor": "...",
+  "articles_involved": [
+    "..."
+  ],
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "...",
+      "language": "de",
+      "text": "..."
+    }
+  ]
+}
 ]
 Besteht der Zielartikel ausschließlich aus Standardformeln oder gibt er keine Frage her, die die Tests besteht, geben Sie genau Folgendes zurück: [{"skip_reason": "<eine kurze Wendung>"}]
 - anchor: die Formulierung des Regelungsankers, genau so, wie sie in der Grundfassung der Frage erscheint.

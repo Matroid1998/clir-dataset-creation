@@ -149,7 +149,8 @@ def prepare_payload(target: Target, index: ctx.ArticleIndex, *,
                        languages=ctx.payload_languages(target.language))
 
 
-def quality_sources(payload: ctx.GenerationPayload, language: str) -> list[dict[str, Any]]:
+def quality_sources(payload: ctx.GenerationPayload, language: str, *,
+                    evidence_contract: bool = False) -> list[dict[str, Any]]:
     """Name each supplied source, preserving the generator's reference truncation."""
     sources = []
     for unit, role, keyed in (
@@ -158,7 +159,7 @@ def quality_sources(payload: ctx.GenerationPayload, language: str) -> list[dict[
             + [(unit, "reference", True) for unit in payload.external_references]
             + [(unit, "reference", True) for unit in payload.annexes]):
         languages = [lg for lg in ctx.payload_languages(language) if unit.texts.get(lg)]
-        sources.append({
+        source = {
             "source_id": unit.eli_id, "role": role,
             "text": "\n\n".join(ctx._block(
                 unit, lg, limit=None if role == "target" else ctx.DEFAULT_REFERENCE_CHARS,
@@ -166,7 +167,18 @@ def quality_sources(payload: ctx.GenerationPayload, language: str) -> list[dict[
             "metadata": {"celex_id": unit.celex_id, "article_number": unit.article_number,
                          "unit_type": unit.unit_type, "titles": unit.act_titles,
                          "languages": languages},
-        })
+        }
+        if evidence_contract and getattr(payload, "evidence_sources", None):
+            visible = [body for body in payload.evidence_sources.values()
+                       if body.source_id == unit.eli_id]
+            if not visible:
+                continue
+            source["texts"] = {body.language: body.text for body in visible}
+            source["text"] = "\n\n".join(
+                f"[{body.language.upper()}]\n{body.text}" for body in visible)
+            source["metadata"].update(
+                languages=list(source["texts"]), source_ref=visible[0].source_ref)
+        sources.append(source)
     return sources
 
 
@@ -389,8 +401,10 @@ def run_one(target: Target, index: ctx.ArticleIndex, *, gen_model: str,
                                  position, c.question, c.answer], ensure_ascii=False).encode()).hexdigest()[:24]),
            "question_language": target.language,
            "articles_involved": list(c.articles_involved)} for position, c in enumerate(candidates)]
-    if target.mode in gen.NEW_MODES:
-        for pair, candidate in zip(qa, candidates):
+    evidence_contract = any(getattr(c, "evidence_contract", "")
+                            or getattr(c, "evidence_spans", []) for c in candidates)
+    for pair, candidate in zip(qa, candidates):
+        if target.mode in gen.NEW_MODES or evidence_contract:
             pair.update(mode=target.mode, **gen.annotations.metadata(candidate))
     # The quality rubrics run consistency checks ON the mode's own fields -- is
     # the declared anchor actually present in the question, is the short name
@@ -410,13 +424,15 @@ def run_one(target: Target, index: ctx.ArticleIndex, *, gen_model: str,
     ]
     faith_prompt = gen.PROMPTS.faithfulness("batch")
     quality_prompt = gen.PROMPTS.quality(target.mode, "batch")
+    reuse_identity = ({"deduplicate": "exact_question"}
+                      if deduplicate_exact_questions and not evidence_contract else None)
     errors = []
     faith = quality = None
     try:
         faith = stage("faithfulness", lambda: grade_faithfulness(
             client("faithfulness", grade_model), grader, faith_prompt, payload.text, qa,
             strict=enhanced,
-            reuse_identity={"deduplicate": "exact_question"} if deduplicate_exact_questions else None))
+            reuse_identity=reuse_identity))
     except Exception as error:
         if not enhanced:
             raise
@@ -424,14 +440,15 @@ def run_one(target: Target, index: ctx.ArticleIndex, *, gen_model: str,
     try:
         quality = stage("quality", lambda: grade_quality(
             client("quality", grade_model), grader, quality_prompt, payload.text, qa_quality,
-            target.mode, strict=enhanced, sources=quality_sources(payload, target.language),
+            target.mode, strict=enhanced, sources=quality_sources(
+                payload, target.language, evidence_contract=bool(evidence_contract)),
             target_source_id=target.eli_id, rubric_mode=f"eurlex_{target.mode}",
             policies={"target_granularity": "article", "reference_policy": "target_plus_supplied_references",
                       "answer_role": ("source_identity" if target.mode == gen.MODE_SOURCE_FINDING
                                       else "evidence_span"), "source_time_policy": "supplied_version",
                       "require_unique_gold": False, "fact_pattern_voice": "third_person_client",
                       "fact_pattern_clients": "private_clients"},
-            reuse_identity={"deduplicate": "exact_question"} if deduplicate_exact_questions else None))
+            reuse_identity=reuse_identity))
     except Exception as error:
         if not enhanced:
             raise

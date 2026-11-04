@@ -1,4 +1,35 @@
 # MODE: eurlex_faithfulness_all_six_modes
+
+EXPLICIT SUPPORTING SPANS — VERSIONED CONTRACT
+For evidence_contract="legal_evidence_spans_v1", evidence_spans is the authoritative ordered list.
+Each entry identifies one source_ref/source_id, language, verbatim text and mechanically derived
+start/end offsets. The first entry supports the answer directly, or the source-finding clue;
+scalar evidence and evidence_language are compatibility views of that first entry, not extra proof.
+Every text must be the smallest sufficient continuous original-language excerpt from a permitted
+source body actually supplied, excluding metadata, synthetic truncation markers and unseen text.
+No translated evidence, reordered clauses, joined fragments or quotation across source units.
+Check every material condition, exception, actor, role, modality and scope boundary needed to
+support the actual question and answer. Exact matching alone never establishes semantic support.
+Check that each declared necessary EUR-Lex unit has exactly one supporting span and no unused
+unit is added. The target's legal point must remain indispensable; the primary source-finding span
+must come from the target. UN permits exactly one span from the target block; referenced documents,
+neighbouring blocks and full-document identity cannot establish support from outside that block.
+The answer retains its copy/translation/identity rules. A translated answer may be valid while
+all evidence stays verbatim in its own source language; answer_is_translation describes the
+answer, and evidence_is_translation is false for this contract. Do not require a span
+language to equal question_language. The source-finding identifier is not itself a body quotation.
+Reject whole-article copying as a substitute for evidence selection. Identify removable prefix or
+suffix text when judging padding; preserve material qualifications and indispensable intervening
+clauses. A span is not too long merely because multiple adjacent clauses are necessary, and there
+is no fixed token cap. If a narrower sufficient span cannot meet the contract, the generation
+should narrow or skip the question; do not silently repair the candidate or invent a new quote.
+Report incomplete source coverage, wrong source/language, nonliteral quotations and excessive
+copying in existing support/metadata checks where present and affected scoring dimensions;
+legacy-schema graders use their existing failure_type/reason fields, without new output keys.
+Keep existing rubric keys, score ranges, output schema and unaffected dimensions unchanged.
+Legacy candidates without this contract and without evidence_spans retain their original grading
+and translation conventions. Do not require or invent retroactive spans for those saved records.
+
 # RUBRIC: legal-clir-exceptional-r3
 English-only faithfulness verifier for multilingual candidates.
 
@@ -14,8 +45,8 @@ Use turn boundaries and actual office labels, not nationality/nearby mentioned p
 EXTRACTION, LANGUAGE AND REPRESENTATION
 One contiguous span in one permitted source unit is required, except source_finding's separate metadata identity. Read a phrase/list item with the question and linked governing clause. No added yes/no, computed date, arithmetic difference, standalone rewritten sentence or synthesis is needed. Necessary adjacent sentences, original numbering, fragment openings and punctuation are allowed.
 Before penalizing padding, identify an actually shorter sufficient continuous span. A qualification changing legal meaning, or text between the first and last needed clauses, is not removable. Only removable prefix/suffix material outside the sufficient span can count as extraction excess. If required content is absent, do not describe the answer as complete merely because the remainder is verbatim.
-Use supplied aligned target-language text when available. Otherwise a faithful translation of one permitted span is valid; preserve values, identities, modality and qualifications. Different language versions are not extra independent sources. Follow the translation flag contract; no assumption of fidelity from a flag. If meaning is assessable, missing a verbatim same-language version is not itself low grounding.
-Default comparison normalization is whitespace/line-break normalization only. A caller-declared stronger normalization applies only to representation and cannot erase substantive words/values. A missing bare structural paragraph marker between otherwise adjacent clauses is a metadata/representation issue, not automatically semantic stitching. Do not lower semantic grounding for that alone; explain unresolved representation issues for reconciliation with the quality check. Actual noncontiguous omissions, reordered clauses, fabricated words or missing exceptions remain material defects. A faithful proper-name spelling or standard equivalent date presentation is not invented content.
+For answer, use supplied aligned target-language text when available. Otherwise a faithful translation of one permitted answer span is valid; preserve values, identities, modality and qualifications. Different language versions are not extra independent sources. Follow the translation flag contract; no assumption of fidelity from a flag. If meaning is assessable, missing a verbatim same-language version is not itself low grounding.
+For legacy quotations and answer presentation, default comparison normalization is whitespace/line-break normalization only. New-contract evidence_spans remain exact source quotations. A caller-declared stronger normalization applies only to representation and cannot erase substantive words/values. A missing bare structural paragraph marker between otherwise adjacent clauses is a metadata/representation issue, not automatically semantic stitching. Do not lower semantic grounding for that alone; explain unresolved representation issues for reconciliation with the quality check. Actual noncontiguous omissions, reordered clauses, fabricated words or missing exceptions remain material defects. A faithful proper-name spelling or standard equivalent date presentation is not invented content.
 
 MODE-SPECIFIC INTERPRETATION
 Application: recognizably hypothetical circumstances need not be source-reported events. Direct matching to an explicit rule is permitted. Do not assume omitted decisive facts, a sanction, an exemption's converse or implementation. A category-only ask need not prove every condition for ultimate entitlement. Whether the case is decorative belongs to the quality mode check.

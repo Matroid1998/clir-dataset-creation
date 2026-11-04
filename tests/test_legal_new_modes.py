@@ -5,12 +5,14 @@ import io
 import json
 from copy import deepcopy
 from dataclasses import replace
+from types import SimpleNamespace
 
 import pytest
 
 from clir_bench.core import grading, llm, prompt_registry
 from clir_bench.domains.legal.qac import decider
 from clir_bench.domains.legal.qac import generation_metadata as annotations
+from clir_bench.domains.legal.qac.evidence import MARKER
 from test_legal_batch_replay_integration import Client, MemoryCheckpoint, case, response
 
 
@@ -88,6 +90,13 @@ def candidate_for(source, mode, payload, translated):
 @pytest.mark.parametrize("translated", [False, True])
 def test_generation_grading_csv_and_regrade_preserve_annotations(monkeypatch, source, mode, translated):
     batch, generator, target, payload, _ = case(source)
+    # This fixture represents the older scalar/translated-evidence contract.
+    # New source-span generation has its own all-mode integration coverage.
+    original = generator.PROMPTS
+    monkeypatch.setattr(generator, "PROMPTS", SimpleNamespace(
+        generation=lambda *args: original.generation(*args).replace(MARKER + "\n", ""),
+        faithfulness=original.faithfulness, quality=original.quality,
+    ))
     target = replace(target, mode=mode)
     item = candidate_for(source, mode, payload, translated)
     calls = []

@@ -1,3 +1,41 @@
+EVIDENCE_CONTRACT: legal_evidence_spans_v1
+
+Ausgabesprache: Deutsch. Fragen und Freitextannotationen sind deutsch; Quellenzitate und kopierte Kennungen behalten ihre ursprüngliche Form.
+
+AUSDRÜCKLICHE BELEGSPANNEN — IN JEDEM MODUS ERFORDERLICH
+Geben Sie evidence_spans als geordnete Liste von Objekten mit genau source_ref, language und text
+zurück. Die erste Spanne belegt answer unmittelbar, bei source_finding den materiellen Suchhinweis.
+Jede Spanne ist EIN kleinstmöglicher ausreichender zusammenhängender Ausschnitt, WÖRTLICH aus dem
+tatsächlich mitgelieferten Quellenkörper in dessen Originalsprache kopiert. Bewahren Sie Schreibweise,
+Leerraum, Zeichensetzung, Markup und Fehler. Übersetzen Sie Belege niemals; verbinden Sie keine
+getrennten Stellen, fügen Sie keine Auslassungszeichen ein, kopieren Sie keine Metadaten und zitieren
+Sie nichts hinter einer Kürzungsgrenze. language bezeichnet die Sprache der zitierten Fassung.
+Bewahren Sie alle antwortrelevanten Bedingungen, Ausnahmen, Akteure, Modalitäten und Geltungsgrenzen.
+Kopieren Sie keine ganzen Artikel oder Dokumente anstelle der benötigten Belegstellen.
+Entfernen Sie entbehrlichen Anfangs- und Endtext, bewahren Sie aber notwendige Zwischenpassagen.
+Es gibt keine feste Tokenobergrenze. Grenzen Sie die Frage ein oder überspringen Sie sie, wenn diese
+Beleganforderungen nicht erfüllbar sind.
+Legen Sie zuerst die primäre Belegspanne fest. Außer bei source_finding übernimmt answer deren
+vollständigen Text, wenn eine passende Fassung in der Ausgabesprache mitgeliefert wurde;
+answer_is_translation ist dann false. Andernfalls übersetzen Sie die gesamte Spanne sinngenau in
+die Ausgabesprache und setzen answer_is_translation auf true. Keine Zusammenfassung, Berechnung,
+zusätzliche Ja/Nein-Antwort oder Bedeutungsänderung. Bei source_finding bleibt answer die genaue
+Zielidentität nach der bestehenden Modusregel, answer_is_translation ist false, und die erste Spanne
+belegt den materiellen Hinweis im Zieltext.
+Geben Sie answer_is_translation in JEDEM Modus als JSON-Boolean zurück. Geben Sie keine skalaren
+Felder evidence, evidence_language, evidence_is_translation, kanonischen Quellenkennungen oder
+Zeichenpositionen aus: Diese werden aus erster Spanne und Quelldaten berechnet. Die bestehenden
+modusspezifischen Felder bleiben neben evidence_spans erhalten. Beispielauszüge sind nur Lehrmaterial.
+Auch bei übersetzten Beispielantworten bleibt der Beleg in der tatsächlich gezeigten Quellsprache.
+
+EUR-LEX: BELEGABDECKUNG
+Geben Sie genau eine Spanne für JEDE Einheit in articles_involved zurück: Ziel und jede notwendige
+mitgelieferte Referenz oder Anlage. Keine ungenutzten Quellen oder doppelten Sprachfassungen.
+source_ref ist bei Ziel und eigenem Rechtsakt die bloße Artikelnummer, bei fremdem Rechtsakt oder
+jeder Anlage der exakt mitgelieferte Cite as-Schlüssel. Die erste Spanne darf nur dann aus einer
+zulässigen Referenz stammen, wenn die Regel des Ziels unverzichtbar bleibt; belegen Sie diese separat.
+Bei source_finding muss die erste Spanne aus dem Ziel stammen. Jede Spanne bleibt in ihrer Einheit.
+
 VORRANGIGE KLARSTELLUNGEN — diese Regeln ersetzen widersprechende Formulierungen oder Beispiele unten.
 Die Antwort ist eine zusammenhängende Belegstelle des bereitgestellten Texts, gelesen mit Frage, maßgeblicher Regel und ausdrücklich verknüpften bereitgestellten Verweisen. Kein zusätzliches „Ja/Nein“, kein umgeschriebenes Ergebnis und kein berechnetes Kalenderdatum. Vorgegebene Tatsachen einer ausdrücklichen Kategorie, Bedingung, Schwelle oder Zeitangabe zuzuordnen, gewöhnliche Verweise aufzulösen oder einen Verstoß gegen eine ausdrückliche Pflicht zu erkennen, ist keine unbelegte rechtliche Schlussfolgerung. Keine fehlenden entscheidenden Tatsachen, Sanktionen, Umkehrschlüsse oder externes Recht erfinden.
 Ja/Nein- und W-Fragen sind gleichwertig. Eine reine Kategoriefrage verlangt nicht sämtliche Voraussetzungen eines endgültigen Anspruchs; eine Frage nach dem vollständigen Anspruch verlangt alle entscheidenden Voraussetzungen. Notwendige Rechtsbegriffe und Bedingungen dürfen in Frage und Beleg wiederkehren, solange die erfragte Rechtsfolge unbekannt bleibt. Das Entfernen der Antwortstelle ist kein automatischer Ausschlusstest.
@@ -47,7 +85,27 @@ Beispiel 1 — Antwort vollständig im Zielartikel
 ### REFERENCED ARTICLES
 [DE] Artikel 12 — Durchführungsbefugnisse
 "Die Kommission erlässt Durchführungsrechtsakte zur Festlegung des Formats der Berichte."
-✓ {"question": "Ein Erzeuger hat im vergangenen Jahr 40 Tonnen Einwegbesteck aus Kunststoff auf dem spanischen Markt in Verkehr gebracht und der spanischen Behörde die Menge noch nicht gemeldet. Bis wann muss er dies tun?", "answer": "bis zum 31. März jedes Jahres", "question_type": "deadline_or_duration", "particulars": ["Erzeuger", "im vergangenen Jahr 40 Tonnen Einwegbesteck aus Kunststoff auf dem spanischen Markt in Verkehr gebracht", "die Menge noch nicht gemeldet"], "articles_involved": ["8"]}
+✓ {
+  "question": "Ein Erzeuger hat im vergangenen Jahr 40 Tonnen Einwegbesteck aus Kunststoff auf dem spanischen Markt in Verkehr gebracht und der spanischen Behörde die Menge noch nicht gemeldet. Bis wann muss er dies tun?",
+  "answer": "bis zum 31. März jedes Jahres",
+  "question_type": "deadline_or_duration",
+  "particulars": [
+    "Erzeuger",
+    "im vergangenen Jahr 40 Tonnen Einwegbesteck aus Kunststoff auf dem spanischen Markt in Verkehr gebracht",
+    "die Menge noch nicht gemeldet"
+  ],
+  "articles_involved": [
+    "8"
+  ],
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "8",
+      "language": "de",
+      "text": "bis zum 31. März jedes Jahres"
+    }
+  ]
+}
   → Die Einzelheiten legen den Regelungsbereich (Einwegkunststoff) und das Verhalten fest; die Frist des Artikels selbst beantwortet die Frage. Artikel 12 wird zitiert, hat aber nichts beigetragen und wird daher nicht aufgeführt.
 ✗ „Ein Unternehmen, das den Kunststoffvorschriften unterliegt, möchte seine Meldefrist wissen.“ → kein Akteur, kein Erzeugnis, kein Verhalten: eine verkleidete Leerformel.
 ✗ „Ein Hersteller, der im vergangenen Jahr 40 Tonnen Wegwerfgabeln aus Kunststoff verkauft hat …“ → „verkauft“ ist nicht „in Verkehr gebracht“ und „Hersteller“ ist nicht „Erzeuger“; die Frage beschreibt nun eine andere Regel.
@@ -59,11 +117,57 @@ Beispiel 2 — Antwort durch einen referenzierten Artikel vervollständigt
 ### REFERENCED ARTICLES
 [DE] Artikel 3 — Erfasste Erzeugnisse
 "Diese Richtlinie gilt für Wattestäbchen, Besteck, Teller, Trinkhalme und Rührstäbchen für Getränke aus Kunststoff."
-✓ {"question": "Im August 2026 beabsichtigt ein Einzelhändler in Spanien, weiterhin Teller und Trinkhalme aus Kunststoff in Verkehr zu bringen. Gehören sie zu den Einwegkunststoffprodukten, die die EU verboten hat?", "answer": "Wattestäbchen, Besteck, Teller, Trinkhalme und Rührstäbchen für Getränke aus Kunststoff", "question_type": "scope_or_applicability", "particulars": ["August 2026", "Einzelhändler in Spanien", "weiterhin Teller und Trinkhalme aus Kunststoff in Verkehr zu bringen"], "articles_involved": ["3", "4"]}
+✓ {
+  "question": "Im August 2026 beabsichtigt ein Einzelhändler in Spanien, weiterhin Teller und Trinkhalme aus Kunststoff in Verkehr zu bringen. Gehören sie zu den Einwegkunststoffprodukten, die die EU verboten hat?",
+  "answer": "Wattestäbchen, Besteck, Teller, Trinkhalme und Rührstäbchen für Getränke aus Kunststoff",
+  "question_type": "scope_or_applicability",
+  "particulars": [
+    "August 2026",
+    "Einzelhändler in Spanien",
+    "weiterhin Teller und Trinkhalme aus Kunststoff in Verkehr zu bringen"
+  ],
+  "articles_involved": [
+    "3",
+    "4"
+  ],
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "3",
+      "language": "de",
+      "text": "Wattestäbchen, Besteck, Teller, Trinkhalme und Rührstäbchen für Getränke aus Kunststoff"
+    },
+    {
+      "source_ref": "4",
+      "language": "de",
+      "text": "Die Mitgliedstaaten verbieten ab dem 3. Juli 2026 das Inverkehrbringen der in Artikel 3 aufgeführten Einwegkunststoffartikel."
+    }
+  ]
+}
   → Das Verbot ist die eigene Regel des Zielartikels; die Produktliste stammt aus Artikel 3, daher werden beide angegeben. Der Sachverhalt nennt zwei der fünf Erzeugnisse, nicht die ganze Liste: Eine Frage, die die Aufzählung des Artikels kopiert, findet den Text durch Wortüberschneidungen und beschreibt keinen wirklichen Mandanten.
     EIN-ARTIKEL-TEST: Artikel 3 zählt Erzeugnisse auf, sagt aber nie, dass sie verboten sind — das Verbot ist die Regel des Zielartikels.
 ✗ „Ein spanischer Einzelhändler verkauft Kunststoffgeschirr. Welche Erzeugnisse erfasst die Einwegkunststoffrichtlinie?“ → eine Frage zu Artikel 3; verwerfen.
-✗ {"question": "Ein spanischer Einzelhändler hat noch Vorräte der vom EU-Verbot erfassten Einwegkunststoffartikel. Ab welchem Datum darf er sie nicht mehr in Verkehr bringen?", "answer": "ab dem 3. Juli 2026", "articles_involved": ["3", "4"]}
+✗ {
+  "question": "Ein spanischer Einzelhändler hat noch Vorräte der vom EU-Verbot erfassten Einwegkunststoffartikel. Ab welchem Datum darf er sie nicht mehr in Verkehr bringen?",
+  "answer": "ab dem 3. Juli 2026",
+  "articles_involved": [
+    "3",
+    "4"
+  ],
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "4",
+      "language": "de",
+      "text": "ab dem 3. Juli 2026"
+    },
+    {
+      "source_ref": "3",
+      "language": "de",
+      "text": "Diese Richtlinie gilt für Wattestäbchen, Besteck, Teller, Trinkhalme und Rührstäbchen für Getränke aus Kunststoff."
+    }
+  ]
+}
   → Zu viel angegeben: Das Datum steht vollständig in Artikel 4.
 Beispiel 3 — ein Artikel eines ANDEREN Rechtsakts vervollständigt die Antwort
 ### TARGET ARTICLE
@@ -73,24 +177,128 @@ Beispiel 3 — ein Artikel eines ANDEREN Rechtsakts vervollständigt die Antwort
 ### REFERENCED ARTICLES FROM OTHER ACTS
 [DE] Artikel 5 — Kontrollen   Act: Verordnung (EG) Nr. 21/2004 des Rates …   Cite as: 32004R0021:5
 "Die Mitgliedstaaten führen jährlich Vor-Ort-Kontrollen bei mindestens 3 % der Betriebe durch."
-✓ {"question": "Ein Schafhalter in Irland hat die diesjährige Beihilfe für Schaf- und Ziegenhaltungsbetriebe beantragt. Welche Kontrollen müssen abgeschlossen sein, bevor die Beihilfe ausgezahlt werden kann?", "answer": "jährlich Vor-Ort-Kontrollen bei mindestens 3 % der Betriebe", "question_type": "condition_or_prerequisite", "particulars": ["Schafhalter in Irland", "die diesjährige Beihilfe für Schaf- und Ziegenhaltungsbetriebe beantragt"], "articles_involved": ["2", "32004R0021:5"]}
+✓ {
+  "question": "Ein Schafhalter in Irland hat die diesjährige Beihilfe für Schaf- und Ziegenhaltungsbetriebe beantragt. Welche Kontrollen müssen abgeschlossen sein, bevor die Beihilfe ausgezahlt werden kann?",
+  "answer": "jährlich Vor-Ort-Kontrollen bei mindestens 3 % der Betriebe",
+  "question_type": "condition_or_prerequisite",
+  "particulars": [
+    "Schafhalter in Irland",
+    "die diesjährige Beihilfe für Schaf- und Ziegenhaltungsbetriebe beantragt"
+  ],
+  "articles_involved": [
+    "2",
+    "32004R0021:5"
+  ],
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "32004R0021:5",
+      "language": "de",
+      "text": "jährlich Vor-Ort-Kontrollen bei mindestens 3 % der Betriebe"
+    },
+    {
+      "source_ref": "2",
+      "language": "de",
+      "text": "Die Beihilfe wird erst gezahlt, nachdem die in Artikel 5 der Verordnung (EG) Nr. 21/2004 des Rates vorgesehenen Kontrollen durchgeführt worden sind."
+    }
+  ]
+}
   → Die Zahlungsbedingung ist die Regel des Zielartikels; der andere Rechtsakt sagt nur, worin die Kontrollen bestehen. Die Antwort ist ein zusammenhängender Abschnitt des referenzierten Artikels. Beide Artikel werden angegeben, der Artikel des anderen Rechtsakts mit seinem „Cite as“-Schlüssel; die Frage enthält keine Kennung.
 ✗ „Eine irische Zahlstelle plant die diesjährigen Viehkontrollen. Welchen Anteil der Schaf- und Ziegenhaltungsbetriebe muss sie vor Ort kontrollieren?“ → Artikel 5 der anderen Verordnung beantwortet dies allein; die Frage würde jene Verordnung finden. Verwerfen.
 Beispiel 4 — tatsächliche Fragen aus einem Produktionslauf, in Sachverhalte umgearbeitet
 (a) ZIELARTIKEL 1 der Euratom-Verordnung, die geringe Mengen von Erzen, Ausgangsstoffen und besonderen spaltbaren Stoffen vom Versorgungskapitel des Vertrags freistellt: „(a) Verbringungen innerhalb der Gemeinschaft und Einfuhren in die Gemeinschaft von Mengen, die je Transaktion eine Tonne Uran und Thorium (oder Uran oder Thorium) nicht überschreiten, innerhalb einer Grenze von fünf Tonnen pro Jahr und Verwender für jeden dieser Stoffe; …“
 ✗ Generiert: „Wie viel Uran oder Thorium darf bei einem einzelnen Geschäft innerhalb der Gemeinschaft verbracht oder in sie eingeführt werden, bevor die Freistellung nicht mehr gilt?“ → eine umformulierte Leerformel; kein Sachverhalt.
-✓ {"question": "Ein Unternehmen führt eine einzige Sendung Uranerz mit einem Gehalt von 800 kg Uran in die Union ein und erwartet in diesem Jahr Einfuhren von insgesamt etwa vier Tonnen Uran. Ist die Sendung vom Versorgungskapitel des Euratom-Vertrags freigestellt?", "answer": "Verbringungen innerhalb der Gemeinschaft und Einfuhren in die Gemeinschaft von Mengen, die je Transaktion eine Tonne Uran und Thorium (oder Uran oder Thorium) nicht überschreiten, innerhalb einer Grenze von fünf Tonnen pro Jahr und Verwender für jeden dieser Stoffe", "question_type": "scope_or_applicability", "particulars": ["eine einzige Sendung Uranerz", "800 kg Uran", "in diesem Jahr Einfuhren von insgesamt etwa vier Tonnen Uran"], "articles_involved": ["1"]}
+✓ {
+  "question": "Ein Unternehmen führt eine einzige Sendung Uranerz mit einem Gehalt von 800 kg Uran in die Union ein und erwartet in diesem Jahr Einfuhren von insgesamt etwa vier Tonnen Uran. Ist die Sendung vom Versorgungskapitel des Euratom-Vertrags freigestellt?",
+  "answer": "Verbringungen innerhalb der Gemeinschaft und Einfuhren in die Gemeinschaft von Mengen, die je Transaktion eine Tonne Uran und Thorium (oder Uran oder Thorium) nicht überschreiten, innerhalb einer Grenze von fünf Tonnen pro Jahr und Verwender für jeden dieser Stoffe",
+  "question_type": "scope_or_applicability",
+  "particulars": [
+    "eine einzige Sendung Uranerz",
+    "800 kg Uran",
+    "in diesem Jahr Einfuhren von insgesamt etwa vier Tonnen Uran"
+  ],
+  "articles_involved": [
+    "1"
+  ],
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "1",
+      "language": "de",
+      "text": "Verbringungen innerhalb der Gemeinschaft und Einfuhren in die Gemeinschaft von Mengen, die je Transaktion eine Tonne Uran und Thorium (oder Uran oder Thorium) nicht überschreiten, innerhalb einer Grenze von fünf Tonnen pro Jahr und Verwender für jeden dieser Stoffe"
+    }
+  ]
+}
   → Beide Schwellenwerte werden auf der Innenseite konkretisiert, daher entscheidet der Abschnitt ohne Schlussfolgerung. Bei 1,2 Tonnen in einer Sendung wäre das Ergebnis ein selbst abgeleitetes Urteil, kein Textabschnitt — verwerfen Sie einen solchen Fall.
 (b) ZIELARTIKEL 98 der Sektorenvergaberichtlinie — Entscheidungen des Preisgerichts: „Das Preisgericht prüft die von den Bewerbern vorgelegten Pläne und Entwürfe anonym und ausschließlich anhand der in der Wettbewerbsbekanntmachung genannten Kriterien.“
 ✗ Generiert: „Auf welcher Grundlage muss das Preisgericht die vorgelegten Pläne und Entwürfe bewerten?“ → Dieselbe Regel steht in der klassischen Vergaberichtlinie; „das Preisgericht“ grenzt nichts ab.
-✓ {"question": "Ein Wasserversorgungsunternehmen veranstaltet einen Wettbewerb für eine neue Aufbereitungsanlage, und das Preisgericht möchte die Beiträge teilweise anhand von Kriterien einstufen, die nicht in der Wettbewerbsbekanntmachung standen. Ist das erlaubt?", "answer": "ausschließlich anhand der in der Wettbewerbsbekanntmachung genannten Kriterien", "question_type": "obligation_or_prohibition", "particulars": ["Wasserversorgungsunternehmen", "Wettbewerb", "Kriterien einstufen, die nicht in der Wettbewerbsbekanntmachung standen"], "articles_involved": ["98"]}
+✓ {
+  "question": "Ein Wasserversorgungsunternehmen veranstaltet einen Wettbewerb für eine neue Aufbereitungsanlage, und das Preisgericht möchte die Beiträge teilweise anhand von Kriterien einstufen, die nicht in der Wettbewerbsbekanntmachung standen. Ist das erlaubt?",
+  "answer": "ausschließlich anhand der in der Wettbewerbsbekanntmachung genannten Kriterien",
+  "question_type": "obligation_or_prohibition",
+  "particulars": [
+    "Wasserversorgungsunternehmen",
+    "Wettbewerb",
+    "Kriterien einstufen, die nicht in der Wettbewerbsbekanntmachung standen"
+  ],
+  "articles_involved": [
+    "98"
+  ],
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "98",
+      "language": "de",
+      "text": "ausschließlich anhand der in der Wettbewerbsbekanntmachung genannten Kriterien"
+    }
+  ]
+}
 ✗ „Ein öffentlicher Auftraggeber, der einen Wettbewerb veranstaltet, möchte …“ → Passt ebenso auf die klassische Richtlinie; „Wasserversorgungsunternehmen“ legt den Regelungsbereich fest.
 (c) ZIELARTIKEL 24 der Durchführungsverordnung zur Landwirtschaft in den Regionen in äußerster Randlage: „… Um die Repräsentativität zu gewährleisten, wählen die Mitgliedstaaten zwischen 20 und 25 % der Mindestzahl der Beihilfeantragsteller, die einer Vor-Ort-Kontrolle zu unterziehen sind, nach dem Zufallsprinzip aus.“
 ✗ Generiert: „Welchen Anteil der Mindestzahl der Beihilfeantragsteller müssen die Mitgliedstaaten nach dem Zufallsprinzip auswählen, um die Repräsentativität zu gewährleisten?“ → Dieselbe Regel gibt es in der allgemeinen GAP-Kontrollverordnung; kein Sachverhalt.
-✓ {"question": "Eine Zahlstelle in einer Region in äußerster Randlage der Union wählt die Beihilfeantragsteller für Vor-Ort-Kontrollen ausschließlich anhand einer Risikoanalyse und ohne Zufallselement aus. Ist das zulässig?", "answer": "wählen die Mitgliedstaaten zwischen 20 und 25 % der Mindestzahl der Beihilfeantragsteller, die einer Vor-Ort-Kontrolle zu unterziehen sind, nach dem Zufallsprinzip aus.", "question_type": "obligation_or_prohibition", "particulars": ["Zahlstelle in einer Region in äußerster Randlage", "ausschließlich anhand einer Risikoanalyse", "ohne Zufallselement"], "articles_involved": ["24"]}
+✓ {
+  "question": "Eine Zahlstelle in einer Region in äußerster Randlage der Union wählt die Beihilfeantragsteller für Vor-Ort-Kontrollen ausschließlich anhand einer Risikoanalyse und ohne Zufallselement aus. Ist das zulässig?",
+  "answer": "wählen die Mitgliedstaaten zwischen 20 und 25 % der Mindestzahl der Beihilfeantragsteller, die einer Vor-Ort-Kontrolle zu unterziehen sind, nach dem Zufallsprinzip aus.",
+  "question_type": "obligation_or_prohibition",
+  "particulars": [
+    "Zahlstelle in einer Region in äußerster Randlage",
+    "ausschließlich anhand einer Risikoanalyse",
+    "ohne Zufallselement"
+  ],
+  "articles_involved": [
+    "24"
+  ],
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "24",
+      "language": "de",
+      "text": "wählen die Mitgliedstaaten zwischen 20 und 25 % der Mindestzahl der Beihilfeantragsteller, die einer Vor-Ort-Kontrolle zu unterziehen sind, nach dem Zufallsprinzip aus."
+    }
+  ]
+}
 (d) ZIELARTIKEL 111 der Mehrwertsteuerrichtlinie: „Vorbehaltlich der Bedingungen des Artikels 110 Absatz 2 dürfen Steuerbefreiungen mit Recht auf Vorsteuerabzug in folgenden Fällen weiterhin gewährt werden: (a) durch Finnland für die Lieferung von Zeitungen und Zeitschriften, die im Abonnement verkauft werden, und …; (b) durch Schweden …“
 ✗ Generiert: „Welche finnischen Lieferungen dürfen weiterhin von Mehrwertsteuerbefreiungen mit Vorsteuerabzug profitieren?“ → eine Leerformel, kein Sachverhalt.
-✓ {"question": "Ein finnischer Verlag verkauft Zeitschriften im Abonnement an seine Leser. Gehören diese Lieferungen zu einer der aufgeführten Kategorien für eine fortgesetzte Mehrwertsteuerbefreiung mit Vorsteuerabzug?", "answer": "durch Finnland für die Lieferung von Zeitungen und Zeitschriften, die im Abonnement verkauft werden", "question_type": "scope_or_applicability", "particulars": ["finnischer Verlag", "verkauft Zeitschriften im Abonnement"], "articles_involved": ["111"]}
+✓ {
+  "question": "Ein finnischer Verlag verkauft Zeitschriften im Abonnement an seine Leser. Gehören diese Lieferungen zu einer der aufgeführten Kategorien für eine fortgesetzte Mehrwertsteuerbefreiung mit Vorsteuerabzug?",
+  "answer": "durch Finnland für die Lieferung von Zeitungen und Zeitschriften, die im Abonnement verkauft werden",
+  "question_type": "scope_or_applicability",
+  "particulars": [
+    "finnischer Verlag",
+    "verkauft Zeitschriften im Abonnement"
+  ],
+  "articles_involved": [
+    "111"
+  ],
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "111",
+      "language": "de",
+      "text": "durch Finnland für die Lieferung von Zeitungen und Zeitschriften, die im Abonnement verkauft werden"
+    }
+  ]
+}
   → „Finnland“ und „im Abonnement verkauft“ konkretisieren die Kriterien der aufgeführten Kategorie. Die Frage betrifft nur die Zuordnung zu dieser Kategorie, nicht die Erfüllung aller Bedingungen der Steuerbefreiung. Eine Frage zu den Bedingungen des Artikels 110 würde diesen Artikel als bereitgestellten Text und die Angabe ["111", "110"] erfordern; ohne ihn ist sie zu verwerfen.
 Beispiel 5 — tatsächliche Fragen aus einem Produktionslauf, die zu verwerfen sind
 ✗ „Ein Kommissionsbeamter wird gebeten, zwei zentralen Meldestellen aus verschiedenen Mitgliedstaaten bei der Koordinierung eines grenzüberschreitenden Falls und beim Informationsaustausch innerhalb der Union zu helfen. Darf die Kommission diese Unterstützung leisten?“ → Der Protagonist ist die Kommission, und der Sachverhalt wiederholt die Rechtsfolge der Regel; die Klausel betrifft keinen Fall eines privaten Akteurs. Lassen Sie sie aus oder verwenden Sie eine andere Bestimmung des Artikels.
@@ -106,7 +314,26 @@ SELBSTPRÜFUNG für jede Frage vor dem Finalisieren:
 7. Keine Standardformel; ein Anliegen; Duktus eines Praktikers in der dritten Person; die Fragen beruhen auf unterschiedlichen Tatsachen und decken bei zwei oder drei Fragen mindestens zwei Kategorien ab.
 AUSGABE (nur gültiges JSON, kein Markdown): bis zu drei Einträge, weniger, wenn weniger alle Tests bestehen:
 [
-  {"question": "...", "answer": "...", "question_type": "...", "particulars": ["...", "..."], "articles_involved": ["..."]}
+  {
+  "question": "...",
+  "answer": "...",
+  "question_type": "...",
+  "particulars": [
+    "...",
+    "..."
+  ],
+  "articles_involved": [
+    "..."
+  ],
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "...",
+      "language": "de",
+      "text": "..."
+    }
+  ]
+}
 ]
 Besteht der Zielartikel ausschließlich aus Standardformeln oder gibt er keine Frage her, die die Tests besteht, geben Sie genau Folgendes zurück: [{"skip_reason": "<eine kurze Wendung>"}]
 - answer: der kürzeste zusammenhängende Abschnitt, der die Frage für den geschilderten Sachverhalt entscheidet, streng im bereitgestellten Text verankert.

@@ -11,6 +11,8 @@ and the batch driver refuses to keep a best candidate below that floor.
 
 Source-finding returns target document identity as the answer and a separate
 contiguous target-block evidence span. Other modes return the evidence as answer.
+Versioned generators also retain original-language source spans in every mode;
+older pinned prompts and saved candidates keep their existing scalar contract.
 
 Usage:
     python -m clir_bench.domains.legal.qac.un_generate \
@@ -26,6 +28,7 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from clir_bench.core.prompts import PromptPack
+from clir_bench.domains.legal.qac import evidence
 from clir_bench.domains.legal.qac import generation_metadata as annotations
 from clir_bench.domains.legal.qac import un_context as ctx
 from clir_bench.domains.legal.qac.env import load_env
@@ -88,7 +91,8 @@ def skip_reason(data: Any) -> str:
     return ""
 
 
-def parse_candidates(data: Any, mode: str) -> list[Candidate]:
+def parse_candidates(data: Any, mode: str, *, payload: ctx.GenerationPayload | None = None,
+                     require_evidence: bool = False) -> list[Candidate]:
     """Validate the model's JSON.
 
     ``mode`` selects which of the prompts' extra fields are read, so a field
@@ -97,6 +101,10 @@ def parse_candidates(data: Any, mode: str) -> list[Candidate]:
     The new retrieval modes retain their own annotations through the shared
     generation metadata parser, including source identity and separate evidence.
     """
+    if require_evidence:
+        data = evidence.validate_envelope(data)
+        if payload is None:
+            raise ValueError("evidence validation requires the generation payload")
     if isinstance(data, Mapping):
         data = [data]
     key = "framing" if mode in CONCEPTUAL_MODES else "question_type"
@@ -111,8 +119,11 @@ def parse_candidates(data: Any, mode: str) -> list[Candidate]:
         raw_anchors = item.get("anchors")
         if isinstance(raw_anchors, str):
             raw_anchors = [raw_anchors]
+        metadata = annotations.parse_metadata(item, mode, eurlex=False)
+        if require_evidence:
+            metadata.update(evidence.validate_spans(item, payload.evidence_sources, ["target"]))
         out.append(Candidate(
-            **annotations.parse_metadata(item, mode, eurlex=False),
+            **metadata,
             question=question,
             answer=answer,
             classification=str(item.get(key, "other")).strip(),
@@ -140,9 +151,11 @@ def generate(payload: ctx.GenerationPayload, *, mode: str, language: str,
              model: str, client: Any, reasoning_effort: str = "medium") -> list[Candidate]:
     from clir_bench.core.llm import chat, parse_json_response
 
-    raw = chat(client, model, build_messages(payload, mode, language),
+    messages = build_messages(payload, mode, language)
+    raw = chat(client, model, messages,
                reasoning_effort=reasoning_effort)
-    return parse_candidates(parse_json_response(raw), mode)
+    return parse_candidates(parse_json_response(raw), mode, payload=payload,
+                            require_evidence=evidence.uses_contract(messages[0]["content"]))
 
 
 def rows_for(payload: ctx.GenerationPayload, candidates: list[Candidate], *,

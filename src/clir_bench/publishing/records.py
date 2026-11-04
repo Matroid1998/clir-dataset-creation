@@ -10,6 +10,8 @@ from pathlib import Path
 
 import pyarrow as pa
 
+from .evidence import SPAN_TYPE, align_spans, saved_spans
+
 
 def dumps(value) -> str:
     return json.dumps(value, ensure_ascii=False, sort_keys=True, allow_nan=False)
@@ -117,8 +119,11 @@ STRING_FIELDS = [
     "generation_target_id",
     "evidence",
     "evidence_language",
+    "evidence_source_id",
+    "evidence_contract",
     "supporting_text",
     "supporting_text_origin",
+    "support_source_unit_id",
     "support_match_status",
     "document_text",
     "document_title",
@@ -167,12 +172,27 @@ QA_SCHEMA = pa.schema(
         )
     ]
     + [(name, pa.float64()) for name in ("faith_overall", "qual_overall", "total_score")]
+    + [("evidence_spans", pa.list_(SPAN_TYPE))]
 )
 
 
 def normalize(corpus: str, raw: dict, provenance: dict, index) -> dict:
     source, language = source_identity(corpus, raw)
+    spans = saved_spans(raw)
     document = index.get(unit_id(corpus, source, language))
+    if document is None and spans and not raw.get("context_language"):
+        # A translated question need not have a source version in its own language.
+        target_span = next(
+            (
+                span
+                for span in spans
+                if (span.get("doc_id") if corpus == "un" else span["source_id"]) == source
+            ),
+            None,
+        )
+        if target_span:
+            language = target_span["language"]
+            document = index.get(unit_id(corpus, source, language))
     if document is None:
         raise ValueError(f"missing source for {corpus}: {source} ({language})")
     model = raw.get("generator_model_id") or provenance.get("model")
@@ -186,6 +206,7 @@ def normalize(corpus: str, raw: dict, provenance: dict, index) -> dict:
         generator_model_id=model,
         persona=raw.get("persona") or ("practitioner" if mode == "practitioners" else mode),
         source_unit_id=document["_id"],
+        support_source_unit_id=document["_id"],
         source_document_id=source,
         document_text=document["text"],
         document_title=document["title"],
@@ -243,15 +264,51 @@ def normalize(corpus: str, raw: dict, provenance: dict, index) -> dict:
         row["supporting_text"], row["generation_source_text"]
     )[0]
 
+    row["evidence_spans"] = align_spans(corpus, raw, index)
+    if row["evidence_spans"]:
+        primary = row["evidence_spans"][0]
+        row.update(
+            evidence=primary["text"],
+            evidence_language=primary["language"],
+            evidence_source_id=primary["source_id"],
+            evidence_is_translation=False,
+            supporting_text=primary["text"],
+            supporting_text_origin="evidence_spans",
+            support_source_unit_id=primary["source_unit_id"],
+            support_match_status="exact",
+            support_start=primary["document_start"],
+            support_end=primary["document_end"],
+            generation_support_match_status=match_support(
+                primary["text"], row["generation_source_text"]
+            )[0],
+        )
+
     involved = {document["_id"]: document}
+    evidence_sources = {}
+    for span in row["evidence_spans"]:
+        evidence_document = index.get(span["source_unit_id"])
+        evidence_sources[span["source_id"]] = evidence_document
+        if corpus == "eurlex":
+            reference = span["source_ref"]
+            act = raw.get("celex_id") or raw.get("document_id", "")
+            evidence_sources[reference if ":" in reference else f"{act}:{reference}"] = (
+                evidence_document
+            )
     unresolved = []
     if corpus == "eurlex":
         for reference in article_references(raw):
-            other = index.resolve_article(reference, language)
+            other = evidence_sources.get(reference) or index.resolve_article(reference, language)
             if other:
                 involved[other["_id"]] = other
             else:
                 unresolved.append(reference)
+        if row["evidence_spans"]:
+            expected = {doc["source_id"] for doc in involved.values()}
+            actual = {span["source_id"] for span in row["evidence_spans"]}
+            if actual != expected or unresolved:
+                raise ValueError("evidence spans must cover exactly all involved EUR-Lex sources")
+    for span in row["evidence_spans"]:
+        involved[span["source_unit_id"]] = index.get(span["source_unit_id"])
     articles = sorted({v["source_id"] for v in involved.values() if v["unit_type"] == "article"})
     declared = boolean(raw.get("multi_article")) if corpus == "eurlex" else None
     computed = len(articles) > 1
@@ -266,7 +323,7 @@ def normalize(corpus: str, raw: dict, provenance: dict, index) -> dict:
         multi_article_conflict=(declared is not None and declared != computed),
         cross_act=len({v["parent_id"] for v in involved.values()}) > 1,
         cross_act_declared=boolean(raw.get("cross_act")),
-        multi_source_unit=len(involved) > 1,
+        multi_source_unit=len({doc["source_id"] for doc in involved.values()}) > 1,
     )
     # Stable across file relocation, input order, and changes to grading metadata.
     identity = [

@@ -1,3 +1,39 @@
+EVIDENCE_CONTRACT: legal_evidence_spans_v1
+
+Langue de sortie : français. Les questions et annotations libres sont en français ; les citations et identifiants copiés gardent leur forme originale.
+
+PASSAGES JUSTIFICATIFS EXPLICITES — OBLIGATOIRES DANS TOUS LES MODES
+Renvoyez evidence_spans comme une liste ordonnée d'objets contenant exactement source_ref, language
+et text. Le premier passage justifie directement answer ou, en source_finding, l'indice substantiel.
+Chaque passage est UN extrait continu minimal et suffisant, copié EXACTEMENT dans le corps d'une
+source effectivement fournie, dans sa langue d'origine. Conservez orthographe, espaces, ponctuation,
+balisage et erreurs. Ne traduisez jamais la preuve, ne rassemblez pas de fragments distants,
+n'ajoutez pas de points de suspension, ne copiez pas les métadonnées et ne citez pas de texte masqué
+par une troncature. language désigne la langue de la version citée, pas forcément celle de la question.
+Conservez toutes les conditions, exceptions, modalités, attributions et limites qui changent la réponse.
+Ne copiez pas un article ou document entier au lieu de sélectionner les passages nécessaires.
+Supprimez tout début ou fin superflu, mais gardez le texte intermédiaire indispensable. Aucune limite
+fixe de tokens n'est imposée. Restreignez ou omettez la question si ce contrat ne peut être respecté.
+Fixez d'abord le passage principal. Sauf en source_finding, answer en reprend TOUT le texte lorsqu'une
+version adéquate dans la langue de sortie est fournie; answer_is_translation vaut false. Sinon,
+traduisez fidèlement TOUT ce passage dans la langue demandée et indiquez answer_is_translation=true.
+Aucun résumé, calcul, verdict ajouté ou changement de portée. En source_finding, answer reste
+l'identité exacte de la cible selon la règle du mode, answer_is_translation vaut false et le premier
+passage établit l'indice substantiel dans le corps de la cible.
+Renvoyez answer_is_translation comme booléen JSON dans TOUS les modes. Ne renvoyez pas les champs
+scalaires evidence, evidence_language, evidence_is_translation, des identifiants canoniques ou des
+positions de caractères: le parseur les déduit du premier passage et des sources. Conservez les
+champs propres au mode à côté de evidence_spans. Les extraits illustratifs sont uniquement du
+matériel pédagogique. Même si la réponse est traduite, la preuve reste dans la langue montrée.
+
+EUR-LEX: COUVERTURE DES PREUVES
+Renvoyez exactement un passage pour CHAQUE unité de articles_involved: cible et chaque référence ou
+annexe fournie indispensable. Aucune source inutilisée ni version linguistique en double.
+source_ref est le simple numéro d'article pour le même acte, ou la clé Cite as exacte pour un autre
+acte ou toute annexe. Le passage principal peut venir d'une référence autorisée uniquement si la
+règle de la cible reste indispensable; justifiez celle-ci séparément. En source_finding, le premier
+passage vient de la cible. Chaque extrait reste dans sa propre unité, sans assemblage entre sources.
+
 Vous créez des questions de recherche conceptuelle à partir de la législation de l'Union européenne. La personne qui cherche connaît une question ou une activité réglementée, mais pas l'instrument applicable ni sa formulation exacte. Interrogez un problème expressément identifié par la disposition, une réponse ou un mécanisme juridique, ou la situation d'une partie concernée. Une question conceptuelle n'est pas intrinsèquement meilleure qu'une recherche factuelle précise ou qu'un cas pratique concret.
 
 SOURCE ET ÉLÉMENTS PROBANTS
@@ -23,7 +59,23 @@ Reformulez naturellement les mots ordinaires de la question, en conservant les t
 UTILITÉ ET SORTIE
 Privilégiez le contenu réglementaire substantiel. Écartez les simples dispositions de transposition, d'entrée en vigueur ou d'abrogation générale, ainsi que les clauses génériques de réexamen ou de sanction dépourvues de relation réglementaire informative. Une garantie concrète, une disposition transitoire ou un mécanisme d'exécution n'est pas une formule creuse du seul fait de son intitulé. Dans un article mixte, utilisez sa partie substantielle.
 Renvoyez jusqu'à trois questions distinctes ; une seule question solide suffit. N'imposez ni tous les cadrages ni un nombre fixe de candidats. Renvoyez uniquement du JSON valide :
-[{"question":"...","answer":"...","framing":"situation|response|stakeholder","anchor":"...","articles_involved":["..."]}]
+[{
+  "question": "...",
+  "answer": "...",
+  "framing": "situation|response|stakeholder",
+  "anchor": "...",
+  "articles_involved": [
+    "..."
+  ],
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "...",
+      "language": "fr",
+      "text": "..."
+    }
+  ]
+}]
 Choisissez une seule valeur effective de framing. anchor est une expression substantielle copiée exactement de la question. Les champs question_cited et particulars ne sont pas nécessaires. Si aucune question ne convient, renvoyez [{"skip_reason":"une courte raison"}].
 
 ILLUSTRATION (formulation inventée, non citation législative)

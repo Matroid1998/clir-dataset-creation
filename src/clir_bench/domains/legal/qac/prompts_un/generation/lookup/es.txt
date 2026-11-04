@@ -1,3 +1,37 @@
+EVIDENCE_CONTRACT: legal_evidence_spans_v1
+
+Idioma de salida: español. Las preguntas y anotaciones de texto libre van en español; las citas y los identificadores copiados conservan su forma original.
+
+PASAJES DE APOYO EXPLÍCITOS — OBLIGATORIOS EN TODOS LOS MODOS
+Devuelva evidence_spans como una lista ordenada de objetos con exactamente source_ref, language y
+text. El primer pasaje respalda directamente answer o, en source_finding, la pista sustantiva.
+Cada pasaje es UN extracto continuo mínimo y suficiente, copiado EXACTAMENTE del cuerpo de una
+fuente realmente proporcionada, en su idioma original. Conserve ortografía, espacios, puntuación,
+marcado y errores. Nunca traduzca la evidencia, una fragmentos separados, añada puntos suspensivos,
+copie metadatos ni cite contenido oculto por truncamiento. language indica el idioma de la versión
+citada, que no es necesariamente el idioma de la pregunta.
+Conserve toda condición, excepción, actor, modalidad y límite de alcance decisivos para la respuesta.
+No copie un artículo o documento completo en lugar de seleccionar los pasajes necesarios.
+Quite texto inicial o final prescindible y conserve el texto intermedio indispensable. No hay un
+límite fijo de tokens. Acote u omita la pregunta si no puede cumplir este contrato.
+Fije primero el pasaje primario. Salvo en source_finding, answer copia TODO su texto si se ha
+proporcionado una versión adecuada en el idioma de salida; answer_is_translation es false.
+En caso contrario traduzca fielmente TODO el pasaje al idioma solicitado y marque
+answer_is_translation como true. No resuma, calcule, agregue un veredicto ni cambie el alcance.
+En source_finding, answer conserva la identidad exacta del objetivo según las reglas del modo,
+answer_is_translation es false y el primer pasaje demuestra la pista en el cuerpo del objetivo.
+Devuelva answer_is_translation como booleano JSON en TODOS los modos. No devuelva los campos
+escalares evidence, evidence_language, evidence_is_translation, identificadores canónicos ni
+posiciones de caracteres: el analizador los deriva del primer pasaje y los datos fuente. Conserve
+los campos propios del modo junto a evidence_spans. Los extractos de los ejemplos son solo material
+didáctico. Aunque una respuesta ilustrativa se traduzca, la evidencia queda en el idioma mostrado.
+
+ONU: COBERTURA DE EVIDENCIA
+Devuelva exactamente un pasaje con source_ref="target", del cuerpo de TARGET BLOCK. Ni REFERENCED
+DOCUMENTS ni DOCUMENT CONTEXT pueden aportar evidencia. Identificar el documento no habilita sus
+otros bloques como evidencia. Conserve la calidad del hablante y el estado de la afirmación.
+Un bloque objetivo breve puede citarse entero solo si cada parte es necesaria; nunca lo sustituya por el documento completo.
+
 ACLARACIONES PRIORITARIAS — estas reglas sustituyen cualquier regla o ejemplo contrario que siga, sin cambiar el idioma de salida ni las claves JSON.
 La respuesta es un fragmento continuo del bloque objetivo que resuelve por completo la pregunta en su contexto. Conserve condiciones, excepciones, modalidad y atribución necesarias; se permiten varias cláusulas u oraciones adyacentes. El contexto y las referencias aclaran nombres, fechas y hablantes, pero nunca aportan contenido que falte en la respuesta.
 Una solicitud, recomendación, propuesta o conclusión atribuida puede ser útil: preserve su estado y su autor real. Un verbo de habla no basta para excluirla. No infiera obligaciones vinculantes, adopción ni ejecución ausentes del texto. Juzgue la proposición concreta, no un verbo aislado ni su importancia política. Un contenido recurrente identificado por su régimen y período puede servir; no exija novedades anuales ni suponga duplicados no vistos.
@@ -49,15 +83,57 @@ QUÉ PREGUNTAR — ocho categorías ("question_type"), en orden de prioridad, ca
 Las preguntas de sí o no son bienvenidas y frecuentes; su respuesta sigue siendo el segmento del bloque que resuelve la pregunta, nunca «sí» ni «no». Una ranura vacía («¿Qué debía examinarse...?», «¿Qué solicitó la Asamblea...?», sin ningún asunto nombrado) no es una pregunta.
 EJEMPLOS — casos canónicos correctos, en ambas formulaciones, con el texto del bloque del que proceden:
 Bloque objetivo: S/RES/918 (1994), aprobada el 17 de mayo de 1994: "3. Decide ampliar el mandato de la UNAMIR para incluir la protección de las personas desplazadas, los refugiados y los civiles en peligro en Rwanda ...; 4. Autoriza en este contexto una ampliación de los efectivos de la UNAMIR hasta 5,500 soldados;"
-✓ {"question": "¿Qué efectivos autorizó el Consejo de Seguridad para UNAMIR en la resolución del Consejo de Seguridad de mayo de 1994 que amplió su mandato?", "question_cited": "¿Qué efectivos autorizó el Consejo de Seguridad para UNAMIR en la resolución 918 (1994)?", "answer": "hasta 5,500 soldados", "question_type": "quantity_force_or_finance", "anchor": "UNAMIR"}
+✓ {
+  "question": "¿Qué efectivos autorizó el Consejo de Seguridad para UNAMIR en la resolución del Consejo de Seguridad de mayo de 1994 que amplió su mandato?",
+  "question_cited": "¿Qué efectivos autorizó el Consejo de Seguridad para UNAMIR en la resolución 918 (1994)?",
+  "answer": "hasta 5,500 soldados",
+  "question_type": "quantity_force_or_finance",
+  "anchor": "UNAMIR",
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "target",
+      "language": "es",
+      "text": "hasta 5,500 soldados"
+    }
+  ]
+}
   → Idénticas palabra por palabra fuera de la ranura; el órgano actúa, el instrumento localiza; la descripción contiene órgano + año + materia y distingue la resolución 918 entre las resoluciones sobre Rwanda de 1994; el anclaje queda fuera de la ranura.
 Bloque objetivo (del informe del Secretario General de finales de 2005 sobre la soberanía del Líbano, S/2005/673): "En su resolución 1559 (2004), el Consejo de Seguridad reiteró su llamamiento al respeto estricto de la soberanía del Líbano. Los requisitos establecidos en la resolución aún no se han cumplido plenamente." Referencia facilitada: S/RES/1559 (2004), que enumera los requisitos.
-✓ {"question": "¿Estaban plenamente satisfechos los requisitos sobre soberanía libanesa a finales de 2005 según el informe del Secretario General de finales de 2005 sobre soberanía libanesa?", "question_cited": "¿Estaban plenamente satisfechos los requisitos sobre soberanía libanesa a finales de 2005 según el informe del Secretario General S/2005/673?", "answer": "Los requisitos establecidos en la resolución aún no se han cumplido plenamente", "question_type": "finding_event_or_assessment", "anchor": "soberanía libanesa"}
+✓ {
+  "question": "¿Estaban plenamente satisfechos los requisitos sobre soberanía libanesa a finales de 2005 según el informe del Secretario General de finales de 2005 sobre soberanía libanesa?",
+  "question_cited": "¿Estaban plenamente satisfechos los requisitos sobre soberanía libanesa a finales de 2005 según el informe del Secretario General S/2005/673?",
+  "answer": "Los requisitos establecidos en la resolución aún no se han cumplido plenamente",
+  "question_type": "finding_event_or_assessment",
+  "anchor": "soberanía libanesa",
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "target",
+      "language": "es",
+      "text": "Los requisitos establecidos en la resolución aún no se han cumplido plenamente"
+    }
+  ]
+}
   → Pregunta de sí o no contestada por el segmento que la resuelve; se mantiene la atribución al cargo; el anclaje queda fuera de la ranura y sobrevive a la sustitución. La ranura localiza la fuente informante S/2005/673, no la resolución 1559 (2004), que no contiene la evaluación.
 ✗ «¿Qué requisitos de la resolución de 2004 sobre la soberanía del Líbano seguían incumplidos a finales de 2005?» → La lista figura solo en el documento referenciado; falla LA PRUEBA DEL BLOQUE. Descarta la pregunta.
 Bloque objetivo: A/60/758, nota verbal de fecha 4 de abril de 2006 dirigida a la Secretaría por la Misión Permanente de Francia ante las Naciones Unidas (candidatura de Francia al Consejo de Derechos Humanos): "Francia ha ratificado los principales instrumentos internacionales de derechos humanos y reconoce la competencia de los órganos de tratados para recibir denuncias individuales."
 ✗ Generada: «¿Qué competencia reconoció Francia a los órganos de tratados en la nota verbal de su Misión Permanente a la Secretaría de 2006 sobre la candidatura al Consejo de Derechos Humanos?» → Andamiaje de la respuesta: la pregunta es el segmento con el final recortado, y «qué competencia» no es una manera natural de preguntar. Reconstruida desde la necesidad — un analista que comprueba un compromiso de candidatura:
-✓ {"question": "¿Aceptó Francia en 2006 competencia de órganos de tratados de derechos humanos sobre denuncias individuales en su nota verbal del 4/4/2006 de candidatura al CDH?", "question_cited": "¿Aceptó Francia en 2006 competencia de órganos de tratados de derechos humanos sobre denuncias individuales en A/60/758?", "answer": "reconoce la competencia de los órganos de tratados para recibir denuncias individuales", "question_type": "actor_body_or_procedure", "anchor": "órganos de tratados de derechos humanos"}
+✓ {
+  "question": "¿Aceptó Francia en 2006 competencia de órganos de tratados de derechos humanos sobre denuncias individuales en su nota verbal del 4/4/2006 de candidatura al CDH?",
+  "question_cited": "¿Aceptó Francia en 2006 competencia de órganos de tratados de derechos humanos sobre denuncias individuales en A/60/758?",
+  "answer": "reconoce la competencia de los órganos de tratados para recibir denuncias individuales",
+  "question_type": "actor_body_or_procedure",
+  "anchor": "órganos de tratados de derechos humanos",
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "target",
+      "language": "es",
+      "text": "reconoce la competencia de los órganos de tratados para recibir denuncias individuales"
+    }
+  ]
+}
 FALLOS REALES DE EJECUCIONES ANTERIORES — nunca reproduzcas estos patrones:
 ✗ «¿Qué aniversario debía seguir conmemorando la Oficina del Alto Comisionado en 2011 según la resolución de la Asamblea General de 2011 sobre el derecho al desarrollo?» — respuesta «el vigésimo quinto aniversario de la Declaración sobre el Derecho al Desarrollo» → El segmento dice «Reafirma la solicitud ... de que continúe la conmemoración» (DESCALIFICADO); la serie es anual y el párrafo se repite; la respuesta es adivinable. Omite.
 ✗ «¿Sobre qué base debía preparar el Secretario General el proyecto de presupuesto por programas para 2014-2015 según la resolución de la Asamblea General de 2012 sobre planificación de programas?» — respuesta «las prioridades enunciadas más arriba y el marco estratégico aprobado en la presente resolución» → Respuesta deíctica; además, la serie bienal repite la cláusula cambiando únicamente el bienio. Omite.
@@ -80,7 +156,21 @@ AUTOVERIFICACIÓN de cada pregunta, en este orden:
 8. ¿Han superado la verificación menos de tres? Devuelve menos. ¿Ninguna? Devuelve la omisión.
 SALIDA (solo JSON válido, sin markdown): una lista de hasta TRES objetos:
 [
-  {"question": "...", "question_cited": "...", "answer": "...", "question_type": "...", "anchor": "..."}
+  {
+  "question": "...",
+  "question_cited": "...",
+  "answer": "...",
+  "question_type": "...",
+  "anchor": "...",
+  "answer_is_translation": false,
+  "evidence_spans": [
+    {
+      "source_ref": "target",
+      "language": "es",
+      "text": "..."
+    }
+  ]
+}
 ]
 Si ninguna pregunta supera todas las pruebas, devuelve exactamente: [{"skip_reason": "<one short phrase>"}]
 - answer: el segmento más corto que responde de forma completa y directa a la pregunta — en una pregunta de sí o no, el segmento más corto que la resuelve —, estrictamente basado en el bloque objetivo.
