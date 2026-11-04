@@ -1,18 +1,19 @@
-# Publish generated QAs and their related documents
+# Publish generated QAs and source corpora
 
 `clir publish generations` preserves every candidate from the specified runs, including all
 models, personas/modes, languages, answers, evidence, grading and provenance. It reads legal
 SQLite outcomes (not potentially stale CSV exports) and the explicitly listed chemistry CSVs.
 The input manifest excludes archive, retry and best-only files.
 
-Prepare one dataset per corpus:
+For a new release, prepare one dataset per corpus. Use `--corpus-scope full` for
+the retrieval corpus; the default `referenced` scope contains only QA-associated documents:
 
 ```bash
-clir publish generations --manifest docs/generation_export.json --corpora eurlex \
+clir publish generations --manifest docs/generation_export.json --corpora eurlex --corpus-scope full \
   --output data/hf_export/eurlex-generated-qa
-clir publish generations --manifest docs/generation_export.json --corpora un \
+clir publish generations --manifest docs/generation_export.json --corpora un --corpus-scope full \
   --output data/hf_export/un-generated-qa
-clir publish generations --manifest docs/generation_export.json --corpora chemistry \
+clir publish generations --manifest docs/generation_export.json --corpora chemistry --corpus-scope full \
   --output data/hf_export/chemistry-generated-qa
 ```
 
@@ -39,12 +40,36 @@ The JSON manifest's paths resolve relative to its `root`, which is relative to t
 file. List chemistry generator identities explicitly: those CSVs omit the generator model.
 `--corpora` selects one or more entries; omitting it combines all entries in a single dataset.
 
+## Expand an existing published corpus
+
+The original November 4 exports used `referenced` scope. Expand an existing repository
+without rewriting its published questions, answers, evidence or metadata:
+
+```bash
+clir publish expand-corpus \
+  --from-export data/hf_export/eurlex-generated-qa \
+  --manifest docs/generation_export.json --corpus eurlex \
+  --output data/hf_export/eurlex-generated-qa-full-20261104
+
+clir publish expand-corpus \
+  --from-export data/hf_export/eurlex-generated-qa \
+  --upload-from data/hf_export/eurlex-generated-qa-full-20261104 \
+  --repo MehdiAstaraki/eurlex-generated-qa
+```
+
+Preparation checks that all previously published source records remain identical and copies
+the existing QA, evidence and source-qrels shards byte for byte. If new language versions
+become available, their direct source associations are appended in separate qrels shards.
+The upload verifies the remote release against the original manifest and replaces the
+corpus in one commit, guarded against concurrent remote changes. Repository visibility is
+preserved. Only the selected repository is updated; each corpus is prepared/uploaded separately.
+
 ## Dataset contents
 
 | Configuration | Contents |
 | --- | --- |
 | `qas` (default) | Q&A, complete primary `document_text`, persona/mode, languages, generator, evidence, source IDs, scores, and complete original metadata |
-| `corpus` | Unique related documents and available/directly accepted translations, with original source metadata |
+| `corpus` | Complete selected local corpus with `full` scope, or related sources and translations with `referenced` scope |
 | `evidence` | Supporting text, its origin (`evidence` or `answer`), source ID, match status and exact-match character offsets |
 | `source_qrels` | Generation-derived source associations and direct translations, not chunk-level judgments |
 
@@ -88,11 +113,16 @@ languages are loaded even if the manifest omitted them. Missing sources, changed
 invalid offsets or incomplete multi-article coverage abort an export. Legacy rows keep their
 existing behavior and receive no automatic evidence backfill.
 
-This release includes **related documents**, not the complete retrieval haystack. EUR-Lex
-source units are whole articles; chemistry uses title plus abstract; UN reconstructs the whole
-document from its original aligned line range, including material omitted from generation
-blocks. UN block IDs and generation passages remain provenance. No 512-token chunks are made.
-`--corpus-scope full` optionally exports the full local corpora in the configured languages.
+Full scope includes the complete locally collected corpus selected by the manifest, not every
+document available upstream. The current EUR-Lex selection contains **340,833 article/annex
+language records**: 266,494 articles and 74,339 annexes in English, French, German and Spanish.
+These come from 14,580 acts processed from the original MultiEURLEX collection; they do not
+cover all 35,395 originally downloaded acts. The `unit_types` filter excludes recitals.
+
+Chemistry uses the complete local accepted-pair corpus of title/abstract records. UN
+reconstructs each whole document from its original aligned line range, including material
+omitted from generation blocks; the manifest selects all six available languages. UN block
+IDs and generation passages remain provenance. No 512-token chunks are made.
 
 The `train` split is a storage convention. Construct evaluation splits by source and related
 translations, across all generators, before training or evaluating. Keep provenance-derived

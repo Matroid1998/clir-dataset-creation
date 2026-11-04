@@ -8,6 +8,10 @@
         "data/legal/qac/generation_600_20261008_model_comparison/continuation_de_zh_50_20261012/eurlex/run.sqlite"
       ],
       "articles": "data/legal/eurlex/structure/articles.jsonl",
+      "unit_types": [
+        "article",
+        "annex"
+      ],
       "languages": [
         "en",
         "fr",
@@ -26,7 +30,9 @@
         "en",
         "fr",
         "es",
-        "zh"
+        "zh",
+        "ar",
+        "ru"
       ]
     },
     "chemistry": {

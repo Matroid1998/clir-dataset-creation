@@ -174,6 +174,38 @@ def test_corpus_selection_and_existing_output_protection(inputs, tmp_path):
     assert (output / "manifest.json").read_bytes() == before
 
 
+def test_full_corpus_includes_unrelated_articles_and_annexes_but_filters_recitals(
+    inputs, tmp_path
+):
+    manifest, _ = inputs
+    specification = json.loads(manifest.read_text())
+    specification["corpora"]["eurlex"]["unit_types"] = ["article", "annex"]
+    manifest.write_text(json.dumps(specification))
+    articles = tmp_path / "articles.jsonl"
+    with articles.open("a", encoding="utf-8") as handle:
+        for kind in ("annex", "recital"):
+            handle.write(
+                json.dumps(
+                    {
+                        "eli_id": f"eli/{kind}-1",
+                        "celex_id": "ACT",
+                        "language": "en",
+                        "unit_type": kind,
+                        "article_number": f"{kind}-1",
+                        "heading": kind,
+                        "text": f"Unrelated {kind} content",
+                    }
+                ) + "\n"
+            )
+    output = tmp_path / "full-export"
+    report = prepare(manifest, output, scope="full", corpora=["eurlex"])
+    corpus = read_config(output, "corpus")
+    assert report["configs"]["corpus"] == 7
+    assert any(row["source_id"] == "eli/article-3" for row in corpus)
+    assert any(row["unit_type"] == "annex" for row in corpus)
+    assert all(row["unit_type"] != "recital" for row in corpus)
+
+
 def test_un_uses_full_document_and_rejects_truncated_alignment(tmp_path):
     write_jsonl(
         tmp_path / "docs.jsonl",

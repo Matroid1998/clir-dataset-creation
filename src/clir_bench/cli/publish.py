@@ -77,6 +77,23 @@ def register(subparsers: argparse._SubParsersAction, context: AppContext | None)
     generations.add_argument("--public", action="store_true", help="Create a public repository")
     generations.set_defaults(handler=_generations, needs_domain=False)
 
+    expansion = sub.add_parser(
+        "expand-corpus",
+        help="Expand a published QA dataset to its full local source corpus",
+    )
+    expansion.add_argument(
+        "--from-export", type=Path, required=True,
+        help="Original published export, whose QA and evidence files are preserved",
+    )
+    expansion_inputs = expansion.add_mutually_exclusive_group(required=True)
+    expansion_inputs.add_argument("--manifest", type=Path, help="Full source input manifest")
+    expansion_inputs.add_argument("--upload-from", type=Path, help="Prepared expanded export")
+    expansion.add_argument("--corpus", choices=["eurlex", "un", "chemistry"])
+    expansion.add_argument("--output", type=Path, help="New local export directory")
+    expansion.add_argument("--push", action="store_true", help="Upload after preparing")
+    expansion.add_argument("--repo", help="Existing Hugging Face dataset repository")
+    expansion.set_defaults(handler=_expand_corpus, needs_domain=False)
+
 
 def _generations(args: argparse.Namespace, context: AppContext | None) -> int:
     import json
@@ -99,6 +116,33 @@ def _generations(args: argparse.Namespace, context: AppContext | None) -> int:
         print(f"Prepared dataset: {output}")
     if push:
         print(upload(output, args.repo, private=not args.public))
+    return 0
+
+
+def _expand_corpus(args: argparse.Namespace, context: AppContext | None) -> int:
+    import json
+
+    from clir_bench.publishing.corpus_expansion import expand_corpus
+    from clir_bench.publishing.corpus_update import upload_corpus_expansion
+
+    push = args.push or args.upload_from is not None
+    if push and not args.repo:
+        raise ValueError("upload requires --repo OWNER/DATASET")
+    if args.repo and not push:
+        raise ValueError("use --push to upload, or omit --repo to prepare locally")
+    if args.upload_from and (args.output or args.corpus):
+        raise ValueError("--upload-from cannot be combined with --output or --corpus")
+    if args.manifest and (not args.output or not args.corpus):
+        raise ValueError("preparation requires --output and --corpus")
+    output = args.upload_from or args.output
+    if args.manifest:
+        report = expand_corpus(args.from_export, args.manifest, output, corpus=args.corpus)
+        print(json.dumps(report, ensure_ascii=False, indent=2))
+        print(f"Prepared expanded dataset: {output}")
+    if push:
+        commit = upload_corpus_expansion(args.from_export, output, args.repo)
+        print(f"Published expanded corpus: https://huggingface.co/datasets/{args.repo}")
+        print(f"Revision: {commit.oid}")
     return 0
 
 

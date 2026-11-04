@@ -131,12 +131,15 @@ def source_row(corpus, source, parent, language, kind, title, text, metadata, pa
 
 def load_eurlex(index: SourceIndex, spec: dict, root: Path, wanted: set[str] | None):
     languages = set(spec["languages"])
+    unit_types = set(spec.get("unit_types", []))
     with (root / spec["articles"]).open(encoding="utf-8") as handle:
         for line in handle:
             raw = json.loads(line)
             source = raw.get("eli_id")
             key = f"{raw['celex_id']}:{raw['article_number']}"
             if not source or raw["language"] not in languages:
+                continue
+            if unit_types and raw["unit_type"] not in unit_types:
                 continue
             if wanted is not None and source not in wanted and key not in wanted:
                 continue
