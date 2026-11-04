@@ -57,6 +57,20 @@ clir publish expand-corpus \
   --repo MehdiAstaraki/eurlex-generated-qa
 ```
 
+For the UN document-type collection across all six languages:
+
+```bash
+clir publish expand-corpus \
+  --from-export data/hf_export/un-generated-qa \
+  --manifest docs/generation_export.json --corpus un \
+  --output data/hf_export/un-generated-qa-genres-20261104
+
+clir publish expand-corpus \
+  --from-export data/hf_export/un-generated-qa \
+  --upload-from data/hf_export/un-generated-qa-genres-20261104 \
+  --repo MehdiAstaraki/un-generated-qa
+```
+
 Preparation checks that all previously published source records remain identical and copies
 the existing QA, evidence and source-qrels shards byte for byte. If new language versions
 become available, their direct source associations are appended in separate qrels shards.
@@ -121,8 +135,16 @@ cover all 35,395 originally downloaded acts. The `unit_types` filter excludes re
 
 Chemistry uses the complete local accepted-pair corpus of title/abstract records. UN
 reconstructs each whole document from its original aligned line range, including material
-omitted from generation blocks; the manifest selects all six available languages. UN block
-IDs and generation passages remain provenance. No 512-token chunks are made.
+omitted from generation blocks. Its `document_genres` selection uses the generation pipeline's
+type classifier and excludes agenda stubs, journals and corrigenda. It includes **14,689 unique
+documents**: 6,572 resolutions/decisions, 6,971 meeting records and 1,146 letters/notes verbales.
+Across Arabic, English, Spanish, French, Russian and Chinese this produces **88,134 records**.
+It is the complete selected type collection, not all 86,307 documents in the six-way corpus.
+Generation-only passage-quality, context-length and reference-completeness restrictions do
+not limit this retrieval corpus. Omitting `document_genres` restores the unfiltered loader;
+an explicitly empty or invalid list is rejected.
+
+UN block IDs and generation passages remain provenance. No 512-token chunks are made.
 
 The `train` split is a storage convention. Construct evaluation splits by source and related
 translations, across all generators, before training or evaluating. Keep provenance-derived

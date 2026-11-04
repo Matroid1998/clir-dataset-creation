@@ -26,6 +26,11 @@
       ],
       "documents": "data/legal/un_parallel/blocks/docs_en.jsonl",
       "text_prefix": "data/legal/un_parallel/6way/UNv1.0.6way",
+      "document_genres": [
+        "resolution",
+        "meeting",
+        "letter"
+      ],
       "languages": [
         "en",
         "fr",

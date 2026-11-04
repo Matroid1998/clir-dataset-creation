@@ -196,6 +196,19 @@ def load_chemistry(index: SourceIndex, spec: dict, root: Path, wanted: set[str] 
 
 
 def load_un(index: SourceIndex, spec: dict, root: Path, wanted: set[str] | None):
+    genres = None
+    if "document_genres" in spec:
+        configured = spec["document_genres"]
+        if (
+            not isinstance(configured, list)
+            or not configured
+            or not all(isinstance(value, str) for value in configured)
+            or not set(configured) <= {"resolution", "meeting", "letter"}
+        ):
+            raise ValueError(
+                "UN document_genres must be a nonempty list of resolution, meeting, or letter"
+            )
+        genres = set(configured)
     with (root / spec["documents"]).open(encoding="utf-8") as handle:
         documents = sorted((json.loads(line) for line in handle), key=lambda d: d["line_start"])
     previous = 0
@@ -204,11 +217,25 @@ def load_un(index: SourceIndex, spec: dict, root: Path, wanted: set[str] | None)
         if start != previous + 1 or end < start or end - start + 1 != int(doc["n_lines"]):
             raise ValueError(f"invalid/gapped UN document range: {doc['doc_id']}")
         previous = end
+    eligible = None
+    if genres is not None:
+        from clir_bench.domains.legal.qac.un_batch import _excluded_doc, genre_for
+
+        # Only document classes constrain retrieval. Generation passage, context
+        # length and reference-completeness gates must not remove corpus documents.
+        eligible = {
+            doc["doc_id"]
+            for doc in documents
+            if not _excluded_doc(doc["doc_id"])
+            and genre_for(doc["doc_id"], doc.get("title", "")) in genres
+        }
     for language in spec["languages"]:
         path = root / f"{spec['text_prefix']}.{language}"
         with path.open(encoding="utf-8") as handle:
             for doc in documents:
-                include = wanted is None or doc["doc_id"] in wanted
+                include = (wanted is None or doc["doc_id"] in wanted) and (
+                    eligible is None or doc["doc_id"] in eligible
+                )
                 lines = []
                 for _ in range(int(doc["n_lines"])):
                     line = handle.readline()

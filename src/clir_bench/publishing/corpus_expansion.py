@@ -116,7 +116,9 @@ def _add_translation_qrels(old_output: Path, stage: Path, index: SourceIndex, co
     return writer.count
 
 
-def _expanded_card(old_card: str, counts: dict, corpus: str, languages: list[str]) -> str:
+def _expanded_card(
+    old_card: str, counts: dict, corpus: str, languages: list[str], source_spec: dict | None = None
+) -> str:
     if _REFERENCED_NOTE in old_card:
         card = old_card.replace(_REFERENCED_NOTE, _FULL_NOTE, 1)
     elif _FULL_NOTE in old_card:
@@ -139,6 +141,23 @@ def _expanded_card(old_card: str, counts: dict, corpus: str, languages: list[str
         card = re.sub(r"(?m)^Corpus languages: .*\.$", language_note, card)
     else:
         card = card.replace(_FULL_NOTE, _FULL_NOTE + "\n\n" + language_note, 1)
+    genres = (source_spec or {}).get("document_genres")
+    if corpus == "un" and genres:
+        names = {
+            "resolution": "resolutions and decisions",
+            "meeting": "meeting records",
+            "letter": "letters and notes verbales",
+        }
+        scope_note = (
+            "UN document selection: " + "; ".join(names[genre] for genre in genres) + ". "
+            "Uses the generation pipeline's document-type classifier and excludes agenda "
+            "stubs, journals and corrigenda. Includes whole documents regardless of "
+            "generation passage quality, context-length or reference-completeness limits. "
+            "This is the complete selected document-type collection, not every UN document "
+            "in the upstream six-way corpus."
+        )
+        card = re.sub(r"(?m)^UN document selection: .*\n?", "", card)
+        card = card.replace(language_note, language_note + "\n\n" + scope_note, 1)
     return card
 
 
@@ -213,6 +232,7 @@ def expand_corpus(old_output: Path, manifest_path: Path, output: Path, *, corpus
                 report["configs"],
                 corpus,
                 languages,
+                spec,
             ),
             encoding="utf-8",
         )
