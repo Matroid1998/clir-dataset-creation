@@ -78,6 +78,59 @@ The upload verifies the remote release against the original manifest and replace
 corpus in one commit, guarded against concurrent remote changes. Repository visibility is
 preserved. Only the selected repository is updated; each corpus is prepared/uploaded separately.
 
+## Add multilingual evidence to existing QAs
+
+The Terra alignment update adds fields to the existing `qas` configurations in
+`MehdiAstaraki/eurlex-generated-qa`, `MehdiAstaraki/un-generated-qa`, and
+`MehdiAstaraki/chemistry-generated-qa`. All **10,691 QAs** remain: 4,050 EUR-Lex,
+4,691 UN, and 1,950 chemistry rows. Original questions, answers, IDs, metadata,
+schema fields, and row order are preserved. The `corpus`, `source_qrels`, and
+legacy `evidence` configurations remain unchanged, as do the original scalar
+`evidence` and `evidence_language` fields.
+
+The authoritative new fields are native nested Parquet values:
+
+| Field | Meaning |
+| --- | --- |
+| `evidence_all_languages` | Five language keys (`en`, `de`, `es`, `fr`, `zh`), each containing a list of exact passages with `text`, source IDs, origin, validation status, and model/request provenance. Unavailable evidence is an empty list. |
+| `evidence_alignment_status` | Language-keyed status lists, including unsuccessful or uncertain alignments and their reasons. |
+| `evidence_alignment_eligibility` | Explains whether the QA had eligible exact source support or was excluded, for example because no source passage matched or its language label was quarantined. Excluded QAs remain present with empty evidence lists. |
+| `evidence_alignment_contract` | `cross_language_evidence_terra_v1`. |
+
+Original-language passages are labeled `source_exact`. Generated target passages
+remain **`pending_review`**: literal containment has been verified, but publication
+does not claim semantic equivalence or independent human review. The alignment
+adds no Arabic or Russian evidence; previously published corpus versions in those
+languages remain available.
+
+For passage text alone, `evidence_en`, `evidence_de`, `evidence_es`, `evidence_fr`,
+and `evidence_zh` are native lists of strings. Each repository also includes
+`exports/qa_evidence_readable.csv` with questions, answers, persona/mode, generator,
+and these language columns. In that CSV, one span is plain text, no span is an
+empty cell, and multiple spans form a JSON list. Passages are never joined into
+invented quotations or normalized for display.
+
+Preparation and upload use separate guarded helpers:
+
+- `clir_bench.publishing.alignment_update.prepare_alignment_update(...)` builds
+  the additive QA patch against an explicit original export, repository, and
+  immutable base revision. It validates QA identity and exact source quotations.
+- `clir_bench.publishing.alignment_upload.validate_alignment_patch(...)` verifies
+  local file hashes, original QA values/schema/order, and the allowed added fields.
+- `clir_bench.publishing.alignment_upload.upload_alignment_update(...)` verifies
+  the remote base revision, manifest, and original files, then commits only the
+  prepared QA additions, readable CSV, and release metadata. A guarded parent
+  commit prevents overwriting a concurrent remote change.
+
+The November 5 patches are staged under
+`data/hf_export/evidence-alignment-20261105/<corpus>-generated-qa/`. The staging
+root uses `local-validation.json` for local checks and `upload-receipts.json` for
+committed repository/revision records. Remote verification results are written to
+`remote-verification.json`; consult these records for the uploaded revisions and
+their verification state. Run inputs and durable alignment outputs remain under
+`data/evidence_alignment/terra-20261105/`; see
+[the alignment workflow](evidence_alignment_pilot.md) for generation and recovery.
+
 ## Dataset contents
 
 | Configuration | Contents |
