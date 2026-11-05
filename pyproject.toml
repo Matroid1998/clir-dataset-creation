@@ -16,6 +16,7 @@ dependencies = [
 # Heavy, source-specific and evaluation-only stacks are opt-in so a laptop never
 # has to install torch. The cluster runs `uv sync --extra eval`.
 [project.optional-dependencies]
+alignment = ["tiktoken>=0.14.0"]
 eval = [
     "mteb>=2.12.15",
     "pytrec-eval-terrier>=0.5.10",

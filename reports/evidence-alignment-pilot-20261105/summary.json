@@ -1,0 +1,677 @@
+{
+  "model": "gpt-6-luna",
+  "run": {
+    "api_model": "openai/gpt-6-luna",
+    "base_url": "https://openrouter.ai/api/v1",
+    "completed_alignments": 757,
+    "completed_at": "2026-11-05T19:00:06.580633+00:00",
+    "max_attempts": 3,
+    "max_output_tokens": 32768,
+    "model": "gpt-6-luna",
+    "model_catalog": {
+      "architecture": {
+        "input_modalities": [
+          "file",
+          "image",
+          "text"
+        ],
+        "instruct_type": null,
+        "modality": "text+image+file->text",
+        "output_modalities": [
+          "text"
+        ],
+        "tokenizer": "GPT"
+      },
+      "benchmarks": {
+        "artificial_analysis": {
+          "agentic_index": null,
+          "coding_index": null,
+          "intelligence_index": 27.9
+        },
+        "design_arena": []
+      },
+      "canonical_slug": "openai/gpt-6-luna-20260922",
+      "context_length": 1050000,
+      "created": 1790100786,
+      "default_parameters": {
+        "frequency_penalty": null,
+        "presence_penalty": null,
+        "repetition_penalty": null,
+        "temperature": null,
+        "top_k": null,
+        "top_p": null
+      },
+      "description": "GPT-6 Luna is the fast, cost-efficient model in OpenAI's GPT-6 series, positioned below GPT-6 Sol. It is suited for high-volume and latency-sensitive workloads such as chat, classification, and lightweight agentic...",
+      "endpoints": [
+        "/api/v1/chat/completions",
+        "/api/v1/completions",
+        "/api/v1/messages",
+        "/api/v1/responses"
+      ],
+      "expiration_date": null,
+      "hugging_face_id": null,
+      "id": "openai/gpt-6-luna",
+      "knowledge_cutoff": null,
+      "links": {
+        "details": "/api/v1/models/openai/gpt-6-luna-20260922/endpoints"
+      },
+      "name": "OpenAI: GPT-6 Luna",
+      "object": null,
+      "owned_by": null,
+      "per_request_limits": null,
+      "pricing": {
+        "completion": "0.0000005",
+        "input_cache_read": "0.00000001",
+        "input_cache_write": "0.000000125",
+        "overrides": [
+          {
+            "completion": "0.00000075",
+            "input_cache_read": "0.00000002",
+            "input_cache_write": "0.00000025",
+            "min_prompt_tokens": 272000,
+            "prompt": "0.0000002"
+          }
+        ],
+        "prompt": "0.0000001",
+        "web_search": "0.01"
+      },
+      "reasoning": {
+        "default_effort": "medium",
+        "default_enabled": true,
+        "mandatory": false,
+        "supported_efforts": [
+          "max",
+          "xhigh",
+          "high",
+          "medium",
+          "low",
+          "none"
+        ]
+      },
+      "supported_parameters": [
+        "include_reasoning",
+        "max_completion_tokens",
+        "max_tokens",
+        "reasoning",
+        "reasoning_effort",
+        "response_format",
+        "seed",
+        "structured_outputs",
+        "tool_choice",
+        "tools",
+        "verbosity"
+      ],
+      "supported_voices": null,
+      "top_provider": {
+        "context_length": 1050000,
+        "is_moderated": true,
+        "max_completion_tokens": 128000
+      }
+    },
+    "prompt_sha256": "dca44fedb4179aec8c2b38418ef41fe8d5e5ac5bf97e05b811c54a47a98a4dce",
+    "provider": "openrouter",
+    "reasoning_effort": "medium",
+    "started_at": "2026-11-05T18:54:34.564554+00:00",
+    "status": "completed",
+    "task_count": 92,
+    "tasks_sha256": "7a0115052671913f74508c6394d1e00ca422e5f120b1f00c4dac6a097e886296"
+  },
+  "assessment": {
+    "overall": {
+      "alignment_tasks": 757,
+      "first_attempt_statuses": {
+        "invalid": 10,
+        "matched": 726,
+        "uncertain": 6,
+        "not_found": 15
+      },
+      "first_attempt_exact_matches": 726,
+      "final_statuses": {
+        "matched": 734,
+        "uncertain": 6,
+        "invalid": 2,
+        "not_found": 15
+      },
+      "final_exact_matches": 734,
+      "proposed_matches": 736,
+      "reviews": {
+        "pass": 692,
+        "fail": 42,
+        "not_applicable": 23
+      },
+      "pending_reviews": 0,
+      "valid_matches": 692,
+      "semantic_precision": 0.9402173913043478,
+      "valid_coverage": 0.9141347424042272,
+      "gate": "failed"
+    },
+    "by_corpus": {
+      "chemistry": {
+        "alignment_tasks": 44,
+        "first_attempt_statuses": {
+          "matched": 35,
+          "not_found": 4,
+          "uncertain": 1,
+          "invalid": 4
+        },
+        "first_attempt_exact_matches": 35,
+        "final_statuses": {
+          "matched": 39,
+          "not_found": 4,
+          "uncertain": 1
+        },
+        "final_exact_matches": 39,
+        "proposed_matches": 39,
+        "reviews": {
+          "pass": 28,
+          "fail": 11,
+          "not_applicable": 5
+        },
+        "pending_reviews": 0,
+        "valid_matches": 28,
+        "semantic_precision": 0.717948717948718,
+        "valid_coverage": 0.6363636363636364,
+        "gate": "failed"
+      },
+      "eurlex": {
+        "alignment_tasks": 228,
+        "first_attempt_statuses": {
+          "invalid": 3,
+          "matched": 224,
+          "uncertain": 1
+        },
+        "first_attempt_exact_matches": 224,
+        "final_statuses": {
+          "matched": 226,
+          "uncertain": 1,
+          "invalid": 1
+        },
+        "final_exact_matches": 226,
+        "proposed_matches": 227,
+        "reviews": {
+          "pass": 216,
+          "fail": 10,
+          "not_applicable": 2
+        },
+        "pending_reviews": 0,
+        "valid_matches": 216,
+        "semantic_precision": 0.9515418502202643,
+        "valid_coverage": 0.9473684210526315,
+        "gate": "passed"
+      },
+      "un": {
+        "alignment_tasks": 485,
+        "first_attempt_statuses": {
+          "matched": 467,
+          "invalid": 3,
+          "not_found": 11,
+          "uncertain": 4
+        },
+        "first_attempt_exact_matches": 467,
+        "final_statuses": {
+          "matched": 469,
+          "not_found": 11,
+          "uncertain": 4,
+          "invalid": 1
+        },
+        "final_exact_matches": 469,
+        "proposed_matches": 470,
+        "reviews": {
+          "pass": 448,
+          "fail": 21,
+          "not_applicable": 16
+        },
+        "pending_reviews": 0,
+        "valid_matches": 448,
+        "semantic_precision": 0.9531914893617022,
+        "valid_coverage": 0.9237113402061856,
+        "gate": "passed"
+      }
+    },
+    "by_target_language": {
+      "chemistry": {
+        "de": {
+          "alignment_tasks": 8,
+          "first_attempt_statuses": {
+            "matched": 8
+          },
+          "first_attempt_exact_matches": 8,
+          "final_statuses": {
+            "matched": 8
+          },
+          "final_exact_matches": 8,
+          "proposed_matches": 8,
+          "reviews": {
+            "pass": 4,
+            "fail": 4
+          },
+          "pending_reviews": 0,
+          "valid_matches": 4,
+          "semantic_precision": 0.5,
+          "valid_coverage": 0.5,
+          "gate": "failed"
+        },
+        "en": {
+          "alignment_tasks": 12,
+          "first_attempt_statuses": {
+            "matched": 10,
+            "not_found": 2
+          },
+          "first_attempt_exact_matches": 10,
+          "final_statuses": {
+            "matched": 10,
+            "not_found": 2
+          },
+          "final_exact_matches": 10,
+          "proposed_matches": 10,
+          "reviews": {
+            "pass": 9,
+            "fail": 1,
+            "not_applicable": 2
+          },
+          "pending_reviews": 0,
+          "valid_matches": 9,
+          "semantic_precision": 0.9,
+          "valid_coverage": 0.75,
+          "gate": "failed"
+        },
+        "fr": {
+          "alignment_tasks": 20,
+          "first_attempt_statuses": {
+            "matched": 13,
+            "not_found": 2,
+            "uncertain": 1,
+            "invalid": 4
+          },
+          "first_attempt_exact_matches": 13,
+          "final_statuses": {
+            "matched": 17,
+            "not_found": 2,
+            "uncertain": 1
+          },
+          "final_exact_matches": 17,
+          "proposed_matches": 17,
+          "reviews": {
+            "pass": 12,
+            "fail": 5,
+            "not_applicable": 3
+          },
+          "pending_reviews": 0,
+          "valid_matches": 12,
+          "semantic_precision": 0.7058823529411765,
+          "valid_coverage": 0.6,
+          "gate": "failed"
+        },
+        "zh": {
+          "alignment_tasks": 4,
+          "first_attempt_statuses": {
+            "matched": 4
+          },
+          "first_attempt_exact_matches": 4,
+          "final_statuses": {
+            "matched": 4
+          },
+          "final_exact_matches": 4,
+          "proposed_matches": 4,
+          "reviews": {
+            "pass": 3,
+            "fail": 1
+          },
+          "pending_reviews": 0,
+          "valid_matches": 3,
+          "semantic_precision": 0.75,
+          "valid_coverage": 0.75,
+          "gate": "failed"
+        }
+      },
+      "eurlex": {
+        "de": {
+          "alignment_tasks": 65,
+          "first_attempt_statuses": {
+            "invalid": 2,
+            "matched": 63
+          },
+          "first_attempt_exact_matches": 63,
+          "final_statuses": {
+            "matched": 65
+          },
+          "final_exact_matches": 65,
+          "proposed_matches": 65,
+          "reviews": {
+            "pass": 61,
+            "fail": 4
+          },
+          "pending_reviews": 0,
+          "valid_matches": 61,
+          "semantic_precision": 0.9384615384615385,
+          "valid_coverage": 0.9384615384615385,
+          "gate": "failed"
+        },
+        "en": {
+          "alignment_tasks": 54,
+          "first_attempt_statuses": {
+            "matched": 54
+          },
+          "first_attempt_exact_matches": 54,
+          "final_statuses": {
+            "matched": 54
+          },
+          "final_exact_matches": 54,
+          "proposed_matches": 54,
+          "reviews": {
+            "pass": 51,
+            "fail": 3
+          },
+          "pending_reviews": 0,
+          "valid_matches": 51,
+          "semantic_precision": 0.9444444444444444,
+          "valid_coverage": 0.9444444444444444,
+          "gate": "failed"
+        },
+        "es": {
+          "alignment_tasks": 50,
+          "first_attempt_statuses": {
+            "matched": 50
+          },
+          "first_attempt_exact_matches": 50,
+          "final_statuses": {
+            "matched": 50
+          },
+          "final_exact_matches": 50,
+          "proposed_matches": 50,
+          "reviews": {
+            "pass": 48,
+            "fail": 2
+          },
+          "pending_reviews": 0,
+          "valid_matches": 48,
+          "semantic_precision": 0.96,
+          "valid_coverage": 0.96,
+          "gate": "passed"
+        },
+        "fr": {
+          "alignment_tasks": 59,
+          "first_attempt_statuses": {
+            "matched": 57,
+            "uncertain": 1,
+            "invalid": 1
+          },
+          "first_attempt_exact_matches": 57,
+          "final_statuses": {
+            "matched": 57,
+            "uncertain": 1,
+            "invalid": 1
+          },
+          "final_exact_matches": 57,
+          "proposed_matches": 58,
+          "reviews": {
+            "pass": 56,
+            "fail": 1,
+            "not_applicable": 2
+          },
+          "pending_reviews": 0,
+          "valid_matches": 56,
+          "semantic_precision": 0.9655172413793104,
+          "valid_coverage": 0.9491525423728814,
+          "gate": "passed"
+        }
+      },
+      "un": {
+        "ar": {
+          "alignment_tasks": 97,
+          "first_attempt_statuses": {
+            "matched": 96,
+            "not_found": 1
+          },
+          "first_attempt_exact_matches": 96,
+          "final_statuses": {
+            "matched": 96,
+            "not_found": 1
+          },
+          "final_exact_matches": 96,
+          "proposed_matches": 96,
+          "reviews": {
+            "pass": 89,
+            "fail": 7,
+            "not_applicable": 1
+          },
+          "pending_reviews": 0,
+          "valid_matches": 89,
+          "semantic_precision": 0.9270833333333334,
+          "valid_coverage": 0.9175257731958762,
+          "gate": "failed"
+        },
+        "en": {
+          "alignment_tasks": 63,
+          "first_attempt_statuses": {
+            "matched": 61,
+            "invalid": 1,
+            "not_found": 1
+          },
+          "first_attempt_exact_matches": 61,
+          "final_statuses": {
+            "matched": 62,
+            "not_found": 1
+          },
+          "final_exact_matches": 62,
+          "proposed_matches": 62,
+          "reviews": {
+            "pass": 57,
+            "fail": 5,
+            "not_applicable": 1
+          },
+          "pending_reviews": 0,
+          "valid_matches": 57,
+          "semantic_precision": 0.9193548387096774,
+          "valid_coverage": 0.9047619047619048,
+          "gate": "failed"
+        },
+        "es": {
+          "alignment_tasks": 76,
+          "first_attempt_statuses": {
+            "matched": 72,
+            "not_found": 4
+          },
+          "first_attempt_exact_matches": 72,
+          "final_statuses": {
+            "matched": 72,
+            "not_found": 4
+          },
+          "final_exact_matches": 72,
+          "proposed_matches": 72,
+          "reviews": {
+            "pass": 68,
+            "fail": 4,
+            "not_applicable": 4
+          },
+          "pending_reviews": 0,
+          "valid_matches": 68,
+          "semantic_precision": 0.9444444444444444,
+          "valid_coverage": 0.8947368421052632,
+          "gate": "failed"
+        },
+        "fr": {
+          "alignment_tasks": 89,
+          "first_attempt_statuses": {
+            "matched": 80,
+            "not_found": 3,
+            "uncertain": 4,
+            "invalid": 2
+          },
+          "first_attempt_exact_matches": 80,
+          "final_statuses": {
+            "matched": 81,
+            "not_found": 3,
+            "uncertain": 4,
+            "invalid": 1
+          },
+          "final_exact_matches": 81,
+          "proposed_matches": 82,
+          "reviews": {
+            "pass": 81,
+            "not_applicable": 8
+          },
+          "pending_reviews": 0,
+          "valid_matches": 81,
+          "semantic_precision": 0.9878048780487805,
+          "valid_coverage": 0.9101123595505618,
+          "gate": "passed"
+        },
+        "ru": {
+          "alignment_tasks": 97,
+          "first_attempt_statuses": {
+            "matched": 96,
+            "not_found": 1
+          },
+          "first_attempt_exact_matches": 96,
+          "final_statuses": {
+            "matched": 96,
+            "not_found": 1
+          },
+          "final_exact_matches": 96,
+          "proposed_matches": 96,
+          "reviews": {
+            "pass": 92,
+            "fail": 4,
+            "not_applicable": 1
+          },
+          "pending_reviews": 0,
+          "valid_matches": 92,
+          "semantic_precision": 0.9583333333333334,
+          "valid_coverage": 0.9484536082474226,
+          "gate": "passed"
+        },
+        "zh": {
+          "alignment_tasks": 63,
+          "first_attempt_statuses": {
+            "matched": 62,
+            "not_found": 1
+          },
+          "first_attempt_exact_matches": 62,
+          "final_statuses": {
+            "matched": 62,
+            "not_found": 1
+          },
+          "final_exact_matches": 62,
+          "proposed_matches": 62,
+          "reviews": {
+            "pass": 61,
+            "fail": 1,
+            "not_applicable": 1
+          },
+          "pending_reviews": 0,
+          "valid_matches": 61,
+          "semantic_precision": 0.9838709677419355,
+          "valid_coverage": 0.9682539682539683,
+          "gate": "passed"
+        }
+      }
+    }
+  },
+  "pilot_cost": {
+    "recorded_attempts": 121,
+    "attempts_with_usage": 121,
+    "attempts_without_usage": [],
+    "rejected_before_generation": [],
+    "recorded_usage_complete": true,
+    "complete": false,
+    "known_usd": 0.13154233,
+    "recorded_total_usd": 0.13154233,
+    "total_usd": null,
+    "provider_reported_usd": 0.13154233,
+    "provider_reported_attempts": 121,
+    "rate_calculated_usd": 0.13154233,
+    "cost_basis": "Provider-reported usage.cost where present; token-rate calculation otherwise.",
+    "input_tokens": 526763,
+    "output_tokens": 149215,
+    "cached_input_tokens": 76748,
+    "cache_write_tokens": 446634,
+    "billing_incidents": [
+      {
+        "billing_unknown": true,
+        "projection_policy": "Include all recorded costs in pilot spend; exclude later duplicate attempts after first valid response from recurring full-run cost.",
+        "reason": "Stopped the worker process to fix handling of OpenRouter reasoning output items with content:null. Saved raw responses are intact and replayed with the corrected parser.",
+        "recorded_response_attempts_at_stop": 34,
+        "time": "2026-11-05T18:54:29.435820+00:00",
+        "type": "interrupted_run",
+        "unrecorded_requests_upper_bound": 3
+      }
+    ],
+    "unrecorded_requests_upper_bound": 3,
+    "unrecorded_cost_allowance_usd": 0.055549499999999995,
+    "recorded_plus_allowance_usd": 0.18709183000000001,
+    "allowance_assumption": "At most the recorded incident request count, each using the largest observed/estimated input, all cache-write input, and the full 32,768 output-token limit. This is an allowance, not a verified billing bound."
+  },
+  "full_workload_estimate": {
+    "status": "estimated",
+    "currency": "USD",
+    "by_corpus": {
+      "eurlex": {
+        "request_groups": 582,
+        "alignment_tasks": 4134,
+        "input_tokens": 950520,
+        "estimated_output_tokens": 658724.9880952383,
+        "standard_usd": 0.46021661904761857,
+        "conservative_usd": 0.5908004092261907,
+        "stratum_fallbacks": {
+          "4": 582
+        },
+        "batch_usd": 0.23010830952380928,
+        "conservative_batch_usd": 0.29540020461309535
+      },
+      "un": {
+        "request_groups": 1230,
+        "alignment_tasks": 12755,
+        "input_tokens": 8689876,
+        "estimated_output_tokens": 2004082.601455734,
+        "standard_usd": 2.1743401757278673,
+        "conservative_usd": 2.858167282159831,
+        "stratum_fallbacks": {
+          "4": 1230
+        },
+        "batch_usd": 1.0871700878639337,
+        "conservative_batch_usd": 1.4290836410799155
+      },
+      "chemistry": {
+        "request_groups": 212,
+        "alignment_tasks": 1068,
+        "input_tokens": 575069,
+        "estimated_output_tokens": 438136.04583333334,
+        "standard_usd": 0.29781514791666663,
+        "conservative_usd": 0.3815766692708331,
+        "stratum_fallbacks": {
+          "4": 169,
+          "2": 14,
+          "1": 29
+        },
+        "batch_usd": 0.14890757395833332,
+        "conservative_batch_usd": 0.19078833463541656
+      }
+    },
+    "standard_usd": 2.9323719426921526,
+    "conservative_usd": 3.8305443606568548,
+    "batch_usd": 1.4661859713460763,
+    "conservative_batch_usd": 1.9152721803284274,
+    "input_count_methods": {
+      "calibrated_local_tokenizer": 1932,
+      "observed_provider_usage": 92
+    },
+    "input_counts_approximate": true,
+    "excluded_post_success_attempts_from_projection": 21,
+    "method": "Full-request input counts (approximate where calibrated_local_tokenizer is recorded); pilot output tokens per anchor including protocol retries through the first valid response; pilot attempt counts per group. Strata: corpus/source/target/genre, then corpus/source/target, corpus/target, corpus. All input is priced at the cache-write rate ($0.125/M), with no assumed cache-read savings, matching first-call billing. Conservative estimate adds 25% to measured output and retry-adjusted input, plus 10% input allowance for calibrated counts (a heuristic, not a confidence interval). Duplicate calls after the first valid raw response are excluded from projection only; actual spending includes them.",
+    "quality_gate": "failed",
+    "rollout_approved": false
+  },
+  "rates_usd_per_million": {
+    "input": 0.1,
+    "cached_input": 0.01,
+    "cache_write": 0.125,
+    "output": 0.5
+  },
+  "pricing_source": "https://developers.openai.com/api/docs/models/gpt-6-luna",
+  "criteria": {
+    "semantic_precision": 0.95,
+    "valid_coverage_per_corpus": 0.9,
+    "retained_quotes_exact_and_reviewed": true
+  }
+}
