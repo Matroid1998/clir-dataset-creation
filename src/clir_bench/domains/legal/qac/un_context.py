@@ -75,8 +75,8 @@ class BlockUnit:
     title: str
     block_index: int
     n_blocks: int
-    line_start: int | None
-    line_end: int | None
+    line_start: int
+    line_end: int
     token_count: int
     in_range: bool
     usable: bool = True
@@ -85,7 +85,6 @@ class BlockUnit:
     part_id: str = ""
     part_label: str = ""
     texts: dict[str, str] = field(default_factory=dict)
-    source_locations: dict[str, dict] = field(default_factory=dict)
 
     @classmethod
     def from_row(cls, row: dict) -> BlockUnit:
@@ -93,13 +92,12 @@ class BlockUnit:
             block_id=row["block_id"], doc_id=row["doc_id"],
             symbol=row.get("symbol", row["doc_id"]), title=row.get("title", ""),
             block_index=row["block_index"], n_blocks=row["n_blocks"],
-            line_start=row.get("line_start"), line_end=row.get("line_end"),
+            line_start=row["line_start"], line_end=row["line_end"],
             token_count=row["token_count"], in_range=row.get("in_range", True),
             usable=row.get("usable", True), heading=row.get("heading", ""),
             part=row.get("part", "body"), part_id=row.get("part_id", ""),
             part_label=row.get("part_label", ""),
-            texts=dict(row.get("texts") or {"en": row["text"]}),
-            source_locations=dict(row.get("source_locations") or {}),
+            texts={"en": row["text"]},
         )
 
 
@@ -131,7 +129,6 @@ class GenerationPayload:
     dropped_references: list[str]       # resolved but beyond the cap
     text: str
     evidence_sources: dict[tuple[str, str], EvidenceSource] = field(default_factory=dict)
-    document_contexts: dict[str, str] = field(default_factory=dict)
 
 
 class BlockIndex:
@@ -272,8 +269,7 @@ class BlockIndex:
             return None
 
         citations = refs.resolve_citations(
-            refs.extract_citations(target.texts["en"], doc_id=doc_id,
-                                   symbol=target.symbol),
+            refs.extract_citations(target.texts["en"], doc_id=doc_id),
             self.symbols, citing_doc_id=doc_id)
         refs.resolve_external_annexes(
             citations, lambda d: self.docs.get(d, {}).get("annexes", []))
@@ -367,19 +363,10 @@ class BlockIndex:
 
 
 def visible_evidence_sources(target, languages):
-    sources = {}
-    for language in languages:
-        if not target.texts.get(language):
-            continue
-        loc = target.source_locations.get(language)
-        location = ({"location_kind": "document_chars", "block_document_start": loc["start"],
-                     "block_document_end": loc["end"],
-                     "document_text_sha256": loc["document_sha256"]} if loc else {})
-        sources["target", language] = EvidenceSource(
-            "target", target.block_id, language, target.texts[language], target.texts[language],
-            "block", doc_id=target.doc_id, line_start=target.line_start, line_end=target.line_end,
-            **location)
-    return sources
+    return {("target", language): EvidenceSource(
+        "target", target.block_id, language, target.texts[language], target.texts[language],
+        "block", doc_id=target.doc_id, line_start=target.line_start, line_end=target.line_end,
+    ) for language in languages if target.texts.get(language)}
 
 
 def _select_context(blocks: list[BlockUnit], target_index: int,
@@ -449,8 +436,7 @@ def unit_source(unit: BlockUnit, language: str) -> str:
 
 def render_payload(target: BlockUnit, context_blocks: list[BlockUnit], *,
                    references: list[ReferencedDoc] = (),
-                   languages: tuple[str, ...] = ("en",),
-                   document_contexts: dict[str, str] | None = None) -> str:
+                   languages: tuple[str, ...] = ("en",)) -> str:
     """The user message: target block, referenced documents, then the document
     context, clearly separated -- the literal ``###`` markers are the contract
     pinned by the ``prompts_un`` pack.
@@ -480,14 +466,6 @@ def render_payload(target: BlockUnit, context_blocks: list[BlockUnit], *,
                                  f"{r.title}{anchor}\n{body}")
     else:
         parts.append(REFERENCES_NONE)
-
-    if document_contexts:
-        parts.append(CONTEXT_HEADER)
-        for language in present:
-            if language in document_contexts:
-                parts.append(f"[{language.upper()}] Document {target.symbol} — surrounding passages\n"
-                             + document_contexts[language])
-        return "\n\n".join(parts)
 
     if not context_blocks:
         parts.append(CONTEXT_NONE)

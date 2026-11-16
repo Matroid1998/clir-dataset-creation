@@ -310,8 +310,7 @@ def is_resolution_doc(doc_id: str | None) -> bool:
     """Resolutions and decisions carry their own operative numbering; a bare
     "paragraph 5" inside one names that numbering. Anywhere else it usually
     names the document under discussion."""
-    key = (doc_id or "").lower()
-    return "/res/" in key or "/dec/" in key
+    return bool(doc_id) and ("/res/" in doc_id or "/dec/" in doc_id)
 
 
 def _organ_hint(text: str, start: int) -> str | None:
@@ -354,8 +353,7 @@ def _own_heading_line(text: str, start: int, end: int) -> bool:
     return not tail.strip()
 
 
-def extract_citations(text: str, *, doc_id: str | None = None,
-                      symbol: str | None = None) -> list[Citation]:
+def extract_citations(text: str, *, doc_id: str | None = None) -> list[Citation]:
     """Pure regex pass over one block's text. ``doc_id`` (the citing document)
     only decides whether a bare "paragraph N" may be treated as internal."""
     citations: list[Citation] = []
@@ -547,7 +545,7 @@ def extract_citations(text: str, *, doc_id: str | None = None,
                 start=m.start(), end=m.end(), raw=m.group(0), kind=KIND_PARA_OTHER,
                 scope=SCOPE_UNMODELLED, numbers=numbers,
                 reason="paragraph_of_other_recorded"))
-        elif is_resolution_doc(symbol or doc_id):
+        elif is_resolution_doc(doc_id):
             citations.append(Citation(
                 start=m.start(), end=m.end(), raw=m.group(0), kind=KIND_INTERNAL_PARA,
                 scope=SCOPE_INTERNAL, numbers=numbers))

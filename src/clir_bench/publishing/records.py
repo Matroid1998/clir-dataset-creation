@@ -10,7 +10,7 @@ from pathlib import Path
 
 import pyarrow as pa
 
-from .evidence import SPAN_TYPE, align_spans, saved_spans, validate_un_dataset_identity
+from .evidence import SPAN_TYPE, align_spans, saved_spans
 
 
 def dumps(value) -> str:
@@ -195,8 +195,6 @@ def normalize(corpus: str, raw: dict, provenance: dict, index) -> dict:
             document = index.get(unit_id(corpus, source, language))
     if document is None:
         raise ValueError(f"missing source for {corpus}: {source} ({language})")
-    if corpus == "un":
-        validate_un_dataset_identity(raw, document)
     model = raw.get("generator_model_id") or provenance.get("model")
     if not model or not raw.get("question", "").strip():
         raise ValueError(f"missing model or question in {provenance}")

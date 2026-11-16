@@ -128,27 +128,7 @@ def _joined_metadata(records):
             if key not in seen:
                 targets.append(entry)
                 seen.add(key)
-    config = dict(present[0].get("config", {}))
-    for key in ("un_dataset", "un_dataset_identity"):
-        values = [record["config"][key] for record in present if record.get("config", {}).get(key)]
-        if values:
-            if any(value != values[0] for value in values[1:]):
-                raise ValueError("input runs disagree on the UN dataset identity")
-            config[key] = values[0]
-    return dict(present[0], targets=targets, config=config)
-
-
-def _un_csv_identity(rows):
-    if any(str(row.get("document_id") or row.get("doc_id") or row.get("target_id") or "").startswith("uprprc:")
-           and not row.get("un_dataset_identity") for row in rows):
-        raise ValueError("UPRPRC input rows require a pinned UN dataset identity")
-    identities = {row["un_dataset_identity"] for row in rows if row.get("un_dataset_identity")}
-    if len(identities) > 1:
-        # Normalize JSON whitespace before comparing independent exports.
-        identities = {json.dumps(json.loads(value), sort_keys=True) for value in identities}
-    if len(identities) > 1:
-        raise ValueError("input rows disagree on the UN dataset identity")
-    return json.loads(next(iter(identities))) if identities else None
+    return dict(present[0], targets=targets)
 
 
 def _target_metadata(path, sources):
@@ -179,13 +159,7 @@ def _target_metadata(path, sources):
             if hashes:
                 entry["payload_sha256"] = next(iter(hashes))
             targets.append(entry)
-        identity = _un_csv_identity(rows)
-        config = dict(record.get("config", {}))
-        if identity:
-            if config.get("un_dataset_identity") and config["un_dataset_identity"] != identity:
-                raise ValueError("input UN dataset differs from its parent run")
-            config.update(un_dataset=identity["manifest_path"], un_dataset_identity=identity)
-        return dict(record, targets=targets, config=config)
+        return dict(record, targets=targets)
 
     path = Path(path)
     if path.is_file() or (path / "run.sqlite").is_file() or (path / "results.csv").is_file():
@@ -222,13 +196,6 @@ def _options(args, context, saved=None, *, operation="generate"):
                 "langs": None, "modes": None, "decider_model": None}
     options = {key: getattr(args, key, None) if getattr(args, key, None) is not None
                else old.get(key, default) for key, default in defaults.items()}
-    un_dataset = getattr(args, "un_dataset", None) or old.get("un_dataset")
-    if un_dataset:
-        options["un_dataset"] = str(Path(un_dataset).expanduser().resolve())
-        if old.get("un_dataset") and options["un_dataset"] != str(Path(old["un_dataset"]).resolve()):
-            raise ValueError("saved UN dataset cannot change during resume, regrade, or target replay")
-        if old.get("un_dataset_identity"):
-            options["un_dataset_identity"] = old["un_dataset_identity"]
     initial_counts = getattr(args, "persona_initial_counts", None)
     if initial_counts is None:
         initial_counts = old.get("persona_initial_counts")
@@ -269,7 +236,7 @@ def _options(args, context, saved=None, *, operation="generate"):
     return options
 
 
-def _indexes(sources, supplied=None, *, context=None, options=None):
+def _indexes(sources, supplied=None, *, context=None):
     batches = _batches()
     indexes = {}
     for source in sources:
@@ -281,9 +248,6 @@ def _indexes(sources, supplied=None, *, context=None, options=None):
                 articles_path=directory / "articles.jsonl", edges_path=directory / "internal_edges.jsonl",
                 external_edges_path=directory / "external_edges.jsonl", status_path=directory / "reference_status.jsonl",
                 quarantine_path=directory / "quarantine.jsonl")
-        elif (options or {}).get("un_dataset"):
-            from clir_bench.domains.legal.un.uprprc_index import UPRPRCIndex
-            indexes[source] = UPRPRCIndex(options["un_dataset"])
         else:
             directory = context.workspace.data("un_blocks")
             indexes[source] = batches[source].ctx.BlockIndex(
@@ -292,27 +256,13 @@ def _indexes(sources, supplied=None, *, context=None, options=None):
     return indexes
 
 
-def _pin_un_dataset(options, indexes):
-    index = indexes.get("un")
-    identity = getattr(index, "identity", None)
-    if options.get("un_dataset") and index is not None and not identity:
-        raise ValueError("--un-dataset requires the manifest-backed UN index")
-    if identity:
-        if options.get("un_dataset_identity") and options["un_dataset_identity"] != identity:
-            raise ValueError("UN dataset source identity changed; use the original frozen dataset")
-        options["un_dataset"] = identity["manifest_path"]
-        options["un_dataset_identity"] = identity
-
-
 def _select(sources, indexes, options):
     batches, selections = _batches(), []
     for position, source in enumerate(sources):
         batch = batches[source]
         languages = options["langs"] or (["en", "fr", "de", "es"] if source == "eurlex" else ["en", "fr", "es", "zh"])
         modes = (["lookup"] if options.get("decider_model") else options["modes"]
-                 or (batch.gen.DEFAULT_MODES if source == "eurlex" else
-                     ("lookup", "conceptual", "practitioners")
-                     if getattr(indexes[source], "identity", None) else batch.DEFAULT_MODES))
+                 or (batch.gen.DEFAULT_MODES if source == "eurlex" else batch.DEFAULT_MODES))
         supported_langs = batch.ACT_LANGUAGES if source == "eurlex" else batch.UN_LANGUAGES
         supported_modes = batch.gen.MODES if source == "eurlex" else batch.SUPPORTED_MODES
         # Mixed-source selections may name the union of their supported personas/languages.
@@ -360,9 +310,6 @@ def _prepare(selections, indexes, options, operation):
             raise ValueError(f"target cannot be reconstructed: {entry['target']}")
         if hasattr(payload, "target") and not payload.target.texts.get(target.language):
             raise ValueError(f"target has no source text in {target.language}: {entry['target']}")
-        if source == "un" and getattr(indexes[source], "identity", None) and (
-                target.block_id != payload.target.block_id or target.n_blocks != payload.target.n_blocks):
-            raise ValueError("saved UN target identity differs from its prepared block")
         digest = _digest(payload.text.encode())
         if entry.get("payload_sha256") and digest != entry["payload_sha256"]:
             raise ValueError(f"source payload changed: {entry['target']}")
@@ -404,8 +351,7 @@ def generate(args, context, *, selections=None, supplied_indexes=None):
     saved = _joined_metadata(location[2] for location in locations.values())
     origin = _target_metadata(args.targets_from, sources) if getattr(args, "targets_from", None) else saved
     inherited = {key: value for key, value in origin.get("config", {}).items()
-                 if key in ("max_references", "context_chars", "reference_chars", "seed",
-                            "un_dataset", "un_dataset_identity")}
+                 if key in ("max_references", "context_chars", "reference_chars", "seed")}
     options = _options(args, context, saved or {"config": inherited})
     if selections is None:
         selections = [entry for entry in origin.get("targets", []) if entry["corpus"] in sources] or None
@@ -426,9 +372,7 @@ def generate(args, context, *, selections=None, supplied_indexes=None):
             requested_count = getattr(args, "questions", None)
             if requested_count is not None and requested_count != len(selections):
                 raise ValueError("--questions differs from the saved target count")
-    indexes = (_indexes(sources, supplied_indexes, context=context, options=options)
-               if options.get("un_dataset") else _indexes(sources, supplied_indexes, context=context))
-    _pin_un_dataset(options, indexes)
+    indexes = _indexes(sources, supplied_indexes, context=context)
     selections = selections if selections is not None else _select(sources, indexes, options)
     if options.get("decider_model"):
         # A fixed-mode comparison plan can contain the same target several times.
@@ -490,11 +434,6 @@ def regrade(args, context):
     # default. A resumed regrade must retain its own saved verifier instead.
     inherited = {key: value for key, value in parent.get("config", {}).items()
                  if key != "verifier_model"}
-    identity = _un_csv_identity(rows)
-    if identity:
-        if inherited.get("un_dataset_identity") and inherited["un_dataset_identity"] != identity:
-            raise ValueError("input UN dataset differs from its parent run")
-        inherited.update(un_dataset=identity["manifest_path"], un_dataset_identity=identity)
     options = _options(args, context, saved or {"config": inherited}, operation="regrade")
     batches, groups = _batches(), defaultdict(list)
     selected_sources = getattr(args, "source", None)
@@ -538,9 +477,7 @@ def regrade(args, context):
             if previous.get("payload_sha256") and previous["payload_sha256"] not in hashes:
                 raise ValueError("different generators received different source payloads")
             previous["payload_sha256"] = next(iter(hashes))
-    indexes = (_indexes(sources, context=context, options=options)
-               if options.get("un_dataset") else _indexes(sources, context=context))
-    _pin_un_dataset(options, indexes)
+    indexes = _indexes(sources, context=context)
     prepared, prompts = _prepare(selections, indexes, options, "regrade")
     contexts = {(e["corpus"], t.eli_id if e["corpus"] == "eurlex" else t.block_id, t.language, t.mode): (e,t,p)
                 for e,t,p in prepared}
@@ -684,8 +621,6 @@ def _execute(args, context, operation, directory, output, saved, options, select
                         row.update(decider.row_metadata(decision))
                     row.setdefault("generator_model_name", model.rsplit("/", 1)[-1])
                     row["source_payload_sha256"] = entry["payload_sha256"]
-                    if source == "un" and options.get("un_dataset_identity"):
-                        row["un_dataset_identity"] = json.dumps(options["un_dataset_identity"], sort_keys=True)
                     for phase, prompt_key in (("faithfulness", f"{source}/faithfulness"),
                                               ("quality", f"{source}/quality/{target.mode}")):
                         row[f"{phase}_verifier_prompt_sha256"] = config["prompts_sha256"][prompt_key]
@@ -729,14 +664,6 @@ def _execute(args, context, operation, directory, output, saved, options, select
                         row.update(decider.row_metadata(decision))
                     row.update(grading_status="failed", grading_error=diagnostic, regrade_status="failed",
                                regrade_error=diagnostic, total_score="", candidate_rank="", is_best=False)
-                    if source == "un" and options.get("un_dataset_identity"):
-                        row.update(doc_id=target.doc_id, block_id=target.block_id,
-                                   block_index=target.block_index, n_blocks=target.n_blocks,
-                                   stratum=target.stratum, reference_complete=target.reference_complete,
-                                   n_unresolved=target.n_unresolved, unresolved_reasons=target.unresolved_reasons,
-                                   source_payload_sha256=entry["payload_sha256"],
-                                   un_dataset_identity=json.dumps(options["un_dataset_identity"], sort_keys=True),
-                                   source_locations=json.dumps(payload.target.source_locations, sort_keys=True))
                     result.append(row)
                 state.outcome(task, result, str(exc))
             return task, None if generation_only else len(result)

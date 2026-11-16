@@ -20,8 +20,6 @@ SPAN_TYPE = pa.struct(
             "text",
             "source_text_sha256",
             "doc_id",
-            "location_kind",
-            "document_text_sha256",
         )
     ]
     + [
@@ -33,8 +31,6 @@ SPAN_TYPE = pa.struct(
             "document_end",
             "line_start",
             "line_end",
-            "block_document_start",
-            "block_document_end",
         )
     ]
 )
@@ -71,7 +67,6 @@ def saved_spans(raw: dict) -> list[dict]:
         digest = span.get("source_text_sha256")
         if digest and (not isinstance(digest, str) or not re.fullmatch(r"[a-f0-9]{64}", digest)):
             raise ValueError("invalid evidence source text hash")
-        _character_location(span)
     return value
 
 
@@ -81,85 +76,11 @@ def _integer(value, name: str) -> int:
     return value
 
 
-def validate_un_dataset_identity(raw: dict, document: dict) -> None:
-    """A frozen UN run can only publish against the same multilingual source store."""
-    value = raw.get("un_dataset_identity")
-    prepared = json.loads(document["metadata_json"]).get("source_manifest")
-    new_source = document["source_id"].startswith("uprprc:")
-    if value in (None, ""):
-        if new_source:
-            raise ValueError("UPRPRC generation is missing its pinned UN dataset identity")
-        return
-    if isinstance(value, str):
-        value = json.loads(value)
-    if not isinstance(value, dict) or not isinstance(prepared, dict):
-        raise ValueError("UN generation requires its original manifest-backed source store")  # noqa: TRY004
-    for identity in (value, prepared):
-        if not isinstance(identity.get("manifest_path"), str) or not identity["manifest_path"].strip():
-            raise ValueError("invalid UN dataset manifest identity")
-        for key in ("manifest_sha256", "database_sha256"):
-            digest = identity.get(key)
-            if not isinstance(digest, str) or not re.fullmatch(r"[a-f0-9]{64}", digest):
-                raise ValueError(f"invalid UN dataset {key}")
-    if value != prepared:
-        raise ValueError("UN generation dataset identity differs from the exported source store")
-
-
-def _character_location(span: dict) -> bool:
-    """Discriminate explicit character locations without reinterpreting legacy lines."""
-    kind = span.get("location_kind")
-    fields = ("block_document_start", "block_document_end", "document_text_sha256")
-    if kind in (None, ""):
-        if any(span.get(key) not in (None, "") for key in fields):
-            raise ValueError("incomplete evidence document character location")
-        return False
-    if kind != "document_chars":
-        raise ValueError(f"unsupported evidence location_kind: {kind!r}")
-    if any(span.get(key) not in (None, "") for key in ("line_start", "line_end")):
-        raise ValueError("evidence cannot mix document character and line ranges")
-    first = _integer(span.get("block_document_start"), "block_document_start")
-    last = _integer(span.get("block_document_end"), "block_document_end")
-    if not 0 <= first < last:
-        raise ValueError("invalid evidence document character range")
-    if not isinstance(span.get("doc_id"), str) or not span["doc_id"].strip():
-        raise ValueError("document character evidence requires its original document ID")
-    for key in ("source_text_sha256", "document_text_sha256"):
-        digest = span.get(key)
-        if not isinstance(digest, str) or not re.fullmatch(r"[a-f0-9]{64}", digest):
-            raise ValueError(f"invalid evidence {key}")
-    return True
-
-
-def _saved_character_location(raw: dict, span: dict) -> None:
-    """Compare the canonical span with the saved target's original source location."""
-    if any(raw.get(key) not in (None, "") for key in ("line_start", "line_end")):
-        raise ValueError("UN evidence cannot mix saved document character and line ranges")
-    for key in ("location_kind", "block_document_start", "block_document_end", "document_text_sha256"):
-        if (raw.get(key) not in (None, "")
-                and (type(raw[key]) is not type(span[key]) or raw[key] != span[key])):
-            raise ValueError("UN evidence character location differs from saved generation target")
-    locations = raw.get("source_locations")
-    if locations in (None, ""):
-        return
-    if isinstance(locations, str):
-        locations = json.loads(locations)
-    if not isinstance(locations, dict) or not isinstance(locations.get(span["language"]), dict):
-        raise ValueError("UN saved generation target is missing its language source location")  # noqa: TRY004
-    location = locations[span["language"]]
-    for source_key, span_key in (
-        ("start", "block_document_start"),
-        ("end", "block_document_end"),
-        ("document_sha256", "document_text_sha256"),
-    ):
-        if type(location.get(source_key)) is not type(span[span_key]) or location[source_key] != span[span_key]:
-            raise ValueError("UN evidence character location differs from saved generation target")
-
-
 def align_spans(corpus: str, raw: dict, index) -> list[dict]:
     """Keep local offsets and add exact offsets in the exported source unit.
 
-    A UN span is located by its saved block line or character range, never by
-    searching for its text across the whole document. Hashes detect stale sources.
+    A UN span is located by its saved block line range, never by searching for its
+    text across the whole document. The full source hash detects stale corpora.
     """
     spans = saved_spans(raw)
     if spans and corpus not in {"eurlex", "un"}:
@@ -182,23 +103,7 @@ def align_spans(corpus: str, raw: dict, index) -> list[dict]:
             raise ValueError(f"missing evidence source: {identifier}")
         text = document["text"]
         base = 0
-        characters = _character_location(span)
-        if characters and corpus != "un":
-            raise ValueError("document character evidence is only supported for UN blocks")
-        if characters:
-            _saved_character_location(raw, span)
-            if hashlib.sha256(text.encode("utf-8")).hexdigest() != span["document_text_sha256"]:
-                raise ValueError(f"evidence document text changed: {source}")
-            first, last = span["block_document_start"], span["block_document_end"]
-            if last > len(text):
-                raise ValueError("UN evidence block character range lies outside its document")
-            base = first
-            text = text[first:last]
-        elif corpus == "un":
-            if (raw.get("location_kind") not in (None, "")
-                    or any(raw.get(key) not in (None, "") for key in (
-                        "block_document_start", "block_document_end", "document_text_sha256"))):
-                raise ValueError("UN saved character location requires document character evidence")
+        if corpus == "un":
             metadata = json.loads(document["metadata_json"])
             doc_start = _integer(metadata["line_start"], "document line_start")
             doc_end = _integer(metadata["line_end"], "document line_end")
