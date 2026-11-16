@@ -7,6 +7,7 @@ truncation markers and UN understanding-only context are not evidence sources.
 from __future__ import annotations
 
 import hashlib
+import re
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 
@@ -27,6 +28,10 @@ class EvidenceSource:
     line_end: int | None = None
     original_sha256: str = ""
     original_length: int | None = None
+    location_kind: str = ""
+    block_document_start: int | None = None
+    block_document_end: int | None = None
+    document_text_sha256: str = ""
 
 
 def uses_contract(prompt: str) -> bool:
@@ -106,9 +111,32 @@ def validate_spans(
                                    or hashlib.sha256(source.full_text.encode("utf-8")).hexdigest()),
         }
         if source.unit_type == "block":
-            if source.line_start is None or source.line_end is None or source.line_start < 1:
-                raise ValueError("UN evidence requires its original 1-based line range")
-            canonical.update(doc_id=source.doc_id, line_start=source.line_start, line_end=source.line_end)
+            if source.location_kind == "document_chars":
+                first, last = source.block_document_start, source.block_document_end
+                if (not isinstance(source.doc_id, str) or not source.doc_id.strip()
+                        or type(first) is not int or type(last) is not int
+                        or not 0 <= first < last or last - first != len(source.full_text)):
+                    raise ValueError("UN evidence requires its original document character range")
+                if source.line_start is not None or source.line_end is not None:
+                    raise ValueError("UN evidence cannot mix document character and line ranges")
+                for digest in (canonical["source_text_sha256"], source.document_text_sha256):
+                    if not isinstance(digest, str) or not re.fullmatch(r"[a-f0-9]{64}", digest):
+                        raise ValueError("UN evidence requires valid source and document text hashes")
+                if canonical["source_text_sha256"] != hashlib.sha256(
+                        source.full_text.encode("utf-8")).hexdigest():
+                    raise ValueError("UN evidence source text hash does not match its block")
+                canonical.update(
+                    doc_id=source.doc_id, location_kind="document_chars",
+                    block_document_start=first, block_document_end=last,
+                    document_text_sha256=source.document_text_sha256,
+                )
+            elif (source.location_kind or source.block_document_start is not None
+                  or source.block_document_end is not None or source.document_text_sha256):
+                raise ValueError("invalid or incomplete UN evidence location metadata")
+            else:
+                if source.line_start is None or source.line_end is None or source.line_start < 1:
+                    raise ValueError("UN evidence requires its original 1-based line range")
+                canonical.update(doc_id=source.doc_id, line_start=source.line_start, line_end=source.line_end)
         spans.append(canonical)
     if seen != required:
         raise ValueError(f"evidence missing for involved sources: {sorted(required - seen)}")

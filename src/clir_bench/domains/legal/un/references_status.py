@@ -36,8 +36,8 @@ import sys
 from collections import Counter
 from pathlib import Path
 
-from clir_bench.domains.legal.un import paths
 from clir_bench.domains.legal.qac import un_references as refs
+from clir_bench.domains.legal.un import paths
 
 
 def _genre(doc_id: str, title: str = "") -> str:
@@ -68,7 +68,7 @@ def _doc_citations(doc_id: str, doc: dict, blocks: list[dict],
     annexes = doc.get("annexes", [])
     out: dict[int, list[refs.Citation]] = {}
     for idx in doc.get("target_idxs", []):
-        citations = refs.extract_citations(texts[idx], doc_id=doc_id)
+        citations = refs.extract_citations(texts[idx], doc_id=doc_id, symbol=doc.get("symbol"))
         if not citations:
             continue
         refs.resolve_citations(citations, index, citing_doc_id=doc_id)
@@ -212,6 +212,7 @@ def _context(text: str, start: int, end: int, width: int = 80) -> str:
 
 def write_review_sample(n: int, seed: int, out: Path) -> None:
     import random
+
     from clir_bench.domains.legal.qac.un_context import BlockIndex
 
     random.seed(seed)
@@ -275,9 +276,9 @@ def write_review_sample(n: int, seed: int, out: Path) -> None:
     resolved = sum(resolved_kinds.values())
     header = [
         "# UN cross-reference classification — manual review sample", "",
-        f"Scanned {blocks_seen:,} target blocks (seed {seed}); {len(sections)} "
-        f"citing blocks shown; {total} citations, {resolved} resolved "
-        f"({resolved / max(total, 1):.0%}).", "",
+        (f"Scanned {blocks_seen:,} target blocks (seed {seed}); {len(sections)} "
+         f"citing blocks shown; {total} citations, {resolved} resolved "
+         f"({resolved / max(total, 1):.0%})."), "",
         "| kind | found | resolved |", "|---|---|---|",
     ]
     header += [f"| {k} | {v} | {resolved_kinds.get(k, 0)} |"

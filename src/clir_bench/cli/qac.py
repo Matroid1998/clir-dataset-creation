@@ -243,6 +243,10 @@ def _run_arguments(parser: argparse.ArgumentParser) -> None:
 
 def _context_arguments(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
+        "--un-dataset", type=Path,
+        help="Opt-in prepared UN manifest; inherited and checksum-pinned on replay/resume",
+    )
+    parser.add_argument(
         "--max-references",
         type=int,
         default=None,

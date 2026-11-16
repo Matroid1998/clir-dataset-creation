@@ -83,15 +83,16 @@ DEFAULT_MODES = (gen.MODE_TECHNICAL, gen.MODE_CONCEPTUAL, gen.MODE_DESCRIPTIVE)
 SUPPORTED_MODES = gen.MODES
 
 
-def genre_for(doc_id: str, title: str) -> str | None:
+def genre_for(doc_id: str, title: str, symbol: str | None = None) -> str | None:
     """Question-source genre, or None when the document class is ineligible.
 
     Letters are recognised by their title line and undercounted when that line
     is corrupted -- a safe direction: never misclassifies, only misses.
     """
-    if "/res/" in doc_id or "/dec/" in doc_id:
+    key = (symbol or doc_id).lower()
+    if "/res/" in key or "/dec/" in key:
         return "resolution"
-    if "sr_" in doc_id or "pv_" in doc_id:
+    if "sr_" in key or "pv_" in key or "/sr." in key or "/pv." in key:
         return "meeting"
     if title.lower().startswith(("letter dated", "note verbale", "identical letters")):
         return "letter"
@@ -103,10 +104,15 @@ def _fits_whole(doc: dict, block_text: str, index: ctx.BlockIndex) -> bool:
     if doc["char_count"] > FIT_BUDGET:
         return False
     citations = refs.resolve_citations(
-        refs.extract_citations(block_text),
+        refs.extract_citations(block_text, doc_id=doc["doc_id"], symbol=doc.get("symbol")),
         getattr(index, "symbols", None) or index.symbol_map,
         citing_doc_id=doc["doc_id"])
-    kept, _ = refs.referenced_docs(citations)
+    kept, dropped = refs.referenced_docs(citations)
+    if hasattr(index, "identity") and dropped:
+        return False
+    if hasattr(index, "reference_languages_complete") and not index.reference_languages_complete(
+            [c.doc_id for c in kept]):
+        return False
     total = doc["char_count"] + sum(
         index.docs[c.doc_id]["char_count"] for c in kept)
     return total <= FIT_BUDGET
@@ -120,7 +126,7 @@ def _cited_doc_ids(index: ctx.BlockIndex, target: Target) -> set[str]:
     """
     block = index.blocks_for(target.doc_id)[target.block_index]
     citations = refs.resolve_citations(
-        refs.extract_citations(block.texts["en"], doc_id=target.doc_id),
+        refs.extract_citations(block.texts["en"], doc_id=target.doc_id, symbol=block.symbol),
         getattr(index, "symbols", None) or index.symbol_map,
         citing_doc_id=target.doc_id)
     kept, _ = refs.referenced_docs(citations)
@@ -228,16 +234,24 @@ def quality_sources(payload: ctx.GenerationPayload, language: str, *,
                          "paragraph": unit.paragraph, "part_label": unit.part_label,
                          "languages": languages},
         })
+    for lg, text in getattr(payload, "document_contexts", {}).items():
+        if lg in languages:
+            sources.append({"source_id": payload.target.doc_id, "role": "context",
+                            "text": text, "metadata": {"languages": [lg]}})
     return sources
 
 
-def _excluded_doc(doc_id: str) -> bool:
+def _excluded_doc(doc_id: str, symbol: str | None = None) -> bool:
     """Layer 0: document classes that cannot anchor questions.
 
     Agenda stubs and the Journal are meeting logistics; corrigenda are edit
     instructions ("Replace paragraph X with...") about a *different* document
     -- both sampled corrigendum targets in the verification audit were bad.
     """
+    if symbol:
+        key = symbol.lower()
+        return ("/agenda/" in key or key.startswith("journal")
+                or any(p.startswith("corr") for p in key.split("/")))
     pieces = doc_id.split("/")
     body = pieces[1] if len(pieces) > 1 else ""
     return ("/agenda/" in doc_id or body.startswith("journal")
@@ -280,7 +294,7 @@ def select(index: ctx.BlockIndex, *, n: int, seed: int, languages: Sequence[str]
     pools: dict[str, list[tuple[str, int]]] = {name: [] for name, _ in strata}
     missing_idxs = 0
     for doc_id, doc in index.docs.items():
-        if _excluded_doc(doc_id) or doc_id in excluded_documents:
+        if _excluded_doc(doc_id, symbol=doc.get("symbol") if hasattr(index, "identity") else None) or doc_id in excluded_documents:
             continue
         idxs = doc.get("target_idxs")
         if idxs is None:
@@ -289,7 +303,8 @@ def select(index: ctx.BlockIndex, *, n: int, seed: int, languages: Sequence[str]
         if fit_filter and doc["char_count"] > FIT_BUDGET:
             continue
         if genre_filter:
-            stratum = genre_for(doc_id, doc.get("title", ""))
+            stratum = genre_for(doc_id, doc.get("title", ""),
+                                symbol=doc.get("symbol") if hasattr(index, "identity") else None)
             if stratum is None:
                 continue
         else:
@@ -565,6 +580,9 @@ def run_one(target: Target, index: ctx.BlockIndex, *, gen_model: str,
                 "quality_verifier_prompt": quality_prompt,
                 "quality_verifier_prompt_sha256": hashlib.sha256(quality_prompt.encode()).hexdigest(),
             })
+            if payload.target.source_locations:
+                row["source_locations"] = json.dumps(payload.target.source_locations,
+                                                     ensure_ascii=False, sort_keys=True)
         else:
             row = {key: value for key, value in row.items() if key in FIELDS}
         rows.append(row)

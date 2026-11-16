@@ -209,6 +209,9 @@ def load_un(index: SourceIndex, spec: dict, root: Path, wanted: set[str] | None)
                 "UN document_genres must be a nonempty list of resolution, meeting, or letter"
             )
         genres = set(configured)
+    if spec.get("dataset_manifest"):
+        _load_un_manifest(index, spec, root, wanted, genres)
+        return
     with (root / spec["documents"]).open(encoding="utf-8") as handle:
         documents = sorted((json.loads(line) for line in handle), key=lambda d: d["line_start"])
     previous = 0
@@ -259,3 +262,45 @@ def load_un(index: SourceIndex, spec: dict, root: Path, wanted: set[str] | None)
                     )
             if handle.readline():
                 raise ValueError(f"UN file has lines beyond document index: {path}")
+
+
+def _load_un_manifest(index, spec, root, wanted, genres):
+    """Export exact full multilingual sources from a validated prepared UN store."""
+    from clir_bench.domains.legal.qac.un_batch import _excluded_doc, genre_for
+    from clir_bench.domains.legal.un import UN_LANGUAGES
+    from clir_bench.domains.legal.un.uprprc_index import UPRPRCIndex
+
+    languages = spec["languages"]
+    if (not isinstance(languages, list) or not languages
+            or not all(isinstance(language, str) for language in languages)
+            or not set(languages) <= set(UN_LANGUAGES)
+            or len(set(languages)) != len(languages)):
+        raise ValueError("UN languages must be a nonempty list of distinct UN language codes")
+    prepared = UPRPRCIndex(root / spec["dataset_manifest"])
+    try:
+        for doc in prepared.iter_documents():
+            identifier = doc["doc_id"]
+            if wanted is not None and identifier not in wanted:
+                continue
+            if genres is not None and (
+                _excluded_doc(identifier, symbol=doc.get("symbol"))
+                or genre_for(identifier, doc.get("title", ""), symbol=doc.get("symbol")) not in genres
+            ):
+                continue
+            # The multilingual family is a source invariant even when a publication
+            # configuration requests only a subset of its languages.
+            texts = {language: prepared.document_text(identifier, language) for language in UN_LANGUAGES}
+            if any(not isinstance(text, str) or not text.strip() for text in texts.values()):
+                raise ValueError(f"UN source is not available in all six languages: {identifier}")
+            for language in languages:
+                metadata = {
+                    **doc, "title_language": "en",
+                    "source_manifest": prepared.identity,
+                }
+                index.add(source_row(
+                    "un", identifier, identifier, language, "document",
+                    doc.get("title", "") if language == "en" else "",
+                    texts[language], metadata,
+                ))
+    finally:
+        prepared.close()
