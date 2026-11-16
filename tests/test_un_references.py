@@ -7,11 +7,21 @@ symbols). Resolution tests use a small in-memory symbol map.
 
 from __future__ import annotations
 
+import pytest
+
 from clir_bench.domains.legal.qac import un_references as refs
 from clir_bench.domains.legal.qac.un_references import (
-    KIND_DECISION, KIND_ES, KIND_ROMAN, KIND_SC, KIND_SLASH, KIND_SYMBOL,
-    Citation, anchored_block_index, extract_citations, normalise_symbol,
-    referenced_docs, resolve_citations,
+    KIND_DECISION,
+    KIND_ES,
+    KIND_ROMAN,
+    KIND_SC,
+    KIND_SLASH,
+    KIND_SYMBOL,
+    anchored_block_index,
+    extract_citations,
+    normalise_symbol,
+    referenced_docs,
+    resolve_citations,
 )
 
 MAP = {
@@ -53,11 +63,11 @@ def test_sc_resolution_plural_run():
     assert [c.symbol for c in cites] == ["S/RES/1265(1999)", "S/RES/1296(2000)"]
 
 
-def test_slash_resolution_with_candidates_chain():
+def test_slash_resolution_with_named_body():
     text = "the General Assembly, by its resolution 51/210 of 17 December 1996, established"
     (c,) = extract_citations(text)
     assert c.kind == KIND_SLASH
-    assert c.candidates == ("A/RES/51/210", "A/HRC/RES/51/210", "E/RES/51/210")
+    assert c.candidates == ("A/RES/51/210",)
     assert c.organ_hint == "General Assembly"
 
 
@@ -161,6 +171,103 @@ def test_unresolved_symbol_follows_organ_hint():
     (c,) = resolve_citations(extract_citations(
         "pursuant to Human Rights Council resolution 10/27 of March 2009"), MAP)
     assert c.doc_id is None and c.symbol == "A/HRC/RES/10/27"
+
+
+@pytest.mark.parametrize("text", [
+    "Recalling Human Rights Council resolution 51/1,",
+    "Recalling human rights council resolution 51/1,",
+    "Recalling Human Rights\nCouncil resolution 51/1,",
+    "The Human Rights Council, by its resolution 51/1, requested a report.",
+    "Recalling the Human Rights Council's resolution 51/1,",
+])
+def test_named_body_never_falls_back_to_another_body(text):
+    (c,) = resolve_citations(extract_citations(text), {"A/RES/51/1": "ga"})
+    assert c.symbol == "A/HRC/RES/51/1"
+    assert c.doc_id is None and c.reason == "out_of_corpus"
+    assert refs.is_blocking(c)
+    assert refs.citation_status([c])["complete"] is False
+
+
+@pytest.mark.parametrize("organ, symbol", [
+    ("General Assembly", "A/RES/51/1"),
+    ("Human Rights Council", "A/HRC/RES/51/1"),
+])
+def test_named_body_selects_its_document_when_numbers_overlap(organ, symbol):
+    mapping = {"A/RES/51/1": "ga", "A/HRC/RES/51/1": "hrc"}
+    (c,) = resolve_citations(extract_citations(f"Recalling {organ} resolution 51/1,"),
+                             mapping)
+    assert c.symbol == symbol and c.doc_id == mapping[symbol]
+    assert c.reason is None
+
+
+def test_named_body_applies_to_every_resolution_in_a_run():
+    mapping = {"A/RES/51/1": "ga", "A/HRC/RES/51/2": "hrc"}
+    first, second = resolve_citations(extract_citations(
+        "Recalling Human Rights Council resolutions 51/1 and 51/2,"), mapping)
+    assert first.symbol == "A/HRC/RES/51/1"
+    assert first.doc_id is None and first.reason == "out_of_corpus"
+    assert second.doc_id == "hrc" and second.reason is None
+
+
+def test_unsupported_named_body_never_falls_back_to_another_body():
+    (c,) = resolve_citations(extract_citations(
+        "Recalling Commission on Human Rights resolution 2001/1,"),
+        {"E/RES/2001/1": "ecosoc"})
+    assert c.doc_id is None and c.reason == "out_of_corpus"
+
+
+def test_lettered_resolution_cannot_fall_back_to_a_different_body():
+    (c,) = resolve_citations(extract_citations(
+        "Recalling Human Rights Council resolution 51/153 B,"),
+        {"A/RES/51/153B": "ga"})
+    assert c.doc_id is None and c.reason == "out_of_corpus"
+
+
+def test_unnamed_slash_resolution_with_overlapping_numbers_is_ambiguous():
+    mapping = {"A/RES/51/1": "ga", "A/HRC/RES/51/1": "hrc"}
+    (c,) = resolve_citations(extract_citations("Recalling resolution 51/1,"), mapping)
+    assert c.doc_id is None and c.reason == "ambiguous_candidates"
+    assert refs.is_blocking(c)
+    assert referenced_docs([c]) == ([], [])
+
+
+def test_unnamed_slash_resolution_with_one_match_still_resolves():
+    (c,) = resolve_citations(extract_citations("Recalling resolution 51/1,"),
+                             {"A/HRC/RES/51/1": "hrc"})
+    assert c.doc_id == "hrc" and c.reason is None
+
+
+def test_nearby_body_is_not_treated_as_the_cited_body():
+    text = "The Human Rights Council met. Recalling resolution 51/1,"
+    (c,) = resolve_citations(extract_citations(text), {"A/RES/51/1": "ga"})
+    assert c.organ_hint == "Human Rights Council"
+    assert c.doc_id == "ga" and c.reason is None
+
+
+@pytest.mark.parametrize("text, symbol", [
+    ("The General Assembly established the Human Rights Council by its resolution 60/251,",
+     "A/RES/60/251"),
+    (("The Assembly established the Peacebuilding Commission and the Human Rights Council "
+      "by its resolutions 60/180 and 60/251, respectively."), "A/RES/60/180"),
+    (("The Assembly supported the work of the Human Rights Council in its resolutions "
+      "65/281 and 66/169,"), "A/RES/65/281"),
+    (("Mandates given by the General Assembly and Security Council resolutions "
+      "60/180 and 1645 (2005), respectively."), "A/RES/60/180"),
+    (("Operations approved by the Assembly or the Security Council, by its resolution "
+      "56/274 B of 27 June 2002, the Assembly appropriated funds."), "A/RES/56/274B"),
+])
+def test_object_or_coordinated_body_does_not_override_the_resolution(text, symbol):
+    citations = resolve_citations(extract_citations(text), {symbol: "ga"})
+    (citation,) = [c for c in citations if c.kind == KIND_SLASH and c.symbol == symbol]
+    assert citation.doc_id == "ga" and citation.reason is None
+
+
+def test_explicit_symbol_takes_precedence_over_a_nearby_body():
+    text = "The Human Rights Council referred to A/RES/51/1."
+    mapping = {"A/RES/51/1": "ga", "A/HRC/RES/51/1": "hrc"}
+    (c,) = resolve_citations(extract_citations(text), mapping)
+    assert c.symbol == "A/RES/51/1" and c.doc_id == "ga"
+    assert c.reason is None
 
 
 def test_referenced_docs_cap_and_order():

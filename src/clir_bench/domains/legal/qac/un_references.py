@@ -9,11 +9,11 @@ classifies each one (external document, internal part of the same document,
 or a family this corpus cannot model), and resolves it only when the surface
 pins exactly one target:
 
-* **External documents** resolve through candidate chains against the corpus
-  symbol index. Every chain is measured-disjoint -- ``A/RES`` (GA sessions
-  >= 51), ``A/HRC/RES`` (<= 27) and ``E/RES`` (year-like) share no numeric
-  tails, Security Council numbers map to one year each -- so a chain can miss
-  but never pick a wrong document. A citation with a section letter
+* **External documents** resolve against the corpus symbol index. An explicitly
+  named body restricts slash-form resolutions to that body's symbols. Without
+  a named body, overlapping numbers across bodies are ambiguous rather than
+  resolved by candidate order. Literal document symbols remain authoritative.
+  A citation with a section letter
   ("resolution 51/153 B") names ONLY the lettered document; when the corpus
   holds just the plain twin the citation stays unresolved, because 118 of the
   169 lettered symbols coexist with a plain sibling and resolving to it was a
@@ -37,8 +37,8 @@ in ``domains/legal/un/references_status.py``.
 from __future__ import annotations
 
 import re
+from collections.abc import Callable, Iterable, Mapping, Sequence
 from dataclasses import dataclass, field
-from typing import Callable, Iterable, Mapping, Sequence
 
 # References must stay visibly smaller than the same-document context
 # (30k chars): cap 4 carries 92% of citing blocks whole (the references-per-
@@ -174,6 +174,18 @@ ANNEXED_RE = re.compile(
 _ORGANS = ("General Assembly", "Security Council", "Human Rights Council",
            "Economic and Social Council", "Commission on Human Rights",
            "Sub-Commission")
+_ORGAN_NAMES = "|".join(r"\s+".join(map(re.escape, organ.split())) for organ in _ORGANS)
+_GOVERNING_ORGAN_RE = re.compile(
+    rf"\b({_ORGAN_NAMES})(?:['’]s)?\s*(?P<bridge>,?\s*(?:by|in|under)\s+its\s+)?$",
+    re.IGNORECASE)
+_COORDINATED_ORGAN_RE = re.compile(
+    rf"\b(?:{_ORGAN_NAMES})\s+(?:and|or)\s+(?:the\s+)?$", re.IGNORECASE)
+_CLAUSE_SUBJECT_RE = re.compile(r"(?:^|[.;!?]\s+)(?:the\s+)?$", re.IGNORECASE)
+_RESOLUTION_PREFIXES = {
+    "General Assembly": "A/RES/",
+    "Human Rights Council": "A/HRC/RES/",
+    "Economic and Social Council": "E/RES/",
+}
 
 _ROMAN_VALUES = {"I": 1, "V": 5, "X": 10, "L": 50, "C": 100}
 
@@ -256,7 +268,7 @@ class SymbolIndex:
         return key in self.map
 
     @classmethod
-    def from_pairs(cls, pairs: Iterable[tuple[str, str]]) -> "SymbolIndex":
+    def from_pairs(cls, pairs: Iterable[tuple[str, str]]) -> SymbolIndex:
         mapping: dict[str, str] = {}
         dropped: set[str] = set()
         dirty = 0
@@ -281,11 +293,11 @@ class SymbolIndex:
                    n_collisions=len(dropped), n_dirty_keys=dirty)
 
     @classmethod
-    def from_docs(cls, docs: Mapping[str, Mapping]) -> "SymbolIndex":
+    def from_docs(cls, docs: Mapping[str, Mapping]) -> SymbolIndex:
         return cls.from_pairs((doc_id, row["symbol"]) for doc_id, row in docs.items())
 
     @classmethod
-    def from_map(cls, mapping: Mapping[str, str]) -> "SymbolIndex":
+    def from_map(cls, mapping: Mapping[str, str]) -> SymbolIndex:
         return cls.from_pairs((doc_id, symbol) for symbol, doc_id in mapping.items())
 
 
@@ -309,6 +321,25 @@ def _organ_hint(text: str, start: int) -> str | None:
         if pos >= 0 and (found is None or pos > found[0]):
             found = (pos, organ)
     return found[1] if found else None
+
+
+def _governing_organ(text: str, start: int) -> str | None:
+    """Body directly governing a citation, rather than merely mentioned nearby."""
+    match = _GOVERNING_ORGAN_RE.search(text[:start])
+    if match is None:
+        return None
+    prefix = text[:match.start()]
+    if _COORDINATED_ORGAN_RE.search(prefix):
+        # "General Assembly and Security Council resolutions ..." cannot
+        # bind every number in the run to the final body alone.
+        return None
+    if match.group("bridge") and not _CLAUSE_SUBJECT_RE.search(prefix):
+        # In "the Assembly established the Human Rights Council by its
+        # resolution", "its" refers to the Assembly, not the nearest body.
+        # Accept this indirect form only with a body at the clause's start.
+        return None
+    name = " ".join(match.group(1).split()).casefold()
+    return next(organ for organ in _ORGANS if organ.casefold() == name)
 
 
 def _own_heading_line(text: str, start: int, end: int) -> bool:
@@ -387,6 +418,7 @@ def extract_citations(text: str, *, doc_id: str | None = None) -> list[Citation]
         return any(s <= a and b <= e for s, e in es_spans)
 
     for m in SLASH_RUN_RE.finditer(text):
+        organ = _governing_organ(text, m.start())
         for item in SLASH_ITEM_RE.finditer(m.group(1)):
             a = m.start(1) + item.start()
             b = m.start(1) + item.end()
@@ -399,15 +431,21 @@ def extract_citations(text: str, *, doc_id: str | None = None) -> list[Citation]
                 # channel (118 of 169 lettered symbols have a plain sibling).
                 chain = (normalise_symbol(f"A/RES/{x}/{y}{letter}"),)
             else:
-                # Safe by measurement: these three key spaces are disjoint in
-                # this corpus, so at most one candidate can ever resolve.
+                # Expanded corpora can contain the same numbers in several
+                # bodies. Resolution must check all matches for ambiguity.
                 chain = (normalise_symbol(f"A/RES/{x}/{y}"),
                          normalise_symbol(f"A/HRC/RES/{x}/{y}"),
                          normalise_symbol(f"E/RES/{x}/{y}"))
+            if organ is not None:
+                prefix = _RESOLUTION_PREFIXES.get(organ)
+                # An unsupported named body must not fall back to a different
+                # body, including when the cited number has a section letter.
+                chain = tuple(candidate for candidate in chain
+                              if prefix is not None and candidate.startswith(prefix))
             citations.append(Citation(
                 start=a, end=b, raw=item.group(0), kind=KIND_SLASH,
                 section_letter=letter,
-                organ_hint=_organ_hint(text, m.start()),
+                organ_hint=organ or _organ_hint(text, m.start()),
                 candidates=chain))
 
     for m in DEC_RUN_RE.finditer(text):
@@ -440,9 +478,9 @@ def extract_citations(text: str, *, doc_id: str | None = None) -> list[Citation]
     def doc_citation_starting_in(a: int, b: int) -> Citation | None:
         best = None
         for c in citations:
-            if c.scope == SCOPE_EXTERNAL and a <= c.start < b:
-                if best is None or c.start < best.start:
-                    best = c
+            if (c.scope == SCOPE_EXTERNAL and a <= c.start < b
+                    and (best is None or c.start < best.start)):
+                best = c
         return best
 
     # Unmodelled but detected: the completeness gate must see these.
@@ -595,6 +633,13 @@ def resolve_citations(citations: list[Citation],
         if c.kind == KIND_ROMAN:
             c.reason = "pre_corpus"
             continue
+        if c.kind == KIND_SLASH:
+            matches = [candidate for candidate in c.candidates if candidate in index.map]
+            if len(matches) > 1:
+                c.symbol = None
+                c.doc_id = None
+                c.reason = "ambiguous_candidates"
+                continue
         if c.kind == KIND_ES and len(c.candidates) == 2:
             session = int(re.search(r"S\.(\d+)/", c.candidates[0]).group(1))
             in_ga = session in index.ga_special_sessions

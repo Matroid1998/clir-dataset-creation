@@ -1,0 +1,39 @@
+{
+  "baseline_commit": "45dd6b6638870adbf50e53f256fb91fe2420b9ef",
+  "baseline_resolver_sha256": "cae5e390b040b4f299acbec2621d1954a0285b047676aab857b0d72eabae2d29",
+  "fixed_resolver_sha256": "c1b33f81774ae71c1618a651500b9ec6d0ee306257d8dd2b8583cab13f75d75c",
+  "scope": "All current UN generation target_idxs; old HEAD vs fixed resolver; same document index, annex/internal resolution and completeness rules. Default eligibility additionally checks document genre, excluded IDs, and whole-document/reference context budget. Current QA impact uses the authoritative SQLite outcomes selected by docs/generation_export.json, read with the publishing reader.",
+  "artifacts_overwritten": false,
+  "counts": {
+    "newly_reference_incomplete_blocks": 2,
+    "newly_reference_complete_blocks": 0,
+    "newly_excluded_default_generation_blocks": 0,
+    "newly_included_default_generation_blocks": 0,
+    "blocks_with_changed_link_or_reason": 3,
+    "documents_scanned": 86307,
+    "blocks_scanned": 1681496,
+    "target_blocks_scanned": 1505850,
+    "target_blocks_with_slash_resolutions": 105406,
+    "blocks_with_changed_resolution_or_reported_symbol": 2031,
+    "cached_vs_old_complete_disagreement_in_changed_blocks": 0,
+    "cached_complete_now_incomplete_in_changed_blocks": 2
+  },
+  "newly_reference_incomplete_documents": 2,
+  "documents_with_changed_link_or_reason": 3,
+  "newly_incomplete_by_genre": {
+    "other": 2
+  },
+  "changed_citation_occurrences": 2474,
+  "current_generation_qa_rows": 4691,
+  "current_generation_unique_candidate_ids": 4691,
+  "current_generation_source_blocks": 247,
+  "current_generation_source_blocks_seen_in_targets": 247,
+  "current_generation_source_blocks_missing_from_targets": [],
+  "current_qa_rows_from_newly_incomplete_blocks": 0,
+  "current_qa_rows_with_changed_link_or_reason": 0,
+  "current_generation_runs": {
+    "data/legal/qac/generation_600_20261008_model_comparison/un_parallel/run.sqlite": 3530,
+    "data/legal/qac/generation_600_20261008_model_comparison/continuation_de_zh_50_20261012/un_parallel/run.sqlite": 1161
+  },
+  "elapsed_seconds": 82.34
+}

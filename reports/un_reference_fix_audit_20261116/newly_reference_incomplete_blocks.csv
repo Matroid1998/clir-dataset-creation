@@ -1,0 +1,3 @@
+block_id,doc_id,symbol,genre,cached_complete,old_complete,new_complete,old_default_eligible,new_default_eligible,link_or_reason_changed,current_qa_rows,old_reasons,new_reasons
+2008/e/cn_6/2009/6#26,2008/e/cn_6/2009/6,E/CN.6/2009/6,other,True,True,False,False,False,True,0,{},"{""out_of_corpus"": 1}"
+2012/a/67/6__prog__23_#23,2012/a/67/6__prog__23_,A/67/6(PROG..23),other,True,True,False,False,False,True,0,{},"{""out_of_corpus"": 1}"
