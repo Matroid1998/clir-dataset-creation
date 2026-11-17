@@ -31,6 +31,7 @@ class PreparedProfile:
     identity: dict
     target_acts: frozenset[str]
     _stats: dict
+    target_articles: frozenset[str] | None = None
 
     def file(self, name: str) -> Path:
         if name not in self.manifest["files"]:
@@ -81,9 +82,26 @@ def load_profile(manifest_path: str | Path) -> PreparedProfile:
             re.fullmatch(r"3(?:201[7-9]|202[0-2])[RL]\d{4,5}", c) for c in targets)
             or len(set(targets)) != len(targets)):
         raise ValueError("invalid newer EUR-Lex target act whitelist")
+    article_targets = None
+    article_file = "target_articles.json"
+    requested = manifest.get("config", {}).get("target_articles")
+    if article_file in files:
+        entries = json.loads((path.parent / article_file).read_text(encoding="utf-8"))
+        if (not isinstance(entries, list) or not entries
+                or any(not isinstance(eli, str) or not re.fullmatch(
+                    r"https?://data\.europa\.eu/eli/(?:reg|dir)(?:_impl|_del)?/"
+                    r"20(?:1[7-9]|2[0-2])/[1-9]\d*/art_[^/?#\s]+/oj", eli)
+                    for eli in entries)
+                or entries != sorted(set(entries))):
+            raise ValueError("invalid newer EUR-Lex target article whitelist")
+        if type(requested) is not int or requested <= 0 or len(entries) != requested:
+            raise ValueError("EUR-Lex target article count differs from its declared budget")
+        article_targets = frozenset(entries)
+    elif requested is not None or (path.parent / article_file).exists():
+        raise ValueError("EUR-Lex article budget lacks its hashlisted target article whitelist")
     identity = {"manifest_path": str(path), "manifest_sha256": hashlib.sha256(raw).hexdigest(),
                 "files_sha256": files}
-    return PreparedProfile(path, manifest, identity, frozenset(targets), stats)
+    return PreparedProfile(path, manifest, identity, frozenset(targets), stats, article_targets)
 
 
 class ProfileArticleIndex(ArticleIndex):
@@ -97,6 +115,7 @@ class ProfileArticleIndex(ArticleIndex):
         self.profile = load_profile(manifest_path)
         self.identity = self.profile.identity
         self.target_acts = self.profile.target_acts
+        self.target_articles = self.profile.target_articles
         self._amending = set()
         self._quarantined = {json.loads(line)["celex_id"] for line in
                              self.profile.file("quarantine.jsonl").read_text().splitlines() if line.strip()}
@@ -108,6 +127,11 @@ class ProfileArticleIndex(ArticleIndex):
                          quarantine_path=self.profile.file("quarantine.jsonl"))
         if self.target_acts - self.by_act.keys():
             raise ValueError("EUR-Lex target whitelist names acts with no indexed articles")
+        if self.target_articles is not None:
+            for eli in self.target_articles:
+                unit = self.by_eli.get(eli)
+                if unit is None or unit.unit_type != "article" or unit.celex_id not in self.target_acts:
+                    raise ValueError("EUR-Lex target article whitelist names an absent or ineligible unit")
 
     def _load_articles(self, path, annex_whitelist=None):
         # Validate identities with bounded disk staging before the legacy loader's
@@ -155,6 +179,8 @@ class ProfileArticleIndex(ArticleIndex):
         unit = self.by_eli.get(target_eli)
         if unit is None or unit.unit_type != "article" or unit.celex_id not in self.target_acts:
             raise ValueError("EUR-Lex target is not a newer target-eligible article")
+        if self.target_articles is not None and target_eli not in self.target_articles:
+            raise ValueError("EUR-Lex target is outside the prepared article budget")
         if unit.celex_id in self._quarantined or target_eli in self._amending:
             raise ValueError("EUR-Lex target is quarantined or amending")
         if not MIN_CHARS <= len(unit.texts.get("en", "")) <= MAX_CHARS:

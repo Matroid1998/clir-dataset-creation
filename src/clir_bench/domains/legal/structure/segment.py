@@ -32,6 +32,7 @@ import sys
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
+from xml.etree import ElementTree
 
 from clir_bench.domains.legal.structure import ACT_LANGUAGES, cellar, paths
 
@@ -419,8 +420,12 @@ def segment_act(celex: str, entry: dict, meta: dict, *, profile=None, transport=
             errors[language] = documents.error or "no-act"
             continue
         output = profile_paths.PARSED_DIR / celex[1:5] / f"{celex}.{language}.json"
-        parsed = (_profile_parse(documents.act_xml, output, parser or run_parse_fmx)
-                  if profile is not None else (parser or run_parse_fmx)(documents.act_xml, output))
+        try:
+            parsed = (_profile_parse(documents.act_xml, output, parser or run_parse_fmx)
+                      if profile is not None else (parser or run_parse_fmx)(documents.act_xml, output))
+        except FormexArticleError as error:
+            errors[language] = str(error)
+            continue
         if parsed is None:
             errors[language] = "parse-failed"
             continue
@@ -513,29 +518,112 @@ def _parser_identity(parser):
     return f"{getattr(parser, '__module__', '')}:{getattr(parser, '__qualname__', type(parser).__name__)}"
 
 
+class FormexArticleError(ValueError):
+    """A parsed article inventory cannot be proved against the official XML."""
+
+
+def _profile_article_xml(xml):
+    """Normalize operative GR.SEQ divisions and read the original article IDs.
+
+    The external parser only walks DIVISION, while newer Formex also uses
+    GR.SEQ for the same chapter/section hierarchy. Only those operative
+    containers are renamed. Article content, quoted amendments, tables of
+    contents and annexes are never traversed for normalization or promoted into
+    the act's article inventory. The original source bytes remain in the cache.
+    """
+    try:
+        root = ElementTree.fromstring(xml)
+    except ElementTree.ParseError as error:
+        raise FormexArticleError("invalid-formex-article-xml") from error
+
+    def name(node):
+        return node.tag.rsplit("}", 1)[-1]
+
+    body = next((node for node in root if name(node) == "ENACTING.TERMS"), None)
+    if body is None:
+        return xml, ()
+    identifiers = []
+    changed = False
+
+    def number(article):
+        explicit = article.get("IDENTIFIER", "").strip()
+        identifier = re.fullmatch(r"0*(\d+)([a-z]*)", explicit, re.I)
+        title = next((node for node in article if name(node) == "TI.ART"), None)
+        label = "".join(title.itertext()).strip() if title is not None else ""
+        labelled = re.fullmatch(r"(?:Article|Artikel|Art[ií]culo)\s+(\d+)([a-z]*)", label, re.I)
+        if identifier is not None:
+            result = str(int(identifier[1])) + identifier[2].lower()
+            if labelled is not None:
+                declared = str(int(labelled[1])) + labelled[2].lower()
+                if declared != result:
+                    raise FormexArticleError("conflicting-formex-article-number")
+            return result
+        if labelled is not None:
+            return str(int(labelled[1])) + labelled[2].lower()
+        raise FormexArticleError("missing-formex-article-number")
+
+    def walk(container, normalize):
+        nonlocal changed
+        for child in container:
+            kind = name(child)
+            if kind == "ARTICLE":
+                identifiers.append(number(child))
+                # A quoted replacement ARTICLE belongs to this article's body.
+                continue
+            if kind in {"TOC", "ANNEX", "TITLE", "PREAMBLE", "FINAL"}:
+                continue
+            operative = normalize and kind in {"DIVISION", "GR.SEQ"}
+            if operative and kind == "GR.SEQ":
+                child.tag = child.tag[:-len("GR.SEQ")] + "DIVISION"
+                changed = True
+            # Unknown containers remain unchanged, but their original article
+            # IDs still enter the inventory so unsupported layouts fail closed.
+            walk(child, operative)
+
+    walk(body, True)
+    if len(set(identifiers)) != len(identifiers):
+        raise FormexArticleError("duplicate-formex-article-number")
+    return (ElementTree.tostring(root, encoding="utf-8") if changed else xml), tuple(identifiers)
+
+
+def _validate_profile_articles(result, expected, *, strict):
+    actual = [str(article.get("article_number", "")).strip()
+              for article in result.get("articles", [])]
+    if (expected and (len(actual) != len(expected) or set(actual) != set(expected))
+            or strict and not expected):
+        raise FormexArticleError("formex-article-inventory-mismatch")
+
+
 def _profile_parse(xml, destination, parser):
     """Bind a cached parse to its exact source XML before reusing it."""
+    parser_xml, expected = _profile_article_xml(xml)
     digest = hashlib.sha256(xml).hexdigest()
     parser_identity = _parser_identity(parser)
+    adapter_identity = _file_hash(Path(__file__))
     marker = destination.with_suffix(".source.json")
     if marker.exists() and destination.exists():
         try:
             metadata = json.loads(marker.read_text())
             if metadata == {"xml_sha256": digest, "parsed_sha256": _file_hash(destination),
-                            "parser_identity": parser_identity}:
-                return json.loads(destination.read_text())
+                            "parser_identity": parser_identity,
+                            "segmentation_sha256": adapter_identity}:
+                cached = json.loads(destination.read_text())
+                _validate_profile_articles(cached, expected, strict=parser is run_parse_fmx)
+                return cached
         except (OSError, ValueError):
             pass
     destination.parent.mkdir(parents=True, exist_ok=True)
     temporary = destination.with_name(destination.name + ".parsing")
     temporary.unlink(missing_ok=True)
     try:
-        result = parser(xml, temporary)
+        result = parser(parser_xml, temporary)
         if not isinstance(result, dict):
             return None
+        _validate_profile_articles(result, expected, strict=parser is run_parse_fmx)
         cellar._atomic_json(destination, result)
         cellar._atomic_json(marker, {"xml_sha256": digest, "parsed_sha256": _file_hash(destination),
-                                     "parser_identity": parser_identity})
+                                     "parser_identity": parser_identity,
+                                     "segmentation_sha256": adapter_identity})
         return result
     finally:
         temporary.unlink(missing_ok=True)

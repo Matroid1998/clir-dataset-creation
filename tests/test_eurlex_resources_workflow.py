@@ -350,6 +350,85 @@ def test_pinned_profile_qa_cannot_use_annex_of_a_new_act_as_its_primary_target(p
         index.close()
 
 
+def _limit_publication_targets(manifest, targets):
+    path = manifest.parent / "target_articles.json"
+    path.write_text(json.dumps(sorted(targets)), encoding="utf-8")
+    frozen = json.loads(manifest.read_text())
+    frozen["files"][path.name] = hashlib.sha256(path.read_bytes()).hexdigest()
+    frozen.setdefault("config", {})["target_articles"] = len(targets)
+    frozen.setdefault("counts", {})["target_articles"] = len(targets)
+    manifest.write_text(json.dumps(frozen), encoding="utf-8")
+
+
+def test_article_limited_publication_keeps_unlisted_articles_as_references(prepared, tmp_path):
+    from clir_bench.domains.legal.structure.profile import load_profile
+
+    manifest, _ = prepared
+    _limit_publication_targets(manifest, [NEW_ELI])
+    index = SourceIndex(tmp_path / "publication.sqlite")
+    try:
+        load_eurlex(index, {"dataset_manifest": str(manifest), "languages": ["en", "fr"]},
+                    tmp_path, None)
+        sources = {row["source_id"]: row for row in index.rows() if row["language"] == "en"}
+        assert set(sources) == {NEW_ELI, SECOND_ELI, OLD_ELI}
+        assert json.loads(sources[NEW_ELI]["metadata_json"])["dataset_target_article"] is True
+        assert json.loads(sources[SECOND_ELI]["metadata_json"])["dataset_target_article"] is False
+        assert json.loads(sources[OLD_ELI]["metadata_json"])["dataset_target_article"] is False
+        raw = {"target_id": NEW_ELI, "document_id": NEW_ACT, "question_language": "en",
+               "question": "How often?", "answer": "Annually.", "mode": "lookup",
+               "generator_model_id": GENERATOR,
+               "articles_involved_eli": [NEW_ELI, SECOND_ELI],
+               "eurlex_dataset_identity": load_profile(manifest).identity}
+        normalized = normalize("eurlex", raw, {}, index)
+        assert f"eurlex:{SECOND_ELI}:en" in normalized["involved_source_unit_ids"]
+        with pytest.raises(ValueError, match="outside its article target allowlist"):
+            normalize("eurlex", {**raw, "target_id": SECOND_ELI}, {}, index)
+    finally:
+        index.close()
+
+
+def test_article_limited_publication_requires_explicit_target_metadata(prepared, tmp_path):
+    from clir_bench.domains.legal.structure.profile import load_profile
+    from clir_bench.publishing.evidence import validate_eurlex_dataset_identity
+
+    manifest, _ = prepared
+    _limit_publication_targets(manifest, [NEW_ELI])
+    index = SourceIndex(tmp_path / "publication.sqlite")
+    try:
+        load_eurlex(index, {"dataset_manifest": str(manifest), "languages": ["en"]}, tmp_path, None)
+        document = index.resolve_article(NEW_ELI, "en")
+        metadata = json.loads(document["metadata_json"])
+        metadata.pop("dataset_target_article")
+        document["metadata_json"] = json.dumps(metadata)
+        with pytest.raises(ValueError, match="outside its article target allowlist"):
+            validate_eurlex_dataset_identity(
+                {"eurlex_dataset_identity": load_profile(manifest).identity}, document,
+            )
+    finally:
+        index.close()
+
+
+def test_old_profile_publication_preserves_act_level_article_scope(prepared, tmp_path):
+    from clir_bench.domains.legal.structure.profile import load_profile
+    from clir_bench.publishing.evidence import validate_eurlex_dataset_identity
+
+    manifest, _ = prepared
+    index = SourceIndex(tmp_path / "publication.sqlite")
+    try:
+        load_eurlex(index, {"dataset_manifest": str(manifest), "languages": ["en"]}, tmp_path, None)
+        for eli in (NEW_ELI, SECOND_ELI):
+            document = index.resolve_article(eli, "en")
+            metadata = json.loads(document["metadata_json"])
+            assert metadata.pop("dataset_target_article") is True
+            # Existing exported source metadata predates article allowlists.
+            document["metadata_json"] = json.dumps(metadata)
+            validate_eurlex_dataset_identity(
+                {"eurlex_dataset_identity": load_profile(manifest).identity}, document,
+            )
+    finally:
+        index.close()
+
+
 @pytest.mark.parametrize("incomplete_eli", [NEW_ELI, OLD_ELI])
 def test_english_question_still_requires_all_four_original_target_and_reference_languages(
         prepared, incomplete_eli):

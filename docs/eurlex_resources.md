@@ -25,7 +25,7 @@ python -m clir_bench.domains.legal.structure.eurlex_resources inventory \
 Inventory downloads only `data/en/regulation.jsonl.xz` and `data/en/directive.jsonl.xz`.
 It excludes records outside the date/type scope, consolidated or noncanonical CELEX IDs,
 empty texts and conflicting source variants. Exact duplicate records are counted. The
-inventory report records publication endpoints, year/type counts, rejection reasons and
+inventory report records upstream source-date endpoints, year/type counts, rejection reasons and
 the deterministic pilot selection.
 
 Prepare official multilingual articles alongside the current structure directory:
@@ -45,7 +45,38 @@ The pilot size counts **acts**, not questions or articles. Sampling balances yea
 strata and article-count bins using a fixed seed. Preparation removes acts already in the
 baseline before selecting new acts, so its selection can differ from the discovery-only
 pilot. Some selected acts may fail official retrieval, parsing or multilingual checks;
-`preparation_report.json` gives measured counts and the accepted publication range.
+`preparation_report.json` gives measured counts and the accepted source-date range.
+
+To prepare an exact pool of **5,000 additional QA-eligible articles**, use an article
+budget instead of an act count:
+
+```bash
+python -m clir_bench.domains.legal.structure.eurlex_resources prepare \
+  --inventory data/legal/eurlex_resources/inventory-2022 \
+  --baseline-structure data/legal/eurlex/structure \
+  --out-dir data/legal/eurlex_resources/qa-5000 \
+  --target-articles 5000 --batch-size 50 --workers 8 \
+  --exclude-profile data/legal/eurlex_resources/pilot-30/manifest.json
+```
+
+This prioritizes acts with more article headings, initially covering each available year
+and document type. It processes complete acts in batches until enough articles pass the
+existing QA checks. The resulting sample favors larger acts; it is not a census or a
+uniform sample of legislation. `--exclude-profile` excludes acts already accepted in a
+prior prepared collection and can be repeated. `--cache-from DIRECTORY` can reuse
+checksum-verified official responses from another preparation workspace or its `cache`
+directory. Transient failures are retried.
+
+The frozen `target_articles.json` permits exactly the requested number of distinct
+article IDs as QA targets. All four language versions must exist, including the versions
+of references supplied to generation. Additional articles and annexes remain in the
+source collection for reference resolution, so the total source record count exceeds the
+target budget. No partial collection is published if the budget cannot be met. Progress
+and validated source caches remain available for resuming the same command.
+
+Prepared Formex article numbering is checked against the official operative XML
+inventory. Modern `GR.SEQ` divisions are adapted for the existing parser; quoted
+amendments, tables of contents and annexes do not become primary articles.
 
 The output includes complete original article/annex records, same-act and cross-act
 reference artifacts, quarantine records and an explicit `target_acts.json` allowlist.
@@ -83,6 +114,8 @@ This is a preparation pilot, not a claim of complete 2017–2022 coverage. A lim
 can leave cross-act references unresolved, which removes affected articles from the question
 pool. A valid prepared collection can therefore yield fewer targets than requested.
 Inspect the preparation report and dry-run selection before increasing the pilot size.
+Question sampling still defaults to at most two targets per act; the prepared article
+budget defines the available pool, independently of how many questions a run selects.
 
 Run metadata and exported candidate rows retain `eurlex_dataset_identity` and the
 `eurlex-resources-v1` format marker. Identity pins the manifest and every declared source,

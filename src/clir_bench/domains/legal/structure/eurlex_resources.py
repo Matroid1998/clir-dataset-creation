@@ -19,6 +19,7 @@ import re
 import shutil
 import sqlite3
 import tempfile
+import time
 from collections import Counter, defaultdict
 from collections.abc import Iterable, Iterator
 from datetime import date, datetime
@@ -800,7 +801,218 @@ def _audit_official_provenance(root: Path, *, cache_dir: Path | None = None) -> 
                         raise ValidationError(f"Official raw cache metadata changed: {name}")
 
 
+def article_budget_order(rows: Iterable[dict], seed: int = SEED) -> list[dict]:
+    """Prioritize article-rich acts, initially covering every year/type stratum."""
+    def rank(row):
+        return (-int(row["proxy_articles"]), int(row["chars_en"]),
+                _text_hash(f"{seed}:{row['celex_id']}"), row["celex_id"])
+
+    ranked = sorted((row for row in rows if row.get("eligible", True)), key=rank)
+    first = {}
+    for row in ranked:
+        first.setdefault((int(row["year"]), row["doc_type"]), row)
+    coverage = [first[key] for key in sorted(first)]
+    covered = {row["celex_id"] for row in coverage}
+    return coverage + [row for row in ranked if row["celex_id"] not in covered]
+
+
+def _seed_official_cache(source: Path, destination: Path, selected: set[str]) -> None:
+    """Copy only identity-validated, checksum-bound original responses."""
+    source = source.expanduser().resolve()
+    if (source / "cache").is_dir():
+        source = source / "cache"
+    if not source.is_dir():
+        raise ValueError(f"Official cache source does not exist: {source}")
+    if source == destination.resolve():
+        return
+    for celex in sorted(selected):
+        for suffix in ["identifiers.xml", *(f"{language}.zip" for language in ACT_LANGUAGES)]:
+            raw = source / celex[1:5] / f"{celex}.{suffix}"
+            metadata = raw.with_suffix(raw.suffix + ".meta.json")
+            target = destination / celex[1:5] / raw.name
+            if target.exists() or not raw.is_file() or not metadata.is_file():
+                continue
+            payload = raw.read_bytes()
+            recorded = json.loads(metadata.read_text(encoding="utf-8"))
+            if recorded.get("sha256") != hashlib.sha256(payload).hexdigest():
+                raise ValidationError(f"Seed cache raw checksum mismatch: {raw.name}")
+            try:
+                if suffix == "identifiers.xml":
+                    cellar._checked_eli(payload, celex)
+                else:
+                    cellar.validate_formex(payload, celex, suffix[:-4])
+            except cellar.FetchError:
+                # Unusable original responses never become successful cache slots.
+                continue
+            cellar._atomic_write(target, payload)
+            cellar._atomic_json(target.with_suffix(target.suffix + ".meta.json"), recorded)
+
+
 def prepare(
+    inventory_path: Path,
+    baseline_structure: Path,
+    out_dir: Path,
+    *,
+    pilot_size: int = 30,
+    seed: int = SEED,
+    workers: int = 4,
+    work_dir: Path | None = None,
+    target_articles: int | None = None,
+    batch_size: int = 50,
+    exclude_profiles: Iterable[Path] = (),
+    cache_from: Iterable[Path] = (),
+    transport=None,
+    parser=None,
+) -> dict:
+    """Prepare an act pilot or stop once a distinct eligible-article budget is met."""
+    if target_articles is None:
+        if tuple(exclude_profiles):
+            raise ValueError("Excluded profiles require an eligible article budget")
+        return _prepare_acts(
+            inventory_path, baseline_structure, out_dir, pilot_size=pilot_size,
+            seed=seed, workers=workers, work_dir=work_dir, transport=transport,
+            parser=parser, cache_from=cache_from,
+        )
+    if type(target_articles) is not int or target_articles < 1:
+        raise ValueError("Target article count must be a positive integer")
+    if type(batch_size) is not int or batch_size < 1:
+        raise ValueError("Article preparation batch size must be a positive integer")
+    from clir_bench.domains.legal.structure.profile import ProfileArticleIndex, load_profile
+
+    inventory_path = _manifest_path(inventory_path)
+    audit(inventory_path)
+    baseline_structure = Path(baseline_structure).expanduser().resolve()
+    baseline, baseline_acts, _ = _baseline_info(baseline_structure)
+    out_dir = Path(out_dir).expanduser().absolute()
+    if out_dir.exists():
+        raise FileExistsError(f"Output already exists: {out_dir}")
+    excluded_acts = set()
+    exclusions = []
+    for path in exclude_profiles:
+        prior = load_profile(_manifest_path(Path(path)))
+        excluded_acts.update(prior.target_acts)
+        exclusions.append(prior.identity)
+    exclusions.sort(key=lambda entry: entry["manifest_path"])
+    rows = [row for row in _rows(inventory_path.parent / "inventory.jsonl")
+            if row["celex_id"] not in baseline_acts | excluded_acts]
+    ordered = article_budget_order(rows, seed)
+    if not ordered:
+        raise ValidationError("No new acts remain after excluding prior prepared profiles")
+    work = (Path(work_dir).expanduser().absolute() if work_dir
+            else out_dir.with_name(f".{out_dir.name}.work"))
+    if (work == out_dir or work.is_relative_to(baseline_structure)
+            or work.is_relative_to(inventory_path.parent)
+            or out_dir.is_relative_to(baseline_structure)
+            or out_dir.is_relative_to(inventory_path.parent)):
+        raise ValueError("Preparation work must be separate from the output and baseline")
+    identity = {
+        "mode": "eligible-article-budget-v1",
+        "inventory_sha256": sha256_file(inventory_path),
+        "baseline": baseline,
+        "candidate_order": [row["celex_id"] for row in ordered],
+        "target_articles": target_articles,
+        "batch_size": batch_size,
+        "seed": seed,
+        "excluded_profiles": exclusions,
+        "transport": _callable_identity(transport),
+        "parser": _parser_provenance(parser),
+        "implementation": {
+            "preparation": sha256_file(Path(__file__)),
+            "segmentation": sha256_file(Path(segment.__file__)),
+            "retrieval": sha256_file(Path(cellar.__file__)),
+            "references": sha256_file(Path(references.__file__)),
+            "projection": sha256_file(Path(project.__file__)),
+            "resolution": sha256_file(Path(resolve_external.__file__)),
+            "qa_eligibility": _text_hash(inspect.getsource(ProfileArticleIndex)),
+        },
+    }
+    state = work / "work_manifest.json"
+    if work.exists():
+        if not state.is_file() or json.loads(state.read_text(encoding="utf-8")) != identity:
+            raise ValidationError("Resumable workspace belongs to different inputs/configuration")
+    else:
+        work.mkdir(parents=True)
+        _write_json(state, identity)
+    progress_path = work / "article_budget_progress.json"
+    progress = json.loads(progress_path.read_text()) if progress_path.exists() else {"batches": []}
+    batches = progress["batches"]
+    start = batches[-1]["processed_acts"] if batches else min(batch_size, len(ordered))
+    started = time.monotonic()
+    previous_attempt = None
+    for end in range(start, len(ordered) + batch_size, batch_size):
+        end = min(end, len(ordered))
+        attempt = work / f"attempt-{end:06d}"
+        print(f"[article-budget] Preparing {end:,} acts; target {target_articles:,} eligible articles", flush=True)
+        if attempt.exists():
+            audit(attempt / "manifest.json", cache_dir=work / "new" / "cache")
+            manifest = json.loads((attempt / "manifest.json").read_text())
+        else:
+            manifest = _prepare_acts(
+                inventory_path, baseline_structure, attempt, pilot_size=end, seed=seed,
+                workers=workers, work_dir=work, transport=transport, parser=parser,
+                cache_from=cache_from, _selected_rows=ordered[:end], _resume_identity=identity,
+            )
+        index = ProfileArticleIndex(attempt / "manifest.json")
+        eligible = sorted(
+            identifier for identifier, unit in index.by_eli.items()
+            if unit.celex_id in index.target_acts and unit.unit_type == "article"
+            and index.is_target_eligible(identifier)
+        )
+        del index
+        count = len(eligible)
+        record = {"processed_acts": end, "eligible_articles": count,
+                  "elapsed_seconds": round(time.monotonic() - started, 3)}
+        if not batches or batches[-1]["processed_acts"] != end:
+            batches.append(record)
+        else:
+            batches[-1] = record
+        _write_json(progress_path, {"batches": batches})
+        print(f"[article-budget] {count:,}/{target_articles:,} eligible articles after {end:,} acts", flush=True)
+        if count >= target_articles:
+            chosen = sorted(sorted(eligible, key=lambda identifier: (
+                _text_hash(f"{seed}:{identifier}"), identifier))[:target_articles])
+            _write_json(attempt / "target_articles.json", chosen)
+            report_path = attempt / "preparation_report.json"
+            report = json.loads(report_path.read_text())
+            report.update({"requested_target_articles": target_articles,
+                           "eligible_articles_before_cap": count,
+                           "batches": batches,
+                           "selection_strategy": "article-rich with initial year/type coverage",
+                           "excluded_profiles": exclusions})
+            report["counts"].update({"target_articles": target_articles,
+                                     "eligible_articles_before_cap": count})
+            _write_json(report_path, report)
+            manifest["config"].update({"target_articles": target_articles,
+                                       "batch_size": batch_size,
+                                       "selection_strategy": "article-rich with initial year/type coverage"})
+            manifest["counts"].update({"target_articles": target_articles,
+                                      "eligible_articles_before_cap": count})
+            manifest["source"]["excluded_profiles"] = exclusions
+            for name in ("target_articles.json", "preparation_report.json"):
+                manifest["files"][name] = sha256_file(attempt / name)
+            _write_json(attempt / "manifest.json", manifest)
+            audit(attempt / "manifest.json", cache_dir=work / "new" / "cache")
+            if (sha256_file(inventory_path) != identity["inventory_sha256"]
+                    or _baseline_info(baseline_structure)[0] != baseline):
+                raise ValidationError("Inventory or baseline changed during preparation")
+            if out_dir.exists():
+                raise FileExistsError(f"Output already exists: {out_dir}")
+            attempt.rename(out_dir)
+            if previous_attempt and previous_attempt.exists():
+                shutil.rmtree(previous_attempt)
+            return manifest
+        if previous_attempt and previous_attempt != attempt and previous_attempt.exists():
+            shutil.rmtree(previous_attempt)
+        previous_attempt = attempt
+        if end == len(ordered):
+            break
+    raise ValidationError(
+        f"Only {count:,} eligible articles found; requested {target_articles:,}. "
+        f"No partial collection was published; resumable work is retained at {work}."
+    )
+
+
+def _prepare_acts(
     inventory_path: Path,
     baseline_structure: Path,
     out_dir: Path,
@@ -811,6 +1023,9 @@ def prepare(
     work_dir: Path | None = None,
     transport=None,
     parser=None,
+    cache_from: Iterable[Path] = (),
+    _selected_rows: list[dict] | None = None,
+    _resume_identity: dict | None = None,
 ) -> dict:
     """Build a fresh union bundle, resuming official-source work after interruption.
 
@@ -833,7 +1048,10 @@ def prepare(
         for row in _rows(inventory_path.parent / "inventory.jsonl")
         if row["celex_id"] not in baseline_acts
     ]
-    selected = stratified_sample(candidates, pilot_size, seed)
+    selected = (_selected_rows if _selected_rows is not None
+                else stratified_sample(candidates, pilot_size, seed))
+    if any(row not in candidates for row in selected):
+        raise ValidationError("Selected preparation act is outside the input inventory")
     chosen = {row["celex_id"] for row in selected}
     out_dir.parent.mkdir(parents=True, exist_ok=True)
     work = (
@@ -849,7 +1067,7 @@ def prepare(
         or out_dir.is_relative_to(inventory_path.parent)
     ):
         raise ValueError("Preparation work must be separate from the output and baseline")
-    identity = {
+    identity = _resume_identity or {
         "inventory_sha256": sha256_file(inventory_path),
         "baseline": baseline,
         "selected": sorted(chosen),
@@ -867,6 +1085,8 @@ def prepare(
         _write_json(state, identity)
     new_profile = StructurePaths(work / "new")
     new_profile.ensure_dirs()
+    for source_cache in cache_from:
+        _seed_official_cache(Path(source_cache), new_profile.CACHE_DIR, chosen)
     _csv(new_profile.CANDIDATES_CSV, selected)
     _csv(new_profile.PILOT_CSV, selected)
     if chosen:
@@ -1131,6 +1351,23 @@ def audit(manifest_path: Path, *, cache_dir: Path | None = None) -> dict:
                 raise ValidationError("Reference character span is outside its English source")
     if len(targets) != manifest["counts"]["accepted_new_acts"]:
         raise ValidationError("Accepted target act count mismatch")
+    if "target_articles.json" in manifest["files"] or "target_articles" in manifest["config"]:
+        from clir_bench.domains.legal.structure.profile import ProfileArticleIndex
+
+        expected = manifest["config"].get("target_articles")
+        if type(expected) is not int or expected < 1 or "target_articles.json" not in manifest["files"]:
+            raise ValidationError("Missing or invalid eligible article budget")
+        article_targets = json.loads((root / "target_articles.json").read_text())
+        if (not isinstance(article_targets, list) or article_targets != sorted(set(article_targets))
+                or len(article_targets) != expected
+                or manifest["counts"].get("target_articles") != expected):
+            raise ValidationError("Eligible article target count mismatch")
+        # Release the full raw-unit audit map before constructing the QA index.
+        del units, statuses
+        index = ProfileArticleIndex(manifest_path)
+        for identifier in article_targets:
+            if not index.is_target_eligible(identifier):
+                raise ValidationError(f"Article budget contains an ineligible QA target: {identifier}")
     return manifest["counts"]
 
 
@@ -1154,6 +1391,10 @@ def main(argv: list[str] | None = None) -> None:
     build.add_argument("--seed", type=int, default=SEED)
     build.add_argument("--workers", type=int, default=4)
     build.add_argument("--work-dir", type=Path)
+    build.add_argument("--target-articles", type=int, help="Stop after this many distinct QA-eligible articles")
+    build.add_argument("--batch-size", type=int, default=50)
+    build.add_argument("--exclude-profile", type=Path, action="append", default=[])
+    build.add_argument("--cache-from", type=Path, action="append", default=[])
     check = commands.add_parser("audit")
     check.add_argument("manifest", type=Path)
     check.add_argument(
@@ -1175,6 +1416,10 @@ def main(argv: list[str] | None = None) -> None:
             seed=args.seed,
             workers=args.workers,
             work_dir=args.work_dir,
+            target_articles=args.target_articles,
+            batch_size=args.batch_size,
+            exclude_profiles=args.exclude_profile,
+            cache_from=args.cache_from,
         )
     else:
         print(json.dumps(audit(args.manifest, cache_dir=args.cache_dir), sort_keys=True))

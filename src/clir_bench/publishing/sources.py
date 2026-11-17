@@ -223,7 +223,13 @@ def _load_eurlex_manifest(index, spec, root, wanted):
                         raise ValueError(f"profile article has no original text: {source} ({language})")
                     metadata = {key: value for key, value in raw.items() if key != "text"}
                     metadata.update(dataset_identity=profile.identity,
-                                    dataset_target_act=raw["celex_id"] in profile.target_acts)
+                                    dataset_target_act=raw["celex_id"] in profile.target_acts,
+                                    dataset_target_article=(
+                                        raw["unit_type"] == "article"
+                                        and raw["celex_id"] in profile.target_acts
+                                        and (profile.target_articles is None
+                                             or source in profile.target_articles)
+                                    ))
                     index.add(source_row(
                         "eurlex", source, raw["celex_id"], language, raw["unit_type"],
                         raw.get("heading", ""), raw["text"], metadata,

@@ -108,6 +108,10 @@ def validate_eurlex_dataset_identity(raw: dict, document: dict) -> None:
         raise ValueError("EUR-Lex dataset identity differs from the exported source profile")
     if metadata.get("dataset_target_act") is not True or document.get("unit_type") != "article":
         raise ValueError("EUR-Lex profile QA primary source must be a newer target article")
+    article_limited = "target_articles.json" in prepared["files_sha256"]
+    if (metadata.get("dataset_target_article") is False
+            or article_limited and metadata.get("dataset_target_article") is not True):
+        raise ValueError("EUR-Lex profile QA primary source is outside its article target allowlist")
 
 
 def align_spans(corpus: str, raw: dict, index) -> list[dict]:
