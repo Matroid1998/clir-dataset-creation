@@ -159,6 +159,28 @@ clir progressive all         # swap one more term per rung, measure decay
 
 Legal generation and model comparisons use the existing EUR-Lex and UN batch pipelines:
 
+Generation defaults to `--generation-model auto` for UN, EUR-Lex and Google Patents.
+The packaged comparison table selects a generator for each corpus, mode and language.
+Among Haiku and Qwen, Qwen is used only when its average score is at least **0.5 points**
+higher; otherwise the generator is **Claude Haiku 5.5**. The selector uses shared-input
+score differences with at least five independent documents, and observed input means
+for smaller samples. Missing combinations use Haiku. These are point-estimate choices;
+small-sample flags in the analysis still apply. Persona deciders run before the final
+generator is selected; the generator-based decider itself uses Haiku in automatic mode.
+
+Use `--generation-model provider/model` to choose a fixed generator. Legal runs still
+accept repeated explicit IDs for model comparisons; `auto` must be used alone.
+With `auto`, `--questions-per-mode` requests a total across the selected generators,
+rather than that many questions from each model. Dry runs show model assignments (or
+defer them until the persona is known). Results retain the actual generator ID and
+selection metadata; legal run fingerprints also pin the table checksum for resume.
+Existing runs resume their saved model configuration.
+
+The reviewed scores are packaged in
+`src/clir_bench/core/generation_model_table.json`; generation does not depend on files
+under `reports/`. To refresh that snapshot after rerunning the comparison at 0.5 points,
+run `.venv/bin/python reports/qa_generation_model_comparison/export_generation_model_table.py`.
+
 ```bash
 clir --domain legal qac generate --source eurlex --questions 30
 # data/legal/eurlex/qac/<timestamp>/results.csv

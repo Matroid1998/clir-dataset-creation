@@ -53,7 +53,7 @@ from clir_bench.domains.legal.qac.env import load_env
 from clir_bench.domains.legal.structure import ACT_LANGUAGES
 from clir_bench.domains.legal.structure import paths as struct_paths
 
-DEFAULT_GEN_MODEL = "gpt-5.6-luna"
+DEFAULT_GEN_MODEL = "auto"
 
 OUT_DIR = struct_paths.EURLEX_DIR / "qac"
 

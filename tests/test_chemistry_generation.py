@@ -301,8 +301,9 @@ def test_legacy_default_parser_still_supports_semantic_generation(monkeypatch):
     assert qagen.generate_candidates(None, legacy, "prompt", "passage", "semantic") == [candidate]
 
 
+@pytest.mark.parametrize("generator", [None, "provider/manual"])
 def test_cli_generation_and_regrading_preserve_source_metadata_and_replace_grade_audits(
-    monkeypatch, tmp_path,
+    monkeypatch, tmp_path, generator,
 ):
     from clir_bench import domains
     from clir_bench.cli import build_parser
@@ -330,7 +331,13 @@ def test_cli_generation_and_regrading_preserve_source_metadata_and_replace_grade
     ])
     corpus.write_rows(context.workspace.corpus_csv("gp"), source_rows, tuple(source_rows[0]))
     monkeypatch.setattr(cli, "client_for", lambda model: None)
-    monkeypatch.setattr(qagen, "chat", lambda *a, **k: json.dumps([candidate]))
+    generation_models = []
+
+    def generate(client, model, messages, **kwargs):
+        generation_models.append(model)
+        return json.dumps([candidate])
+
+    monkeypatch.setattr(qagen, "chat", generate)
     score = 4
     metadata_status = "pass"
 
@@ -348,12 +355,16 @@ def test_cli_generation_and_regrading_preserve_source_metadata_and_replace_grade
     args = parser.parse_args([
         "qac", "generate", "--source", "gp", "--langs", "en", "--modes", "constraint_search",
         "--questions", "1", "--limit", "1", "--output", str(output),
+        *(["--generation-model", generator] if generator else []),
     ])
     assert args.handler(args, context) == 0
     saved = corpus.read_rows(output)
     assert len(saved) == 1
     assert saved[0]["total_score"] == "32"
     assert saved[0]["quality_audit_status"] == "clear"
+    assert generation_models == [generator or "qwen/qwen3.8-27b"]
+    assert saved[0]["generator_model_id"] == generation_models[0]
+    assert saved[0]["generator_selection_policy"] == ("" if generator else "table_haiku_preferred_0.5_v1")
 
     # Simulate an input exported by an older rubric: regrading clears old metrics.
     saved[0]["qual_focus"] = "5"
@@ -383,6 +394,8 @@ def test_cli_generation_and_regrading_preserve_source_metadata_and_replace_grade
     assert saved["quality_batch_diversity"] == "not_applicable"
     assert saved["qual_focus"] == ""
     assert saved["qual_failure_type"] == ""
+    assert saved["generator_model_id"] == generation_models[0]
+    assert len(generation_models) == 1
     assert qagen.candidate_from_row(saved) == dict(
         candidate, mode="constraint_search", question_language="en",
     )
@@ -424,6 +437,7 @@ def test_french_documents_use_french_prompts_and_exact_source_through_regrading(
 
     def generate(client, model, messages, **kwargs):
         assert messages[0]["content"] == PACK.generation("lookup", "fr")
+        assert model == "anthropic/claude-haiku-5.5"
         packet = messages[1]["content"]
         assert_packet(packet)
         generation_packets.append(packet)

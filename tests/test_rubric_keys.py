@@ -88,7 +88,7 @@ def test_grade_columns_emits_the_rubric_criteria_not_the_mode_default(pack: str,
 
 
 def test_both_batch_drivers_default_to_the_same_generator() -> None:
-    assert un_batch.DEFAULT_GEN_MODEL == eurlex_batch.DEFAULT_GEN_MODEL == "gpt-5.6-luna"
+    assert un_batch.DEFAULT_GEN_MODEL == eurlex_batch.DEFAULT_GEN_MODEL == "auto"
 
 
 LEGAL_CASES = [("eurlex", "lookup"), ("eurlex", "fact_pattern"), ("eurlex", "conceptual"),

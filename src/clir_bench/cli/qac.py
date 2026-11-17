@@ -4,12 +4,14 @@ from __future__ import annotations
 
 import argparse
 import sys
+from dataclasses import replace
 from pathlib import Path
 
 from clir_bench import domains
 from clir_bench.core import corpus as corpus_io
 from clir_bench.core import qagen
 from clir_bench.core.context import AppContext
+from clir_bench.core.generation_models import AUTO_MODEL, select_generator
 from clir_bench.core.grading import GraderConfig
 from clir_bench.core.llm import client_for
 from clir_bench.core.parallel import run_tasks
@@ -32,8 +34,9 @@ def register(subparsers: argparse._SubParsersAction, context: AppContext | None)
         "generate",
         help="Generate graded questions from a corpus",
         description=(
-            "Generate and grade questions using the same selected targets for every "
-            "generator. Each source gets one run folder and results CSV containing all models."
+            "Generate and grade questions with table-driven model selection by default. "
+            "Explicit model IDs compare generators on the same selected targets. "
+            "Each source gets one run folder and results CSV."
         )
         if run_workflow
         else (
@@ -112,9 +115,10 @@ def register(subparsers: argparse._SubParsersAction, context: AppContext | None)
     generate.add_argument(
         "--generation-model",
         **(
-            {"action": "append", "help": "Generator model ID; repeat to compare models"}
+            {"action": "append", "help": "auto (default): select by corpus/mode/language; "
+                                          "or a model ID (repeat IDs to compare models)"}
             if run_workflow
-            else {"help": "Override the generation model"}
+            else {"help": "auto (default): select by corpus/mode/language; or a fixed model ID"}
         ),
     )
     generate.add_argument("--verifier-model", help="Override the grading model")
@@ -140,7 +144,8 @@ def register(subparsers: argparse._SubParsersAction, context: AppContext | None)
         )
         generate.add_argument(
             "--questions-per-mode", type=int,
-            help="Save this many candidates per source, mode and generator; advance through targets until filled",
+            help="Save this many candidates per source and mode (per generator with explicit model IDs); "
+                 "advance through targets until filled",
         )
         generate.add_argument(
             "--targets-from",
@@ -272,7 +277,8 @@ def _domain_command(args: argparse.Namespace, context: AppContext) -> int:
 def _generation_config(args: argparse.Namespace, context: AppContext) -> qagen.GenerationConfig:
     llm = context.settings.llm
     return qagen.GenerationConfig(
-        generation_model=getattr(args, "generation_model", None) or llm.generation_model,
+        generation_model=(getattr(args, "generation_model", None)
+                          or context.setting("generation_model", llm.generation_model)),
         grader=GraderConfig(
             model=getattr(args, "verifier_model", None) or llm.verifier_model,
             reasoning_effort=llm.grading_reasoning_effort,
@@ -310,6 +316,7 @@ def _generate(args: argparse.Namespace, context: AppContext) -> int:
     output = args.output or (context.workspace.qac_dir(source) / f"qac_{source.name}.csv")
     prompts = PromptPack(package=domain.prompts_package)
     fieldnames = qagen.output_fieldnames(schema, prompts=prompts, modes=domain.analysis.modes)
+    config = _generation_config(args, context)
 
     print(f"plan: {len(plan)} question(s) from {len(grouped)} documents in {corpus_path.name}")
     if args.dry_run:
@@ -317,7 +324,10 @@ def _generate(args: argparse.Namespace, context: AppContext) -> int:
             print("persona: pending Jev eligibility; dry-run makes no model calls")
         for item in plan[:20]:
             mode = "pending" if getattr(args, "decider_model", None) else item.mode
-            print(f"  {item.family:<24} {item.language}  {mode:<10} {item.strategy_name}")
+            model = ("pending persona" if mode == "pending" and config.generation_model == AUTO_MODEL
+                     else select_generator(source.name, item.mode, item.language,
+                                           model=config.generation_model).model)
+            print(f"  {item.family:<24} {item.language}  {mode:<10} {item.strategy_name}  {model}")
         if len(plan) > 20:
             print(f"  ... and {len(plan) - 20} more")
         print(f"would write -> {output}")
@@ -339,25 +349,31 @@ def _generate(args: argparse.Namespace, context: AppContext) -> int:
             print("no eligible targets to generate")
             return 0
 
-    config = _generation_config(args, context)
-    generation_client = client_for(config.generation_model)
+    selections = {(item.mode, item.language): select_generator(
+        source.name, item.mode, item.language, model=config.generation_model) for item in plan}
+    generation_clients = {model: client_for(model) for model in
+                          sorted({selection.model for selection in selections.values()})}
     grading_client = client_for(config.grader.model)
     order = domain.languages.priority or domain.languages.working
 
     failures: list[dict[str, str]] = []
 
     def work(item: qagen.PlanItem):
+        selection = selections[item.mode, item.language]
         try:
-            return qagen.generate_for_document(
+            rows = qagen.generate_for_document(
                 item,
                 grouped.get(item.family, []),
                 schema=schema,
                 prompts=prompts,
-                config=config,
-                generation_client=generation_client,
+                config=replace(config, generation_model=selection.model),
+                generation_client=generation_clients[selection.model],
                 grading_client=grading_client,
                 language_order=order,
             )
+            for row in rows:
+                row.update(selection.metadata())
+            return rows
         except RuntimeError as exc:
             failure = {
                 "source_document_id": item.document_id,

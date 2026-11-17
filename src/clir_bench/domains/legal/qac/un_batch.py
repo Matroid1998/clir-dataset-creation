@@ -53,7 +53,7 @@ from clir_bench.domains.legal.qac.env import load_env
 from clir_bench.domains.legal.un import UN_LANGUAGES
 from clir_bench.domains.legal.un import paths as un_paths
 
-DEFAULT_GEN_MODEL = "gpt-5.6-luna"
+DEFAULT_GEN_MODEL = "auto"
 
 OUT_DIR = un_paths.QAC_DIR
 

@@ -73,6 +73,7 @@ DATA_LAYOUT = {
 
 # Defaults a user can override in clir.toml under [domains.chemistry].
 DEFAULTS = {
+    "generation_model": "auto",
     # Input is distinct from the writable derived-corpus publishing destination.
     "input_dataset_repo": DATASET_REPO,
     "corpus_repo": "MehdiAstaraki/multilingual_GP",

@@ -26,18 +26,8 @@ main_score = "recall_at_10"
 allow_local_models = false
 
 [domains.legal]
-generation_model_candidates = [
-    "gpt-5.6-luna",
-    "mistralai/mistral-small-2603",
-    "prism-ml/ternary-bonsai-2-27b",
-    "z-ai/glm-5.3-flashx",
-    "deepseek/deepseek-v4.1-flash",
-    "anthropic/claude-haiku-5.5",
-    "qwen/qwen3.8-27b",
-    "nvidia/nemotron-3.5-lightning",
-    "minimax/minimax-m2.7",
-    "upstage/solar-pro4",
-]
+# Table-driven selection per corpus, persona and language. Explicit CLI IDs override it.
+generation_model_candidates = ["auto"]
 
 [domains.legal.persona_weights]
 lookup = 5

@@ -27,6 +27,7 @@ from typing import Any, Callable, Mapping, Optional, Sequence
 
 from clir_bench.core import corpus as corpus_io
 from clir_bench.core.domain import CorpusSchema
+from clir_bench.core.generation_models import SELECTION_FIELDS
 from clir_bench.core.grading import (
     MODE_SEMANTIC,
     MODE_TECHNICAL,
@@ -274,6 +275,8 @@ def generate_for_document(
         }
         row.update(grade_columns(candidate.faith, candidate.quality, item.mode))
         row.update(item.metadata)
+        row["generator_model_id"] = config.generation_model
+        row["generator_model_name"] = config.generation_model.rsplit("/", 1)[-1]
         out.append(row)
     return out
 
@@ -327,6 +330,9 @@ def output_fieldnames(
         "strategy",
         "strategy_name",
         "candidate_rank",
+        "generator_model_id",
+        "generator_model_name",
+        *SELECTION_FIELDS,
         "question",
         "answer",
         *CANDIDATE_METADATA_FIELDS,

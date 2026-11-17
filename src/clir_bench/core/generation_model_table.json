@@ -1,0 +1,979 @@
+{
+  "version": "2026-11-17",
+  "source": "reports/qa_generation_model_comparison/model_selection/recommendations.csv",
+  "source_sha256": "3439b4d5739da8a41072512de5718006a8c64060f339eaa3d2d330a488d43e7b",
+  "input_sha256": "388096b8b4fd62776326ea515b4cd2eac34442d47f94a1e1d8937d629ae29532",
+  "score_scale": 40,
+  "rows": [
+    {
+      "corpus": "gp",
+      "language": "de",
+      "mode": "assertion_verification",
+      "recommended_model": "anthropic/claude-haiku-5.5",
+      "haiku_mean": 32.0,
+      "qwen_mean": 31.0,
+      "haiku_minus_qwen_paired": 1.0,
+      "paired_documents": 2
+    },
+    {
+      "corpus": "gp",
+      "language": "de",
+      "mode": "comparison",
+      "recommended_model": "anthropic/claude-haiku-5.5",
+      "haiku_mean": 31.666666666666668,
+      "qwen_mean": 28.0,
+      "haiku_minus_qwen_paired": 3.6666666666666665,
+      "paired_documents": 3
+    },
+    {
+      "corpus": "gp",
+      "language": "de",
+      "mode": "constraint_search",
+      "recommended_model": "qwen/qwen3.8-27b",
+      "haiku_mean": 25.5,
+      "qwen_mean": 31.0,
+      "haiku_minus_qwen_paired": -5.5,
+      "paired_documents": 2
+    },
+    {
+      "corpus": "gp",
+      "language": "de",
+      "mode": "lookup",
+      "recommended_model": "anthropic/claude-haiku-5.5",
+      "haiku_mean": 32.0,
+      "qwen_mean": 32.0,
+      "haiku_minus_qwen_paired": 0.0,
+      "paired_documents": 2
+    },
+    {
+      "corpus": "gp",
+      "language": "de",
+      "mode": "process_retrieval",
+      "recommended_model": "anthropic/claude-haiku-5.5",
+      "haiku_mean": 31.333333333333332,
+      "qwen_mean": 31.333333333333332,
+      "haiku_minus_qwen_paired": 0.0,
+      "paired_documents": 3
+    },
+    {
+      "corpus": "gp",
+      "language": "de",
+      "mode": "source_finding",
+      "recommended_model": "qwen/qwen3.8-27b",
+      "haiku_mean": 31.666666666666668,
+      "qwen_mean": 32.0,
+      "haiku_minus_qwen_paired": -0.3333333333333333,
+      "paired_documents": 3
+    },
+    {
+      "corpus": "gp",
+      "language": "en",
+      "mode": "assertion_verification",
+      "recommended_model": "qwen/qwen3.8-27b",
+      "haiku_mean": 32.0,
+      "qwen_mean": 32.0,
+      "haiku_minus_qwen_paired": 0.0,
+      "paired_documents": 7
+    },
+    {
+      "corpus": "gp",
+      "language": "en",
+      "mode": "comparison",
+      "recommended_model": "qwen/qwen3.8-27b",
+      "haiku_mean": 31.5,
+      "qwen_mean": 32.0,
+      "haiku_minus_qwen_paired": -0.5,
+      "paired_documents": 4
+    },
+    {
+      "corpus": "gp",
+      "language": "en",
+      "mode": "conceptual",
+      "recommended_model": "anthropic/claude-haiku-5.5",
+      "haiku_mean": 31.714285714285715,
+      "qwen_mean": 30.571428571428573,
+      "haiku_minus_qwen_paired": 1.1428571428571428,
+      "paired_documents": 7
+    },
+    {
+      "corpus": "gp",
+      "language": "en",
+      "mode": "constraint_search",
+      "recommended_model": "qwen/qwen3.8-27b",
+      "haiku_mean": 30.666666666666668,
+      "qwen_mean": 31.6,
+      "haiku_minus_qwen_paired": -1.2,
+      "paired_documents": 5
+    },
+    {
+      "corpus": "gp",
+      "language": "en",
+      "mode": "lookup",
+      "recommended_model": "qwen/qwen3.8-27b",
+      "haiku_mean": 31.22222222222222,
+      "qwen_mean": 31.555555555555557,
+      "haiku_minus_qwen_paired": -0.3333333333333333,
+      "paired_documents": 9
+    },
+    {
+      "corpus": "gp",
+      "language": "en",
+      "mode": "process_retrieval",
+      "recommended_model": "anthropic/claude-haiku-5.5",
+      "haiku_mean": 30.6,
+      "qwen_mean": 30.4,
+      "haiku_minus_qwen_paired": 0.25,
+      "paired_documents": 4
+    },
+    {
+      "corpus": "gp",
+      "language": "en",
+      "mode": "source_finding",
+      "recommended_model": "qwen/qwen3.8-27b",
+      "haiku_mean": 32.0,
+      "qwen_mean": 32.0,
+      "haiku_minus_qwen_paired": 0.0,
+      "paired_documents": 6
+    },
+    {
+      "corpus": "gp",
+      "language": "es",
+      "mode": "assertion_verification",
+      "recommended_model": "qwen/qwen3.8-27b",
+      "haiku_mean": 31.142857142857142,
+      "qwen_mean": 32.0,
+      "haiku_minus_qwen_paired": 0.0,
+      "paired_documents": 6
+    },
+    {
+      "corpus": "gp",
+      "language": "es",
+      "mode": "comparison",
+      "recommended_model": "qwen/qwen3.8-27b",
+      "haiku_mean": 29.666666666666668,
+      "qwen_mean": 32.0,
+      "haiku_minus_qwen_paired": -3.5,
+      "paired_documents": 2
+    },
+    {
+      "corpus": "gp",
+      "language": "es",
+      "mode": "conceptual",
+      "recommended_model": "qwen/qwen3.8-27b",
+      "haiku_mean": 31.4,
+      "qwen_mean": 31.8,
+      "haiku_minus_qwen_paired": -0.75,
+      "paired_documents": 4
+    },
+    {
+      "corpus": "gp",
+      "language": "es",
+      "mode": "constraint_search",
+      "recommended_model": "qwen/qwen3.8-27b",
+      "haiku_mean": 29.0,
+      "qwen_mean": 29.375,
+      "haiku_minus_qwen_paired": -2.0,
+      "paired_documents": 6
+    },
+    {
+      "corpus": "gp",
+      "language": "es",
+      "mode": "lookup",
+      "recommended_model": "anthropic/claude-haiku-5.5",
+      "haiku_mean": 32.0,
+      "qwen_mean": 31.25,
+      "haiku_minus_qwen_paired": 1.0,
+      "paired_documents": 2
+    },
+    {
+      "corpus": "gp",
+      "language": "es",
+      "mode": "process_retrieval",
+      "recommended_model": "anthropic/claude-haiku-5.5",
+      "haiku_mean": 32.0,
+      "qwen_mean": 30.25,
+      "haiku_minus_qwen_paired": 0.0,
+      "paired_documents": 3
+    },
+    {
+      "corpus": "gp",
+      "language": "es",
+      "mode": "source_finding",
+      "recommended_model": "anthropic/claude-haiku-5.5",
+      "haiku_mean": 32.0,
+      "qwen_mean": 32.0,
+      "haiku_minus_qwen_paired": 0.0,
+      "paired_documents": 3
+    },
+    {
+      "corpus": "gp",
+      "language": "fr",
+      "mode": "assertion_verification",
+      "recommended_model": "qwen/qwen3.8-27b",
+      "haiku_mean": 31.375,
+      "qwen_mean": 32.0,
+      "haiku_minus_qwen_paired": -0.625,
+      "paired_documents": 8
+    },
+    {
+      "corpus": "gp",
+      "language": "fr",
+      "mode": "comparison",
+      "recommended_model": "anthropic/claude-haiku-5.5",
+      "haiku_mean": 31.666666666666668,
+      "qwen_mean": 31.6,
+      "haiku_minus_qwen_paired": 0.0,
+      "paired_documents": 9
+    },
+    {
+      "corpus": "gp",
+      "language": "fr",
+      "mode": "conceptual",
+      "recommended_model": "anthropic/claude-haiku-5.5",
+      "haiku_mean": 31.333333333333332,
+      "qwen_mean": 30.625,
+      "haiku_minus_qwen_paired": 0.8333333333333334,
+      "paired_documents": 6
+    },
+    {
+      "corpus": "gp",
+      "language": "fr",
+      "mode": "constraint_search",
+      "recommended_model": "qwen/qwen3.8-27b",
+      "haiku_mean": 31.625,
+      "qwen_mean": 31.857142857142858,
+      "haiku_minus_qwen_paired": 0.0,
+      "paired_documents": 6
+    },
+    {
+      "corpus": "gp",
+      "language": "fr",
+      "mode": "lookup",
+      "recommended_model": "qwen/qwen3.8-27b",
+      "haiku_mean": 31.875,
+      "qwen_mean": 32.22222222222222,
+      "haiku_minus_qwen_paired": -0.2857142857142857,
+      "paired_documents": 7
+    },
+    {
+      "corpus": "gp",
+      "language": "fr",
+      "mode": "process_retrieval",
+      "recommended_model": "qwen/qwen3.8-27b",
+      "haiku_mean": 30.666666666666668,
+      "qwen_mean": 31.77777777777778,
+      "haiku_minus_qwen_paired": -1.1111111111111112,
+      "paired_documents": 9
+    },
+    {
+      "corpus": "gp",
+      "language": "fr",
+      "mode": "source_finding",
+      "recommended_model": "anthropic/claude-haiku-5.5",
+      "haiku_mean": 32.375,
+      "qwen_mean": 32.0,
+      "haiku_minus_qwen_paired": 0.5,
+      "paired_documents": 6
+    },
+    {
+      "corpus": "gp",
+      "language": "ja",
+      "mode": "assertion_verification",
+      "recommended_model": "qwen/qwen3.8-27b",
+      "haiku_mean": 31.857142857142858,
+      "qwen_mean": 32.0,
+      "haiku_minus_qwen_paired": -0.14285714285714285,
+      "paired_documents": 7
+    },
+    {
+      "corpus": "gp",
+      "language": "ja",
+      "mode": "comparison",
+      "recommended_model": "qwen/qwen3.8-27b",
+      "haiku_mean": 30.714285714285715,
+      "qwen_mean": 32.0,
+      "haiku_minus_qwen_paired": 0.0,
+      "paired_documents": 4
+    },
+    {
+      "corpus": "gp",
+      "language": "ja",
+      "mode": "conceptual",
+      "recommended_model": "qwen/qwen3.8-27b",
+      "haiku_mean": 31.166666666666668,
+      "qwen_mean": 31.285714285714285,
+      "haiku_minus_qwen_paired": -0.3333333333333333,
+      "paired_documents": 6
+    },
+    {
+      "corpus": "gp",
+      "language": "ja",
+      "mode": "constraint_search",
+      "recommended_model": "qwen/qwen3.8-27b",
+      "haiku_mean": 28.0,
+      "qwen_mean": 30.142857142857142,
+      "haiku_minus_qwen_paired": -2.142857142857143,
+      "paired_documents": 7
+    },
+    {
+      "corpus": "gp",
+      "language": "ja",
+      "mode": "lookup",
+      "recommended_model": "anthropic/claude-haiku-5.5",
+      "haiku_mean": 31.642857142857142,
+      "qwen_mean": 30.714285714285715,
+      "haiku_minus_qwen_paired": 0.9285714285714286,
+      "paired_documents": 7
+    },
+    {
+      "corpus": "gp",
+      "language": "ja",
+      "mode": "process_retrieval",
+      "recommended_model": "qwen/qwen3.8-27b",
+      "haiku_mean": 29.857142857142858,
+      "qwen_mean": 31.666666666666668,
+      "haiku_minus_qwen_paired": -0.16666666666666666,
+      "paired_documents": 6
+    },
+    {
+      "corpus": "gp",
+      "language": "ja",
+      "mode": "source_finding",
+      "recommended_model": "anthropic/claude-haiku-5.5",
+      "haiku_mean": 32.0,
+      "qwen_mean": 31.75,
+      "haiku_minus_qwen_paired": 0.25,
+      "paired_documents": 8
+    },
+    {
+      "corpus": "gp",
+      "language": "ru",
+      "mode": "assertion_verification",
+      "recommended_model": "anthropic/claude-haiku-5.5",
+      "haiku_mean": 32.0,
+      "qwen_mean": 32.0,
+      "haiku_minus_qwen_paired": 0.0,
+      "paired_documents": 7
+    },
+    {
+      "corpus": "gp",
+      "language": "ru",
+      "mode": "comparison",
+      "recommended_model": "anthropic/claude-haiku-5.5",
+      "haiku_mean": 32.0,
+      "qwen_mean": 31.571428571428573,
+      "haiku_minus_qwen_paired": 0.42857142857142855,
+      "paired_documents": 7
+    },
+    {
+      "corpus": "gp",
+      "language": "ru",
+      "mode": "conceptual",
+      "recommended_model": "anthropic/claude-haiku-5.5",
+      "haiku_mean": 30.642857142857142,
+      "qwen_mean": 30.142857142857142,
+      "haiku_minus_qwen_paired": 0.5,
+      "paired_documents": 7
+    },
+    {
+      "corpus": "gp",
+      "language": "ru",
+      "mode": "constraint_search",
+      "recommended_model": "anthropic/claude-haiku-5.5",
+      "haiku_mean": 29.714285714285715,
+      "qwen_mean": 29.285714285714285,
+      "haiku_minus_qwen_paired": 0.42857142857142855,
+      "paired_documents": 7
+    },
+    {
+      "corpus": "gp",
+      "language": "ru",
+      "mode": "lookup",
+      "recommended_model": "anthropic/claude-haiku-5.5",
+      "haiku_mean": 31.666666666666668,
+      "qwen_mean": 31.285714285714285,
+      "haiku_minus_qwen_paired": 0.5,
+      "paired_documents": 6
+    },
+    {
+      "corpus": "gp",
+      "language": "ru",
+      "mode": "process_retrieval",
+      "recommended_model": "qwen/qwen3.8-27b",
+      "haiku_mean": 31.875,
+      "qwen_mean": 32.0,
+      "haiku_minus_qwen_paired": -0.125,
+      "paired_documents": 8
+    },
+    {
+      "corpus": "gp",
+      "language": "ru",
+      "mode": "source_finding",
+      "recommended_model": "qwen/qwen3.8-27b",
+      "haiku_mean": 32.0,
+      "qwen_mean": 32.285714285714285,
+      "haiku_minus_qwen_paired": -0.2857142857142857,
+      "paired_documents": 7
+    },
+    {
+      "corpus": "gp",
+      "language": "zh",
+      "mode": "assertion_verification",
+      "recommended_model": "anthropic/claude-haiku-5.5",
+      "haiku_mean": 32.0,
+      "qwen_mean": 32.0,
+      "haiku_minus_qwen_paired": 0.0,
+      "paired_documents": 4
+    },
+    {
+      "corpus": "gp",
+      "language": "zh",
+      "mode": "comparison",
+      "recommended_model": "qwen/qwen3.8-27b",
+      "haiku_mean": 31.333333333333332,
+      "qwen_mean": 32.25,
+      "haiku_minus_qwen_paired": -1.0,
+      "paired_documents": 3
+    },
+    {
+      "corpus": "gp",
+      "language": "zh",
+      "mode": "conceptual",
+      "recommended_model": "qwen/qwen3.8-27b",
+      "haiku_mean": 30.4,
+      "qwen_mean": 32.142857142857146,
+      "haiku_minus_qwen_paired": -1.4,
+      "paired_documents": 5
+    },
+    {
+      "corpus": "gp",
+      "language": "zh",
+      "mode": "constraint_search",
+      "recommended_model": "anthropic/claude-haiku-5.5",
+      "haiku_mean": 29.833333333333332,
+      "qwen_mean": 28.0,
+      "haiku_minus_qwen_paired": 1.8333333333333333,
+      "paired_documents": 6
+    },
+    {
+      "corpus": "gp",
+      "language": "zh",
+      "mode": "lookup",
+      "recommended_model": "anthropic/claude-haiku-5.5",
+      "haiku_mean": 31.4,
+      "qwen_mean": 31.0,
+      "haiku_minus_qwen_paired": 0.4,
+      "paired_documents": 5
+    },
+    {
+      "corpus": "gp",
+      "language": "zh",
+      "mode": "process_retrieval",
+      "recommended_model": "qwen/qwen3.8-27b",
+      "haiku_mean": 31.666666666666668,
+      "qwen_mean": 31.75,
+      "haiku_minus_qwen_paired": 0.0,
+      "paired_documents": 3
+    },
+    {
+      "corpus": "gp",
+      "language": "zh",
+      "mode": "source_finding",
+      "recommended_model": "anthropic/claude-haiku-5.5",
+      "haiku_mean": 32.0,
+      "qwen_mean": 32.0,
+      "haiku_minus_qwen_paired": 0.0,
+      "paired_documents": 7
+    },
+    {
+      "corpus": "eurlex",
+      "language": "de",
+      "mode": "claim_verification",
+      "recommended_model": "anthropic/claude-haiku-5.5",
+      "haiku_mean": 30.333333333333332,
+      "qwen_mean": 30.22222222222222,
+      "haiku_minus_qwen_paired": 0.11111111111111033,
+      "paired_documents": 9
+    },
+    {
+      "corpus": "eurlex",
+      "language": "de",
+      "mode": "comparison",
+      "recommended_model": "anthropic/claude-haiku-5.5",
+      "haiku_mean": 33.333333333333336,
+      "qwen_mean": 33.0,
+      "haiku_minus_qwen_paired": 0.3333333333333333,
+      "paired_documents": 3
+    },
+    {
+      "corpus": "eurlex",
+      "language": "de",
+      "mode": "conceptual",
+      "recommended_model": "anthropic/claude-haiku-5.5",
+      "haiku_mean": 31.576923076923077,
+      "qwen_mean": 31.08974358974359,
+      "haiku_minus_qwen_paired": 0.4871794871794871,
+      "paired_documents": 13
+    },
+    {
+      "corpus": "eurlex",
+      "language": "de",
+      "mode": "fact_pattern",
+      "recommended_model": "anthropic/claude-haiku-5.5",
+      "haiku_mean": 31.125,
+      "qwen_mean": 30.73611111111111,
+      "haiku_minus_qwen_paired": 0.388888888888889,
+      "paired_documents": 12
+    },
+    {
+      "corpus": "eurlex",
+      "language": "de",
+      "mode": "lookup",
+      "recommended_model": "qwen/qwen3.8-27b",
+      "haiku_mean": 30.987179487179485,
+      "qwen_mean": 31.76923076923077,
+      "haiku_minus_qwen_paired": -0.7820512820512818,
+      "paired_documents": 13
+    },
+    {
+      "corpus": "eurlex",
+      "language": "en",
+      "mode": "claim_verification",
+      "recommended_model": "anthropic/claude-haiku-5.5",
+      "haiku_mean": 30.8,
+      "qwen_mean": 30.4,
+      "haiku_minus_qwen_paired": 0.4,
+      "paired_documents": 10
+    },
+    {
+      "corpus": "eurlex",
+      "language": "en",
+      "mode": "conceptual",
+      "recommended_model": "anthropic/claude-haiku-5.5",
+      "haiku_mean": 31.1,
+      "qwen_mean": 29.544444444444444,
+      "haiku_minus_qwen_paired": 1.5555555555555556,
+      "paired_documents": 15
+    },
+    {
+      "corpus": "eurlex",
+      "language": "en",
+      "mode": "fact_pattern",
+      "recommended_model": "anthropic/claude-haiku-5.5",
+      "haiku_mean": 31.214285714285715,
+      "qwen_mean": 30.96153846153846,
+      "haiku_minus_qwen_paired": 0.6538461538461539,
+      "paired_documents": 13
+    },
+    {
+      "corpus": "eurlex",
+      "language": "en",
+      "mode": "lookup",
+      "recommended_model": "anthropic/claude-haiku-5.5",
+      "haiku_mean": 32.0625,
+      "qwen_mean": 31.822916666666668,
+      "haiku_minus_qwen_paired": 0.23958333333333326,
+      "paired_documents": 16
+    },
+    {
+      "corpus": "eurlex",
+      "language": "es",
+      "mode": "claim_verification",
+      "recommended_model": "anthropic/claude-haiku-5.5",
+      "haiku_mean": 30.785714285714285,
+      "qwen_mean": 30.238095238095237,
+      "haiku_minus_qwen_paired": 0.5476190476190469,
+      "paired_documents": 7
+    },
+    {
+      "corpus": "eurlex",
+      "language": "es",
+      "mode": "comparison",
+      "recommended_model": "anthropic/claude-haiku-5.5",
+      "haiku_mean": 32.0,
+      "qwen_mean": 32.0,
+      "haiku_minus_qwen_paired": 0.0,
+      "paired_documents": 1
+    },
+    {
+      "corpus": "eurlex",
+      "language": "es",
+      "mode": "conceptual",
+      "recommended_model": "qwen/qwen3.8-27b",
+      "haiku_mean": 31.55,
+      "qwen_mean": 31.71666666666667,
+      "haiku_minus_qwen_paired": -0.1666666666666668,
+      "paired_documents": 10
+    },
+    {
+      "corpus": "eurlex",
+      "language": "es",
+      "mode": "fact_pattern",
+      "recommended_model": "qwen/qwen3.8-27b",
+      "haiku_mean": 28.8,
+      "qwen_mean": 31.53333333333334,
+      "haiku_minus_qwen_paired": -2.733333333333334,
+      "paired_documents": 10
+    },
+    {
+      "corpus": "eurlex",
+      "language": "es",
+      "mode": "lookup",
+      "recommended_model": "qwen/qwen3.8-27b",
+      "haiku_mean": 31.23333333333333,
+      "qwen_mean": 31.96666666666667,
+      "haiku_minus_qwen_paired": -0.7333333333333336,
+      "paired_documents": 10
+    },
+    {
+      "corpus": "eurlex",
+      "language": "fr",
+      "mode": "claim_verification",
+      "recommended_model": "anthropic/claude-haiku-5.5",
+      "haiku_mean": 31.09090909090909,
+      "qwen_mean": 30.78787878787879,
+      "haiku_minus_qwen_paired": 0.3030303030303029,
+      "paired_documents": 11
+    },
+    {
+      "corpus": "eurlex",
+      "language": "fr",
+      "mode": "conceptual",
+      "recommended_model": "anthropic/claude-haiku-5.5",
+      "haiku_mean": 31.766666666666666,
+      "qwen_mean": 31.755555555555556,
+      "haiku_minus_qwen_paired": 0.011111111111110954,
+      "paired_documents": 15
+    },
+    {
+      "corpus": "eurlex",
+      "language": "fr",
+      "mode": "fact_pattern",
+      "recommended_model": "anthropic/claude-haiku-5.5",
+      "haiku_mean": 31.363636363636363,
+      "qwen_mean": 31.016666666666662,
+      "haiku_minus_qwen_paired": 0.28333333333333355,
+      "paired_documents": 10
+    },
+    {
+      "corpus": "eurlex",
+      "language": "fr",
+      "mode": "lookup",
+      "recommended_model": "qwen/qwen3.8-27b",
+      "haiku_mean": 31.511904761904763,
+      "qwen_mean": 31.666666666666668,
+      "haiku_minus_qwen_paired": -0.19444444444444434,
+      "paired_documents": 12
+    },
+    {
+      "corpus": "un",
+      "language": "ar",
+      "mode": "claim_verification",
+      "recommended_model": "qwen/qwen3.8-27b",
+      "haiku_mean": 28.875,
+      "qwen_mean": 30.0,
+      "haiku_minus_qwen_paired": -1.125,
+      "paired_documents": 8
+    },
+    {
+      "corpus": "un",
+      "language": "ar",
+      "mode": "comparison",
+      "recommended_model": "anthropic/claude-haiku-5.5",
+      "haiku_mean": 32.0,
+      "qwen_mean": 27.5,
+      "haiku_minus_qwen_paired": 8.0,
+      "paired_documents": 1
+    },
+    {
+      "corpus": "un",
+      "language": "ar",
+      "mode": "conceptual",
+      "recommended_model": "anthropic/claude-haiku-5.5",
+      "haiku_mean": 30.727272727272727,
+      "qwen_mean": 30.181818181818183,
+      "haiku_minus_qwen_paired": 0.5454545454545454,
+      "paired_documents": 11
+    },
+    {
+      "corpus": "un",
+      "language": "ar",
+      "mode": "lookup",
+      "recommended_model": "anthropic/claude-haiku-5.5",
+      "haiku_mean": 32.0,
+      "qwen_mean": 29.46666666666667,
+      "haiku_minus_qwen_paired": 2.533333333333333,
+      "paired_documents": 10
+    },
+    {
+      "corpus": "un",
+      "language": "ar",
+      "mode": "practitioners",
+      "recommended_model": "anthropic/claude-haiku-5.5",
+      "haiku_mean": 31.25,
+      "qwen_mean": 31.0,
+      "haiku_minus_qwen_paired": 0.25,
+      "paired_documents": 8
+    },
+    {
+      "corpus": "un",
+      "language": "ar",
+      "mode": "source_finding",
+      "recommended_model": "qwen/qwen3.8-27b",
+      "haiku_mean": 30.625,
+      "qwen_mean": 32.333333333333336,
+      "haiku_minus_qwen_paired": -1.375,
+      "paired_documents": 8
+    },
+    {
+      "corpus": "un",
+      "language": "en",
+      "mode": "claim_verification",
+      "recommended_model": "anthropic/claude-haiku-5.5",
+      "haiku_mean": 28.846153846153847,
+      "qwen_mean": 28.153846153846153,
+      "haiku_minus_qwen_paired": 0.6923076923076923,
+      "paired_documents": 13
+    },
+    {
+      "corpus": "un",
+      "language": "en",
+      "mode": "conceptual",
+      "recommended_model": "anthropic/claude-haiku-5.5",
+      "haiku_mean": 31.11111111111111,
+      "qwen_mean": 29.657407407407405,
+      "haiku_minus_qwen_paired": 1.4537037037037037,
+      "paired_documents": 18
+    },
+    {
+      "corpus": "un",
+      "language": "en",
+      "mode": "lookup",
+      "recommended_model": "qwen/qwen3.8-27b",
+      "haiku_mean": 31.0,
+      "qwen_mean": 31.78703703703704,
+      "haiku_minus_qwen_paired": -0.7870370370370371,
+      "paired_documents": 18
+    },
+    {
+      "corpus": "un",
+      "language": "en",
+      "mode": "practitioners",
+      "recommended_model": "anthropic/claude-haiku-5.5",
+      "haiku_mean": 31.1875,
+      "qwen_mean": 30.0,
+      "haiku_minus_qwen_paired": 1.1875,
+      "paired_documents": 16
+    },
+    {
+      "corpus": "un",
+      "language": "en",
+      "mode": "source_finding",
+      "recommended_model": "anthropic/claude-haiku-5.5",
+      "haiku_mean": 32.333333333333336,
+      "qwen_mean": 31.0,
+      "haiku_minus_qwen_paired": 1.3333333333333333,
+      "paired_documents": 3
+    },
+    {
+      "corpus": "un",
+      "language": "es",
+      "mode": "claim_verification",
+      "recommended_model": "anthropic/claude-haiku-5.5",
+      "haiku_mean": 30.833333333333336,
+      "qwen_mean": 30.15,
+      "haiku_minus_qwen_paired": 0.6833333333333339,
+      "paired_documents": 10
+    },
+    {
+      "corpus": "un",
+      "language": "es",
+      "mode": "conceptual",
+      "recommended_model": "qwen/qwen3.8-27b",
+      "haiku_mean": 29.569444444444446,
+      "qwen_mean": 31.642857142857142,
+      "haiku_minus_qwen_paired": -2.472222222222222,
+      "paired_documents": 6
+    },
+    {
+      "corpus": "un",
+      "language": "es",
+      "mode": "lookup",
+      "recommended_model": "anthropic/claude-haiku-5.5",
+      "haiku_mean": 30.136363636363637,
+      "qwen_mean": 29.416666666666668,
+      "haiku_minus_qwen_paired": 0.6,
+      "paired_documents": 5
+    },
+    {
+      "corpus": "un",
+      "language": "es",
+      "mode": "practitioners",
+      "recommended_model": "qwen/qwen3.8-27b",
+      "haiku_mean": 31.345238095238095,
+      "qwen_mean": 31.53571428571429,
+      "haiku_minus_qwen_paired": -0.19047619047619083,
+      "paired_documents": 14
+    },
+    {
+      "corpus": "un",
+      "language": "fr",
+      "mode": "claim_verification",
+      "recommended_model": "anthropic/claude-haiku-5.5",
+      "haiku_mean": 30.416666666666668,
+      "qwen_mean": 30.202380952380956,
+      "haiku_minus_qwen_paired": 0.21428571428571427,
+      "paired_documents": 14
+    },
+    {
+      "corpus": "un",
+      "language": "fr",
+      "mode": "conceptual",
+      "recommended_model": "anthropic/claude-haiku-5.5",
+      "haiku_mean": 30.36111111111111,
+      "qwen_mean": 29.666666666666668,
+      "haiku_minus_qwen_paired": 2.3333333333333335,
+      "paired_documents": 3
+    },
+    {
+      "corpus": "un",
+      "language": "fr",
+      "mode": "lookup",
+      "recommended_model": "qwen/qwen3.8-27b",
+      "haiku_mean": 31.678571428571427,
+      "qwen_mean": 31.740740740740744,
+      "haiku_minus_qwen_paired": -0.12962962962962976,
+      "paired_documents": 9
+    },
+    {
+      "corpus": "un",
+      "language": "fr",
+      "mode": "practitioners",
+      "recommended_model": "anthropic/claude-haiku-5.5",
+      "haiku_mean": 32.1875,
+      "qwen_mean": 31.541666666666668,
+      "haiku_minus_qwen_paired": 0.6458333333333333,
+      "paired_documents": 16
+    },
+    {
+      "corpus": "un",
+      "language": "fr",
+      "mode": "source_finding",
+      "recommended_model": "qwen/qwen3.8-27b",
+      "haiku_mean": 28.5,
+      "qwen_mean": 30.0,
+      "haiku_minus_qwen_paired": -1.5,
+      "paired_documents": 2
+    },
+    {
+      "corpus": "un",
+      "language": "ru",
+      "mode": "claim_verification",
+      "recommended_model": "qwen/qwen3.8-27b",
+      "haiku_mean": 28.22222222222222,
+      "qwen_mean": 28.555555555555557,
+      "haiku_minus_qwen_paired": -0.3333333333333333,
+      "paired_documents": 9
+    },
+    {
+      "corpus": "un",
+      "language": "ru",
+      "mode": "comparison",
+      "recommended_model": "anthropic/claude-haiku-5.5",
+      "haiku_mean": 29.0,
+      "qwen_mean": 29.0,
+      "haiku_minus_qwen_paired": 0.0,
+      "paired_documents": 2
+    },
+    {
+      "corpus": "un",
+      "language": "ru",
+      "mode": "conceptual",
+      "recommended_model": "anthropic/claude-haiku-5.5",
+      "haiku_mean": 29.458333333333332,
+      "qwen_mean": 29.291666666666668,
+      "haiku_minus_qwen_paired": 0.16666666666666666,
+      "paired_documents": 12
+    },
+    {
+      "corpus": "un",
+      "language": "ru",
+      "mode": "lookup",
+      "recommended_model": "qwen/qwen3.8-27b",
+      "haiku_mean": 28.555555555555557,
+      "qwen_mean": 31.77777777777778,
+      "haiku_minus_qwen_paired": -3.2222222222222223,
+      "paired_documents": 9
+    },
+    {
+      "corpus": "un",
+      "language": "ru",
+      "mode": "practitioners",
+      "recommended_model": "qwen/qwen3.8-27b",
+      "haiku_mean": 29.944444444444443,
+      "qwen_mean": 31.055555555555557,
+      "haiku_minus_qwen_paired": -1.1111111111111112,
+      "paired_documents": 9
+    },
+    {
+      "corpus": "un",
+      "language": "ru",
+      "mode": "source_finding",
+      "recommended_model": "qwen/qwen3.8-27b",
+      "haiku_mean": 31.5,
+      "qwen_mean": 31.625,
+      "haiku_minus_qwen_paired": -0.125,
+      "paired_documents": 8
+    },
+    {
+      "corpus": "un",
+      "language": "zh",
+      "mode": "claim_verification",
+      "recommended_model": "qwen/qwen3.8-27b",
+      "haiku_mean": 30.472222222222218,
+      "qwen_mean": 30.819444444444443,
+      "haiku_minus_qwen_paired": -0.3472222222222223,
+      "paired_documents": 12
+    },
+    {
+      "corpus": "un",
+      "language": "zh",
+      "mode": "conceptual",
+      "recommended_model": "qwen/qwen3.8-27b",
+      "haiku_mean": 30.077777777777776,
+      "qwen_mean": 31.14102564102564,
+      "haiku_minus_qwen_paired": -1.358974358974359,
+      "paired_documents": 13
+    },
+    {
+      "corpus": "un",
+      "language": "zh",
+      "mode": "lookup",
+      "recommended_model": "qwen/qwen3.8-27b",
+      "haiku_mean": 31.3,
+      "qwen_mean": 31.76666666666667,
+      "haiku_minus_qwen_paired": -0.4666666666666668,
+      "paired_documents": 10
+    },
+    {
+      "corpus": "un",
+      "language": "zh",
+      "mode": "practitioners",
+      "recommended_model": "anthropic/claude-haiku-5.5",
+      "haiku_mean": 32.0,
+      "qwen_mean": 31.6,
+      "haiku_minus_qwen_paired": 0.5,
+      "paired_documents": 10
+    },
+    {
+      "corpus": "un",
+      "language": "zh",
+      "mode": "source_finding",
+      "recommended_model": "anthropic/claude-haiku-5.5",
+      "haiku_mean": 35.0,
+      "qwen_mean": 35.0,
+      "haiku_minus_qwen_paired": 0.0,
+      "paired_documents": 1
+    }
+  ]
+}

@@ -188,6 +188,35 @@ def run_fixture(tmp_path, monkeypatch, source, n, *, eligible=None, fail_generat
     return context, parser, argv, [entry for entry, _ in targets], native_calls, generation_calls
 
 
+@pytest.mark.parametrize("backend", ["jev", "generator"])
+def test_automatic_generator_is_selected_after_the_persona_and_resumes(tmp_path, monkeypatch, backend):
+    from clir_bench.core.generation_models import HAIKU_MODEL, QWEN_MODEL
+
+    context, parser, argv, entries, calls, generated = run_fixture(
+        tmp_path, monkeypatch, "un", 2, eligible=["lookup"])
+    first = argv.index("--generation-model")
+    del argv[first:first + 4]  # Exercise the default rather than explicit model comparisons.
+    argv[argv.index("--decider-model") + 1] = backend
+    if backend == "generator":
+        def decide(source, payload, *, backend, model, checkpoint):
+            assert model == HAIKU_MODEL
+            calls.append(source)
+            return {"mode": "lookup", "generation_mode": "lookup", "model": model,
+                    "reason": "The source states a fact", "confidence": None,
+                    "probabilities": None}
+        monkeypatch.setattr(decider, "decide", decide)
+    assert qac.generate(parser.parse_args(argv), context, selections=entries) == 0
+    assert len(calls) == 2
+    assert {(model, mode) for _, model, mode in generated} == {(QWEN_MODEL, "lookup")}
+    rows, _ = qac._read_csv(tmp_path / "run/results.csv")
+    assert len(rows) == 6
+    assert all(row["generator_model_id"] == QWEN_MODEL for row in rows)
+    assert all(row["generator_selection_basis"] == "paired_target_mean" for row in rows)
+    before = len(generated)
+    assert qac.generate(parser.parse_args(argv + ["--resume"]), context) == 0
+    assert len(calls) == 2 and len(generated) == before
+
+
 @pytest.mark.parametrize("source", ["eurlex", "un"])
 def test_pipeline_shares_choices_counts_once_and_reuses_resume(tmp_path, monkeypatch, source):
     context, parser, argv, entries, calls, generated = run_fixture(tmp_path, monkeypatch, source, 24)

@@ -12,6 +12,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from types import SimpleNamespace
 
+from clir_bench.core import generation_models
+
 from .batch_recording import RunState, read_run_metadata
 
 
@@ -209,7 +211,7 @@ def _options(args, context, saved=None, *, operation="generate"):
     old = (saved or {}).get("config", {})
     configured_models = context.setting("generation_model_candidates")
     if configured_models is None:
-        configured_models = context.setting("generation_model", "gpt-5.6-luna")
+        configured_models = context.setting("generation_model", generation_models.AUTO_MODEL)
     if isinstance(configured_models, str):
         configured_models = [configured_models]
     elif isinstance(configured_models, (list, tuple)):
@@ -257,6 +259,16 @@ def _options(args, context, saved=None, *, operation="generate"):
     if not options["verifier_model"] or not options["generation_model"] or any(
             not isinstance(model, str) or not model.strip() for model in options["generation_model"]):
         raise ValueError("generator and verifier model IDs must be nonempty")
+    if generation_models.AUTO_MODEL in options["generation_model"]:
+        if len(options["generation_model"]) != 1:
+            raise ValueError("--generation-model auto cannot be combined with explicit model IDs")
+        if operation == "generate":
+            options["generation_model_policy"] = generation_models.selection_policy()
+        elif old.get("generation_model_policy"):
+            options["generation_model_policy"] = old["generation_model_policy"]
+    elif old.get("generation_model_policy"):
+        # Regrading retains the provenance of the original automatic run.
+        options["generation_model_policy"] = old["generation_model_policy"]
     if old.get("persona_selection_policy"):
         from . import persona_routing
         if old["persona_selection_policy"] != persona_routing.POLICY:
@@ -478,7 +490,9 @@ def generate(args, context, *, selections=None, supplied_indexes=None):
     prepared, prompts = _prepare(selections, indexes, options, "generate")
     models = list(dict.fromkeys(options["generation_model"]))
     options["generation_model"] = models
-    cases = [(entry, target, payload, model, None)
+    cases = [(entry, target, payload,
+              (model if options.get("decider_model") else generation_models.select_generator(
+                  entry["corpus"], target.mode, target.language, model=model).model), None)
              for entry, target, payload in prepared for model in models]
     return _execute_sources(args, context, "generate", locations, options, selections,
                             prompts, indexes, cases)
@@ -597,6 +611,10 @@ def _execute(args, context, operation, directory, output, saved, options, select
     config = dict(options, operation=operation, targets=selections,
                   prompts_sha256={key: _digest(text.encode()) for key, text in prompts.items()})
     weighted = operation == "generate" and bool(options.get("persona_selection_policy"))
+    automatic = operation == "generate" and options["generation_model"] == [generation_models.AUTO_MODEL]
+
+    def quota_key(source, mode, model):
+        return source, mode, generation_models.AUTO_MODEL if automatic else model
     if weighted:
         # Wait for all generators on one target before verifying that target.
         # This lets duplicate candidates share grades without delaying every
@@ -624,6 +642,10 @@ def _execute(args, context, operation, directory, output, saved, options, select
     if validate_only:
         return 0
     print(f"{operation}: {len(selections)} shared targets, {len(cases)} model/target cases -> {output}")
+    if automatic:
+        print("generator: auto; Qwen requires a table advantage of at least 0.5 points over Haiku")
+        if not options.get("decider_model"):
+            print(f"selected models: {dict(Counter(case[3] for case in cases))}")
     if getattr(args, "dry_run", False):
         stages = (3 + bool(options.get("decider_model"))) if operation == "generate" else 2
         calls = len(selections) + 3 * len(cases) if weighted else len(cases) * stages
@@ -638,7 +660,7 @@ def _execute(args, context, operation, directory, output, saved, options, select
 
     groups = defaultdict(list)
     for case in cases:
-        groups[(case[0]["corpus"], case[1].mode, case[3])].append(case)
+        groups[quota_key(case[0]["corpus"], case[1].mode, case[3])].append(case)
     plan_order = {task_id(case): position for position, case in enumerate(cases)}
     with RunState(directory / "run.sqlite") as state:
         # A second process may have completed after the preflight path check.
@@ -648,7 +670,7 @@ def _execute(args, context, operation, directory, output, saved, options, select
         elif state.get("schema_version") is not None or state.outcomes():
             raise ValueError("run directory acquired an existing run; choose another directory")
         if cache_path:
-            state.load_replay(Path(cache_path), options["generation_model"])
+            state.load_replay(Path(cache_path), generation_models.replay_models(options["generation_model"]))
         for key, value in {"schema_version": 1, "config": config, "fingerprint": fingerprint,
                            "targets": selections, "prompts": prompts, "output": output.name,
                            "status": "running"}.items():
@@ -664,6 +686,10 @@ def _execute(args, context, operation, directory, output, saved, options, select
             entry, target, payload, model, candidates = case
             source = entry["corpus"]
             task = task_id(case)
+            selection = (generation_models.select_generator(source, target.mode, target.language)
+                         if automatic else generation_models.select_generator(
+                             source, target.mode, target.language, model=model))
+            model = selection.model
             if task in completed:
                 return task, None if generation_only else completed[task]
             limits = {"max_references": options["max_references"]} if source == "eurlex" else {
@@ -686,6 +712,9 @@ def _execute(args, context, operation, directory, output, saved, options, select
                         state.outcome(task, [])
                         return task, None if generation_only else 0
                     target = replace(target, mode=decision["generation_mode"])
+                    if automatic:
+                        selection = generation_models.select_generator(source, target.mode, target.language)
+                        model = selection.model
                 result = batches[source].run_one(target, indexes[source], gen_model=model,
                     grade_model=options["verifier_model"],
                     keep=options["keep"] if candidates is None else len(candidates),
@@ -697,6 +726,7 @@ def _execute(args, context, operation, directory, output, saved, options, select
                 if generation_only:
                     return task, result
                 for row in result:
+                    row.update(selection.metadata())
                     if decision is not None:
                         row.update(decider.row_metadata(decision))
                     row.setdefault("generator_model_name", model.rsplit("/", 1)[-1])
@@ -743,6 +773,7 @@ def _execute(args, context, operation, directory, output, saved, options, select
                                candidate_id=original.get("candidate_id", ""),
                                generator_model_id=model,
                                generator_model_name=model.rsplit("/", 1)[-1])
+                    row.update(selection.metadata())
                     if decision is not None:
                         row.update(decider.row_metadata(decision))
                     row.update(grading_status="failed", grading_error=diagnostic, regrade_status="failed",
@@ -771,7 +802,7 @@ def _execute(args, context, operation, directory, output, saved, options, select
                     rows = sorted(rows, key=lambda row: float(row["total_score"])
                                   if row.get("total_score") not in (None, "") else float("-inf"), reverse=True)
                 for row in rows:
-                    key = (row["corpus"], row["mode"], row["generator_model_id"])
+                    key = quota_key(row["corpus"], row["mode"], row["generator_model_id"])
                     if not quota or saved_counts[key] < quota:
                         result.append(row)
                         saved_counts[key] += 1
@@ -889,7 +920,7 @@ def _execute(args, context, operation, directory, output, saved, options, select
                         positions[key] += len(batch)
                         for target_round in batch:
                             for case in target_round:
-                                futures[executor.submit(work, case)] = (key[0], key[1], case[3])
+                                futures[executor.submit(work, case)] = quota_key(key[0], key[1], case[3])
                     if not futures:
                         break
                     for future in as_completed(futures):
@@ -923,9 +954,9 @@ def _execute(args, context, operation, directory, output, saved, options, select
                 failures=len(routing_errors))
         shortages = False
         if quota:
-            generated = Counter((row["corpus"], row["mode"], row["generator_model_id"])
+            generated = Counter(quota_key(row["corpus"], row["mode"], row["generator_model_id"])
                                 for record in outcomes for row in record["rows"])
-            saved_counts = Counter((row["corpus"], row["mode"], row["generator_model_id"]) for row in rows)
+            saved_counts = Counter(quota_key(row["corpus"], row["mode"], row["generator_model_id"]) for row in rows)
             summary["generated_candidates"] = sum(generated.values())
             summary["quotas"] = [{"corpus": key[0], "mode": key[1], "generator_model_id": key[2],
                                   "requested": quota, "generated": generated[key], "saved": saved_counts[key],

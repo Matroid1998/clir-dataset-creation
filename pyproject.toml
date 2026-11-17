@@ -50,6 +50,7 @@ packages = ["src/clir_bench"]
 [tool.hatch.build.targets.wheel.force-include]
 # Prompt files are package data, loaded via importlib.resources (no path hacks).
 "src/clir_bench/domains" = "clir_bench/domains"
+"src/clir_bench/core/generation_model_table.json" = "clir_bench/core/generation_model_table.json"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

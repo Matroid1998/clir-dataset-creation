@@ -150,7 +150,7 @@ def test_legal_sources_keep_runs_and_structured_inputs_in_their_own_directories(
     assert context.workspace.qac_dir("un") == tmp_path / "data/legal/un_parallel/qac"
     assert context.workspace.data("eurlex_structure") == tmp_path / "data/legal/eurlex/structure"
     assert context.workspace.data("un_blocks") == tmp_path / "data/legal/un_parallel/blocks"
-    assert context.setting("generation_model") == "gpt-5.6-luna"
+    assert context.setting("generation_model") == "auto"
     assert context.setting("verifier_model") == "google/gemini-3.8-flash"
     for source in context.domain.sources:
         assert context.domain.attribution_for(source.name)
@@ -523,6 +523,56 @@ def test_un_generation_defaults_include_arabic_and_russian(legal_run, monkeypatc
     })
     assert run.state.selections[0][2] == UN_LANGUAGES
     assert {entry["target"]["language"] for entry in selections} == set(UN_LANGUAGES)
+
+
+def test_legal_automatic_models_are_selected_per_case_and_pinned_on_resume(legal_run, monkeypatch):
+    from clir_bench.core import generation_models as models
+    from clir_bench.domains.legal.qac.batch_recording import read_run_metadata
+
+    run = legal_run
+    directory = run.tmp_path / "automatic"
+    args = run.parse("generate", "--source", "eurlex", "--questions", 2,
+                     "--langs", "en", "de", "--modes", "lookup", "--run-dir", directory)
+    assert args.handler(args, run.context) == 0
+    rows, _ = run.qac._read_csv(directory / "results.csv")
+    assert {(row["question_language"], row["generator_model_id"]) for row in rows} == {
+        ("en", models.HAIKU_MODEL), ("de", models.QWEN_MODEL)}
+    assert all(row["generator_selection_policy"] == models.POLICY for row in rows)
+    assert read_run_metadata(directory)["config"]["generation_model_policy"] == models.selection_policy()
+    calls = len(run.state.invocations)
+    resume = run.parse("generate", "--source", "eurlex", "--run-dir", directory, "--resume")
+    assert resume.handler(resume, run.context) == 0
+    assert len(run.state.invocations) == calls
+    current = models.selection_policy()
+    monkeypatch.setattr(models, "selection_policy", lambda: dict(current, table_sha256="changed"))
+    with pytest.raises(ValueError, match="resume settings"):
+        resume.handler(resume, run.context)
+    assert len(run.state.invocations) == calls
+
+
+def test_legal_automatic_quota_is_a_total_across_selected_models(legal_run):
+    from clir_bench.core.generation_models import HAIKU_MODEL, QWEN_MODEL
+    from clir_bench.domains.legal.qac.batch_recording import read_run_metadata
+
+    run = legal_run
+    directory = run.tmp_path / "automatic_quota"
+    args = run.parse("generate", "--source", "eurlex", "--questions-per-mode", 2,
+                     "--keep", 1, "--langs", "en", "de", "--modes", "lookup",
+                     "--run-dir", directory)
+    assert args.handler(args, run.context) == 0
+    rows, _ = run.qac._read_csv(directory / "results.csv")
+    assert len(rows) == 2
+    assert {row["generator_model_id"] for row in rows} == {HAIKU_MODEL, QWEN_MODEL}
+    quotas = read_run_metadata(directory)["summary"]["quotas"]
+    assert len(quotas) == 1 and quotas[0]["requested"] == quotas[0]["saved"] == 2
+
+
+def test_automatic_selection_cannot_be_mixed_with_comparison_models(legal_run):
+    run = legal_run
+    args = run.parse("generate", "--source", "un", "--generation-model", "auto",
+                     "--generation-model", "provider/manual", "--dry-run")
+    with pytest.raises(ValueError, match="cannot be combined"):
+        args.handler(args, run.context)
 
 
 @pytest.mark.parametrize("source,subdirectory", [("eurlex", "eurlex"), ("un", "un_parallel")])
