@@ -1,4 +1,4 @@
-"""Refresh the existing legal count and best-generator grids, plus grade tables."""
+"""Separate UN and EUR-Lex question-count and best-generator figures."""
 from __future__ import annotations
 
 import csv
@@ -17,16 +17,20 @@ from plot_chemistry_top_models import MODELS
 from plot_data import LANGUAGE_NAMES, OUT, ROOT, snapshot_note, snapshot_rows
 
 LEGAL = ROOT / 'data/legal/qac/generation_600_20261008_model_comparison'
-MODES = ['claim_verification', 'comparison', 'conceptual', 'fact_pattern_practitioner',
-         'lookup', 'source_finding']
-MODE_LABELS = ['Claim\nverification', 'Comparison', 'Conceptual', 'Fact pattern /\npractitioner',
-               'Lookup', 'Source\nfinding']
-LANGUAGES = ['en', 'fr', 'es', 'de', 'zh', 'ar', 'ru']
+CORPORA = {
+    'eurlex': {'title': 'EUR-Lex', 'languages': ['en', 'fr', 'es', 'de'], 'directory': 'eurlex',
+               'modes': {'claim_verification': 'Claim\nverification', 'comparison': 'Comparison',
+                         'conceptual': 'Conceptual', 'fact_pattern': 'Fact pattern',
+                         'lookup': 'Lookup', 'source_finding': 'Source\nfinding'}},
+    'un': {'title': 'UN', 'languages': ['en', 'fr', 'es', 'zh', 'ar', 'ru'], 'directory': 'un_parallel',
+           'modes': {'claim_verification': 'Claim\nverification', 'comparison': 'Comparison',
+                     'conceptual': 'Conceptual', 'practitioners': 'Practitioner',
+                     'lookup': 'Lookup', 'source_finding': 'Source\nfinding'}},
+}
 
 
 def mode_of(row):
-    return ('fact_pattern_practitioner' if row['mode'] in ('fact_pattern', 'practitioner', 'practitioners')
-            else row['mode'])
+    return 'practitioners' if row['mode'] == 'practitioner' else row['mode']
 
 
 def score_of(row):
@@ -38,84 +42,95 @@ def score_of(row):
     return score
 
 
-def save(fig, stem, pdf):
-    for destination in (OUT, LEGAL):
+def analyze(rows, corpus):
+    """Keep all counts and grade comparisons within the selected corpus."""
+    definition = CORPORA[corpus]
+    selected = [row for row in rows if row['corpus'] == corpus]
+    counts, groups = Counter(), defaultdict(list)
+    for row in selected:
+        language, mode = row['question_language'], mode_of(row)
+        if language not in definition['languages'] or mode not in definition['modes']:
+            raise ValueError(f'Unsupported {corpus} language/mode: {language}/{mode}')
+        counts[language, mode] += 1
+        score = score_of(row)
+        if score is not None:
+            groups[language, mode, row['generator_model_id'].replace('/', '_')].append(score)
+    means = {key: sum(values) / len(values) for key, values in groups.items()}
+    winners = {}
+    for language in definition['languages']:
+        for mode in definition['modes']:
+            available = [model for model in MODELS if (language, mode, model) in means]
+            highest = max((means[language, mode, model] for model in available), default=None)
+            winners[language, mode] = [model for model in available if means[language, mode, model] == highest]
+    return selected, counts, groups, means, winners
+
+
+def save(fig, corpus, stem, pdfs):
+    directory = LEGAL / CORPORA[corpus]['directory']
+    directory.mkdir(parents=True, exist_ok=True)
+    for destination in (OUT, directory):
         for suffix in ('svg', 'png', 'pdf'):
-            fig.savefig(destination / f'{stem}.{suffix}', dpi=200, bbox_inches='tight')
-    pdf.savefig(fig, bbox_inches='tight')
+            fig.savefig(destination / f'{corpus}_{stem}.{suffix}', dpi=200, bbox_inches='tight')
+    for pdf in pdfs:
+        pdf.savefig(fig, bbox_inches='tight')
     plt.close(fig)
 
 
-def write_csv(stem, headers, rows):
-    with (OUT / f'legal_{stem}.csv').open('w', newline='') as handle:
-        writer = csv.writer(handle, lineterminator="\n")
+def write_csv(corpus, stem, headers, rows):
+    with (OUT / f'{corpus}_{stem}.csv').open('w', newline='') as handle:
+        writer = csv.writer(handle, lineterminator='\n')
         writer.writerow(headers)
         writer.writerows(rows)
 
 
-def counts_plot(title, labels, columns, values, stem, pdf):
+def counts_plot(corpus, title, labels, columns, values, stem, pdfs):
     fig, ax = slide(title, 10)
-    # Reuse the established report style with legal labels and an honest snapshot footer.
-    ax.texts[0].set_text('Generated legal questions')
-    ax.texts[2].set_text('EUR-Lex and UN · all candidate outputs from 10 models')
+    name = CORPORA[corpus]['title']
+    ax.texts[0].set_text(f'Generated {name} questions')
+    ax.texts[2].set_text(f'{name} · all candidate outputs from 10 models')
     table(ax, labels, columns, values, x=270, y=270, width=865,
           row_height=min(43, 325 / len(values)))
-    save(fig, stem, pdf)
+    save(fig, corpus, stem, pdfs)
 
 
-def main():
-    plt.rcParams['svg.fonttype'] = 'none'
-    rows = [row for row in snapshot_rows() if row['corpus'] in ('eurlex', 'un')]
-    counts = Counter((row['corpus'], mode_of(row)) for row in rows)
-    language_counts = Counter((row['question_language'], mode_of(row)) for row in rows)
-    corpus_values = [[counts['eurlex', mode], counts['un', mode],
-                      counts['eurlex', mode] + counts['un', mode]] for mode in MODES]
-    corpus_values.append([sum(counts[source, mode] for mode in MODES)
-                          for source in ('eurlex', 'un')] + [len(rows)])
-    language_values = [[language_counts[language, mode] for mode in MODES] for language in LANGUAGES]
-    language_values.append([sum(language_counts[language, mode] for language in LANGUAGES) for mode in MODES])
-    write_csv('questions_by_mode_and_corpus', ['Mode', 'EUR-Lex', 'UN', 'Total'],
-              [[label.replace('\n', ' '), *value] for label, value in
-               zip([*MODE_LABELS, 'Total'], corpus_values)])
-    write_csv('questions_by_language_and_mode', ['Language', *[m.replace('\n', ' ') for m in MODE_LABELS]],
+def plot_corpus(corpus, rows, combined_pdf):
+    definition = CORPORA[corpus]
+    title, languages, modes = definition['title'], definition['languages'], definition['modes']
+    selected, counts, groups, means, winners = analyze(rows, corpus)
+    mode_totals = {mode: sum(counts[language, mode] for language in languages) for mode in modes}
+    mode_values = [[mode_totals[mode]] for mode in modes] + [[len(selected)]]
+    language_values = [[*[counts[language, mode] for mode in modes],
+                         sum(counts[language, mode] for mode in modes)] for language in languages]
+    language_values.append([*[mode_totals[mode] for mode in modes], len(selected)])
+    write_csv(corpus, 'questions_by_mode', ['Mode', 'Questions'],
+              [[label.replace('\n', ' '), *value] for label, value in zip([*modes.values(), 'Total'], mode_values)])
+    write_csv(corpus, 'questions_by_language_and_mode',
+              ['Language', *[label.replace('\n', ' ') for label in modes.values()], 'Total'],
               [[LANGUAGE_NAMES.get(language, 'Total'), *value] for language, value in
-               zip([*LANGUAGES, 'total'], language_values)])
-    groups = defaultdict(list)
-    for row in rows:
-        score = score_of(row)
-        if score is not None:
-            groups[row['question_language'], mode_of(row), row['generator_model_id'].replace('/', '_')].append(score)
-    means = {key: sum(values) / len(values) for key, values in groups.items()}
-    winners = {}
-    with (OUT / 'legal_all_model_scores.csv').open('w', newline='') as handle:
-        writer = csv.writer(handle, lineterminator="\n")
-        writer.writerow(['language', 'mode', 'model', 'graded_outputs', 'mean_total_score'])
-        for (language, mode, model), values in sorted(groups.items()):
-            writer.writerow([language, mode, model, len(values), float(means[language, mode, model])])
-    for language in LANGUAGES:
-        for mode in MODES:
-            available = [model for model in MODELS if (language, mode, model) in means]
-            highest = max((means[language, mode, model] for model in available), default=None)
-            winners[language, mode] = [model for model in available if means[language, mode, model] == highest]
-    with PdfPages(OUT / 'legal_generated_questions.pdf') as pdf:
-        counts_plot('Generated questions by mode and corpus', [*MODE_LABELS, 'Total'],
-                    ['EUR-Lex', 'UN', 'Total'], corpus_values, 'generated_questions_grid', pdf)
-        counts_plot('Generated questions by language and mode',
-                    [*[LANGUAGE_NAMES[language] for language in LANGUAGES], 'Total'],
-                    MODE_LABELS, language_values, 'generated_questions_language_mode_grid', pdf)
-        height = 2.5 + 1.15 * len(LANGUAGES)
-        fig, ax = plt.subplots(figsize=(17, height), facecolor='#fbfcfe')
-        ax.set_xlim(-1.25, len(MODES))
-        ax.set_ylim(len(LANGUAGES) + 1, -1.3)
+               zip([*languages, 'total'], language_values)])
+    write_csv(corpus, 'all_model_scores',
+              ['language', 'mode', 'model', 'graded_outputs', 'mean_total_score'],
+              [[language, mode, model, len(values), float(means[language, mode, model])]
+               for (language, mode, model), values in sorted(groups.items())])
+    with PdfPages(OUT / f'{corpus}_generated_questions.pdf') as corpus_pdf:
+        pdfs = (corpus_pdf, combined_pdf)
+        counts_plot(corpus, f'{title}: generated questions by mode', [*modes.values(), 'Total'],
+                    ['Questions'], mode_values, 'generated_questions_by_mode', pdfs)
+        counts_plot(corpus, f'{title}: generated questions by language and mode',
+                    [*[LANGUAGE_NAMES[language] for language in languages], 'Total'],
+                    [*modes.values(), 'Total'], language_values, 'generated_questions_by_language_and_mode', pdfs)
+        fig, ax = plt.subplots(figsize=(17, 2.5 + 1.15 * len(languages)), facecolor='#fbfcfe')
+        ax.set_xlim(-1.25, len(modes))
+        ax.set_ylim(len(languages) + 1, -1.3)
         ax.axis('off')
-        ax.text(-1.2, -1.1, 'Top generator model by language and mode', fontsize=20, weight='bold')
-        ax.text(-1.2, -.7, 'Highest mean total_score / 40 · fact pattern and practitioner combined', fontsize=10)
-        for j, label in enumerate(MODE_LABELS):
+        ax.text(-1.2, -1.1, f'{title}: top generator model by language and mode', fontsize=19, weight='bold')
+        ax.text(-1.2, -.7, f'Highest mean total_score / 40 · {title} candidates only', fontsize=10)
+        for j, label in enumerate(modes.values()):
             ax.text(j + .5, -.12, label, ha='center', va='bottom', fontsize=10, weight='bold')
         winner_rows = []
-        for i, language in enumerate(LANGUAGES):
+        for i, language in enumerate(languages):
             ax.text(-.1, i + .5, LANGUAGE_NAMES[language], ha='right', va='center', fontsize=11)
-            for j, mode in enumerate(MODES):
+            for j, mode in enumerate(modes):
                 models = winners[language, mode]
                 ax.add_patch(plt.Rectangle((j + .01, i + .01), .98, .98,
                              color='#fff1d8' if len(models) > 1 else '#e5f1f8' if models else '#eff1f4'))
@@ -130,17 +145,29 @@ def main():
                 ax.text(j + .5, i + .5, text, ha='center', va='center',
                         fontsize=7.8 if len(models) > 3 else 8.4, linespacing=1.12)
                 winner_rows.append([language, mode, ' | '.join(models), mean, sizes])
-        ax.text(-1.2, len(LANGUAGES) + .25, 'Exact unrounded means determine ties; n = graded candidate outputs. Small samples can win.', fontsize=9)
-        ax.text(-1.2, len(LANGUAGES) + .55, snapshot_note(), fontsize=8)
-        save(fig, 'best_model_language_mode_grid', pdf)
-    write_csv('top_generator_by_language_and_mode',
+        ax.text(-1.2, len(languages) + .25, 'Exact unrounded means determine ties; n = graded candidate outputs. Small samples can win.', fontsize=9)
+        ax.text(-1.2, len(languages) + .55, snapshot_note(), fontsize=8)
+        save(fig, corpus, 'best_model_language_mode_grid', pdfs)
+    write_csv(corpus, 'top_generator_by_language_and_mode',
               ['language', 'mode', 'winner_models', 'mean_total_score', 'winner_sample_counts'], winner_rows)
-    (OUT / 'legal_plot_summary.json').write_text(json.dumps({
-        'generated_questions': len(rows), 'graded_questions': sum(map(len, groups.values())),
-        'languages': {language: sum(row['question_language'] == language for row in rows) for language in LANGUAGES},
-        'snapshot': snapshot_note(),
-    }, indent=2) + '\n')
-    print(f'Refreshed three legal grids: {len(rows):,} candidates.')
+    summary = {'corpus': corpus, 'generated_questions': len(selected),
+               'graded_questions': sum(map(len, groups.values())),
+               'languages': {language: sum(counts[language, mode] for mode in modes) for language in languages},
+               'snapshot': snapshot_note()}
+    (OUT / f'{corpus}_plot_summary.json').write_text(json.dumps(summary, indent=2) + '\n')
+    return summary
+
+
+def main():
+    plt.rcParams['svg.fonttype'] = 'none'
+    summaries = {}
+    rows = snapshot_rows()
+    with PdfPages(OUT / 'legal_generated_questions.pdf') as combined_pdf:
+        for corpus in CORPORA:
+            summaries[corpus] = plot_corpus(corpus, rows, combined_pdf)
+    (OUT / 'legal_plot_summary.json').write_text(json.dumps({'corpora': summaries}, indent=2) + '\n')
+    print('Refreshed separate legal grids:', {corpus: value['generated_questions']
+                                             for corpus, value in summaries.items()})
 
 
 if __name__ == '__main__':

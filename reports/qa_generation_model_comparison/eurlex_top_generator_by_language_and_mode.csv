@@ -1,0 +1,25 @@
+language,mode,winner_models,mean_total_score,winner_sample_counts
+en,claim_verification,anthropic_claude-haiku-5.5,30.53846153846154,13
+en,comparison,,,
+en,conceptual,mistralai_mistral-small-2603,31.666666666666668,3
+en,fact_pattern,anthropic_claude-haiku-5.5,31.266666666666666,15
+en,lookup,anthropic_claude-haiku-5.5,31.95,20
+en,source_finding,,,
+fr,claim_verification,anthropic_claude-haiku-5.5,31.08695652173913,23
+fr,comparison,,,
+fr,conceptual,qwen_qwen3.8-27b,31.78787878787879,33
+fr,fact_pattern,z-ai_glm-5.3-flashx,31.384615384615383,26
+fr,lookup,qwen_qwen3.8-27b,31.612903225806452,31
+fr,source_finding,,,
+es,claim_verification,z-ai_glm-5.3-flashx,30.842105263157894,19
+es,comparison,anthropic_claude-haiku-5.5 | deepseek_deepseek-v4.1-flash | mistralai_mistral-small-2603 | prism-ml_ternary-bonsai-2-27b | qwen_qwen3.8-27b | upstage_solar-pro4 | z-ai_glm-5.3-flashx,32.0,1/1/1/1/1/1/1
+es,conceptual,qwen_qwen3.8-27b,31.65,20
+es,fact_pattern,qwen_qwen3.8-27b,31.5,26
+es,lookup,qwen_qwen3.8-27b,31.96153846153846,26
+es,source_finding,,,
+de,claim_verification,z-ai_glm-5.3-flashx,30.92,25
+de,comparison,anthropic_claude-haiku-5.5,33.333333333333336,3
+de,conceptual,anthropic_claude-haiku-5.5,31.526315789473685,19
+de,fact_pattern,anthropic_claude-haiku-5.5,31.06896551724138,29
+de,lookup,qwen_qwen3.8-27b,31.763157894736842,38
+de,source_finding,,,

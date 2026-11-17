@@ -1,0 +1,37 @@
+language,mode,winner_models,mean_total_score,winner_sample_counts
+en,claim_verification,mistralai_mistral-small-2603,31.333333333333332,3
+en,comparison,,,
+en,conceptual,mistralai_mistral-small-2603,31.666666666666668,3
+en,practitioners,anthropic_claude-haiku-5.5,31.185185185185187,27
+en,lookup,qwen_qwen3.8-27b,31.76923076923077,39
+en,source_finding,anthropic_claude-haiku-5.5,32.333333333333336,3
+fr,claim_verification,anthropic_claude-haiku-5.5,30.433333333333334,30
+fr,comparison,,,
+fr,conceptual,deepseek_deepseek-v4.1-flash,30.379310344827587,29
+fr,practitioners,anthropic_claude-haiku-5.5,32.1,20
+fr,lookup,anthropic_claude-haiku-5.5,31.666666666666668,30
+fr,source_finding,gpt-5.6-luna,33.0,2
+es,claim_verification,anthropic_claude-haiku-5.5,30.708333333333332,24
+es,comparison,,,
+es,conceptual,qwen_qwen3.8-27b,31.46153846153846,13
+es,practitioners,qwen_qwen3.8-27b,31.564102564102566,39
+es,lookup,gpt-5.6-luna,31.58823529411765,17
+es,source_finding,,,
+zh,claim_verification,qwen_qwen3.8-27b,30.8,35
+zh,comparison,,,
+zh,conceptual,mistralai_mistral-small-2603,31.22222222222222,18
+zh,practitioners,anthropic_claude-haiku-5.5,31.88235294117647,17
+zh,lookup,qwen_qwen3.8-27b,31.8,25
+zh,source_finding,anthropic_claude-haiku-5.5 | gpt-5.6-luna | qwen_qwen3.8-27b,35.0,1/1/1
+ar,claim_verification,gpt-5.6-luna,30.9,10
+ar,comparison,anthropic_claude-haiku-5.5 | gpt-5.6-luna | minimax_minimax-m2.7,32.0,1/2/1
+ar,conceptual,anthropic_claude-haiku-5.5,30.928571428571427,14
+ar,practitioners,anthropic_claude-haiku-5.5,31.333333333333332,9
+ar,lookup,anthropic_claude-haiku-5.5,32.0,11
+ar,source_finding,qwen_qwen3.8-27b,32.25,12
+ru,claim_verification,mistralai_mistral-small-2603,29.846153846153847,13
+ru,comparison,anthropic_claude-haiku-5.5 | gpt-5.6-luna | qwen_qwen3.8-27b | z-ai_glm-5.3-flashx,29.0,2/2/2/2
+ru,conceptual,gpt-5.6-luna,29.875,16
+ru,practitioners,deepseek_deepseek-v4.1-flash,31.055555555555557,18
+ru,lookup,deepseek_deepseek-v4.1-flash,31.857142857142858,14
+ru,source_finding,qwen_qwen3.8-27b | z-ai_glm-5.3-flashx,31.666666666666668,9/9

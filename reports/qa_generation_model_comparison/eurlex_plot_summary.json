@@ -1,0 +1,12 @@
+{
+  "corpus": "eurlex",
+  "generated_questions": 4050,
+  "graded_questions": 3981,
+  "languages": {
+    "en": 904,
+    "fr": 1097,
+    "es": 882,
+    "de": 1167
+  },
+  "snapshot": "Recovery pass finished; failed cases excluded \u00b7 2026-11-17 16:14 Toronto"
+}

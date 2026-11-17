@@ -6,11 +6,18 @@ Refresh all figures and their CSV/provenance files with:
 MPLCONFIGDIR=/tmp/clir-matplotlib .venv/bin/python reports/qa_generation_model_comparison/refresh_plots.py
 ```
 
-`generated_questions_and_grades.pdf` combines the legal and patent count grids,
-the patent model counts, both top-generator grids, and the all-corpus grade
-comparison. Individual PDF/PNG files remain available. The three existing legal
-SVG files in `data/legal/qac/generation_600_20261008_model_comparison/` are also
-refreshed.
+`generated_questions_and_grades.pdf` contains separate EUR-Lex and UN sections,
+the patent count grids, patent model counts, all three top-generator grids, and
+the all-corpus grade comparison. `eurlex_generated_questions.pdf` and
+`un_generated_questions.pdf` each contain three pages: counts by mode, counts by
+language/mode, and top models by language/mode. Their grade means and winners
+are computed independently; fact-pattern and practitioner modes remain separate.
+
+Individual PDF/PNG/SVG figures and CSV tables use `eurlex_` and `un_` prefixes.
+Copies are saved in each source's generation-run directory. The compatibility
+`legal_generated_questions.pdf` contains the same six separate pages. Older
+combined standalone legal grids are retained as historical artifacts and are
+not part of the refreshed report.
 
 Inputs come from `docs/generation_export.json` and the new-language runs in
 `data/new_language_generation_20261117/`. `plot_data.py` freezes one consistent

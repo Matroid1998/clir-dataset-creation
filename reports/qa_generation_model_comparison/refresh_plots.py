@@ -85,7 +85,8 @@ def refresh():
     plot_all_grades()
     if merge := shutil.which('pdfunite'):
         inputs = [OUT / filename for filename in (
-            'legal_generated_questions.pdf', 'chemistry_generated_questions.pdf',
+            'eurlex_generated_questions.pdf', 'un_generated_questions.pdf',
+            'chemistry_generated_questions.pdf',
             'generated_questions_by_mode_and_model.pdf',
             'chemistry_top_generator_by_language_and_mode.pdf',
             'generated_question_grades_by_model_and_language.pdf')]

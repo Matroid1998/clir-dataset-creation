@@ -1,5 +1,5 @@
 {
-  "snapshot_time": "2026-11-17T16:05:07-05:00",
+  "snapshot_time": "2026-11-17T16:14:06-05:00",
   "supplemental_recovery_complete": true,
   "counting_unit": "Generated candidate rows; separate models/candidates count separately.",
   "grade_policy": "Complete numeric total scores only; failed/ungraded totals are excluded.",
