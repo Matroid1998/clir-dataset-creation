@@ -1,0 +1,1096 @@
+{
+  "status": "suggestion_only_not_applied",
+  "practical_margin_out_of_40": 0.5,
+  "routes": [
+    {
+      "corpus": "eurlex",
+      "language": "en",
+      "mode": "claim_verification",
+      "model": "anthropic/claude-haiku-5.5",
+      "evidence": "document_supported",
+      "raw_gap_to_leader": 0.0,
+      "haiku_qwen_paired_documents": 10,
+      "changes_with_best_candidate": true
+    },
+    {
+      "corpus": "eurlex",
+      "language": "en",
+      "mode": "comparison",
+      "model": null,
+      "evidence": "no_data",
+      "raw_gap_to_leader": null,
+      "haiku_qwen_paired_documents": 0,
+      "changes_with_best_candidate": null
+    },
+    {
+      "corpus": "eurlex",
+      "language": "en",
+      "mode": "conceptual",
+      "model": "anthropic/claude-haiku-5.5",
+      "evidence": "document_supported",
+      "raw_gap_to_leader": 0.5666666666666664,
+      "haiku_qwen_paired_documents": 15,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "eurlex",
+      "language": "en",
+      "mode": "fact_pattern",
+      "model": "anthropic/claude-haiku-5.5",
+      "evidence": "document_supported",
+      "raw_gap_to_leader": 0.0,
+      "haiku_qwen_paired_documents": 13,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "eurlex",
+      "language": "en",
+      "mode": "lookup",
+      "model": "anthropic/claude-haiku-5.5",
+      "evidence": "document_supported",
+      "raw_gap_to_leader": 0.0,
+      "haiku_qwen_paired_documents": 16,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "eurlex",
+      "language": "en",
+      "mode": "source_finding",
+      "model": null,
+      "evidence": "no_data",
+      "raw_gap_to_leader": null,
+      "haiku_qwen_paired_documents": 0,
+      "changes_with_best_candidate": null
+    },
+    {
+      "corpus": "eurlex",
+      "language": "fr",
+      "mode": "claim_verification",
+      "model": "anthropic/claude-haiku-5.5",
+      "evidence": "document_supported",
+      "raw_gap_to_leader": 0.0,
+      "haiku_qwen_paired_documents": 11,
+      "changes_with_best_candidate": true
+    },
+    {
+      "corpus": "eurlex",
+      "language": "fr",
+      "mode": "comparison",
+      "model": null,
+      "evidence": "no_data",
+      "raw_gap_to_leader": null,
+      "haiku_qwen_paired_documents": 0,
+      "changes_with_best_candidate": null
+    },
+    {
+      "corpus": "eurlex",
+      "language": "fr",
+      "mode": "conceptual",
+      "model": "anthropic/claude-haiku-5.5",
+      "evidence": "document_supported",
+      "raw_gap_to_leader": 0.0,
+      "haiku_qwen_paired_documents": 15,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "eurlex",
+      "language": "fr",
+      "mode": "fact_pattern",
+      "model": "anthropic/claude-haiku-5.5",
+      "evidence": "document_supported",
+      "raw_gap_to_leader": 0.09090909090908994,
+      "haiku_qwen_paired_documents": 10,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "eurlex",
+      "language": "fr",
+      "mode": "lookup",
+      "model": "qwen/qwen3.8-27b",
+      "evidence": "document_supported",
+      "raw_gap_to_leader": 0.0,
+      "haiku_qwen_paired_documents": 12,
+      "changes_with_best_candidate": true
+    },
+    {
+      "corpus": "eurlex",
+      "language": "fr",
+      "mode": "source_finding",
+      "model": null,
+      "evidence": "no_data",
+      "raw_gap_to_leader": null,
+      "haiku_qwen_paired_documents": 0,
+      "changes_with_best_candidate": null
+    },
+    {
+      "corpus": "eurlex",
+      "language": "es",
+      "mode": "claim_verification",
+      "model": "anthropic/claude-haiku-5.5",
+      "evidence": "provisional",
+      "raw_gap_to_leader": 0.0952380952380949,
+      "haiku_qwen_paired_documents": 7,
+      "changes_with_best_candidate": true
+    },
+    {
+      "corpus": "eurlex",
+      "language": "es",
+      "mode": "comparison",
+      "model": "anthropic/claude-haiku-5.5",
+      "evidence": "provisional",
+      "raw_gap_to_leader": 0.0,
+      "haiku_qwen_paired_documents": 1,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "eurlex",
+      "language": "es",
+      "mode": "conceptual",
+      "model": "qwen/qwen3.8-27b",
+      "evidence": "document_supported",
+      "raw_gap_to_leader": 0.0,
+      "haiku_qwen_paired_documents": 10,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "eurlex",
+      "language": "es",
+      "mode": "fact_pattern",
+      "model": "qwen/qwen3.8-27b",
+      "evidence": "document_supported",
+      "raw_gap_to_leader": 0.0,
+      "haiku_qwen_paired_documents": 10,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "eurlex",
+      "language": "es",
+      "mode": "lookup",
+      "model": "qwen/qwen3.8-27b",
+      "evidence": "document_supported",
+      "raw_gap_to_leader": 0.0,
+      "haiku_qwen_paired_documents": 10,
+      "changes_with_best_candidate": true
+    },
+    {
+      "corpus": "eurlex",
+      "language": "es",
+      "mode": "source_finding",
+      "model": null,
+      "evidence": "no_data",
+      "raw_gap_to_leader": null,
+      "haiku_qwen_paired_documents": 0,
+      "changes_with_best_candidate": null
+    },
+    {
+      "corpus": "eurlex",
+      "language": "de",
+      "mode": "claim_verification",
+      "model": "anthropic/claude-haiku-5.5",
+      "evidence": "provisional",
+      "raw_gap_to_leader": 0.6481481481481524,
+      "haiku_qwen_paired_documents": 9,
+      "changes_with_best_candidate": true
+    },
+    {
+      "corpus": "eurlex",
+      "language": "de",
+      "mode": "comparison",
+      "model": "anthropic/claude-haiku-5.5",
+      "evidence": "provisional",
+      "raw_gap_to_leader": 0.0,
+      "haiku_qwen_paired_documents": 3,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "eurlex",
+      "language": "de",
+      "mode": "conceptual",
+      "model": "anthropic/claude-haiku-5.5",
+      "evidence": "document_supported",
+      "raw_gap_to_leader": 0.0,
+      "haiku_qwen_paired_documents": 13,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "eurlex",
+      "language": "de",
+      "mode": "fact_pattern",
+      "model": "anthropic/claude-haiku-5.5",
+      "evidence": "document_supported",
+      "raw_gap_to_leader": 0.0,
+      "haiku_qwen_paired_documents": 12,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "eurlex",
+      "language": "de",
+      "mode": "lookup",
+      "model": "qwen/qwen3.8-27b",
+      "evidence": "document_supported",
+      "raw_gap_to_leader": 0.0,
+      "haiku_qwen_paired_documents": 13,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "eurlex",
+      "language": "de",
+      "mode": "source_finding",
+      "model": null,
+      "evidence": "no_data",
+      "raw_gap_to_leader": null,
+      "haiku_qwen_paired_documents": 0,
+      "changes_with_best_candidate": null
+    },
+    {
+      "corpus": "un",
+      "language": "en",
+      "mode": "claim_verification",
+      "model": "anthropic/claude-haiku-5.5",
+      "evidence": "document_supported",
+      "raw_gap_to_leader": 2.4871794871794854,
+      "haiku_qwen_paired_documents": 13,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "un",
+      "language": "en",
+      "mode": "comparison",
+      "model": null,
+      "evidence": "no_data",
+      "raw_gap_to_leader": null,
+      "haiku_qwen_paired_documents": 0,
+      "changes_with_best_candidate": null
+    },
+    {
+      "corpus": "un",
+      "language": "en",
+      "mode": "conceptual",
+      "model": "anthropic/claude-haiku-5.5",
+      "evidence": "document_supported",
+      "raw_gap_to_leader": 0.5555555555555571,
+      "haiku_qwen_paired_documents": 18,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "un",
+      "language": "en",
+      "mode": "practitioners",
+      "model": "anthropic/claude-haiku-5.5",
+      "evidence": "document_supported",
+      "raw_gap_to_leader": 0.0,
+      "haiku_qwen_paired_documents": 16,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "un",
+      "language": "en",
+      "mode": "lookup",
+      "model": "qwen/qwen3.8-27b",
+      "evidence": "document_supported",
+      "raw_gap_to_leader": 0.0,
+      "haiku_qwen_paired_documents": 18,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "un",
+      "language": "en",
+      "mode": "source_finding",
+      "model": "anthropic/claude-haiku-5.5",
+      "evidence": "provisional",
+      "raw_gap_to_leader": 0.0,
+      "haiku_qwen_paired_documents": 3,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "un",
+      "language": "fr",
+      "mode": "claim_verification",
+      "model": "anthropic/claude-haiku-5.5",
+      "evidence": "document_supported",
+      "raw_gap_to_leader": 0.0,
+      "haiku_qwen_paired_documents": 14,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "un",
+      "language": "fr",
+      "mode": "comparison",
+      "model": null,
+      "evidence": "no_data",
+      "raw_gap_to_leader": null,
+      "haiku_qwen_paired_documents": 0,
+      "changes_with_best_candidate": null
+    },
+    {
+      "corpus": "un",
+      "language": "fr",
+      "mode": "conceptual",
+      "model": "anthropic/claude-haiku-5.5",
+      "evidence": "provisional",
+      "raw_gap_to_leader": 0.24603174603174693,
+      "haiku_qwen_paired_documents": 3,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "un",
+      "language": "fr",
+      "mode": "practitioners",
+      "model": "anthropic/claude-haiku-5.5",
+      "evidence": "document_supported",
+      "raw_gap_to_leader": 0.0,
+      "haiku_qwen_paired_documents": 16,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "un",
+      "language": "fr",
+      "mode": "lookup",
+      "model": "qwen/qwen3.8-27b",
+      "evidence": "provisional",
+      "raw_gap_to_leader": 0.0,
+      "haiku_qwen_paired_documents": 9,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "un",
+      "language": "fr",
+      "mode": "source_finding",
+      "model": "qwen/qwen3.8-27b",
+      "evidence": "provisional",
+      "raw_gap_to_leader": 3.0,
+      "haiku_qwen_paired_documents": 2,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "un",
+      "language": "es",
+      "mode": "claim_verification",
+      "model": "anthropic/claude-haiku-5.5",
+      "evidence": "document_supported",
+      "raw_gap_to_leader": 0.0,
+      "haiku_qwen_paired_documents": 10,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "un",
+      "language": "es",
+      "mode": "comparison",
+      "model": null,
+      "evidence": "no_data",
+      "raw_gap_to_leader": null,
+      "haiku_qwen_paired_documents": 0,
+      "changes_with_best_candidate": null
+    },
+    {
+      "corpus": "un",
+      "language": "es",
+      "mode": "conceptual",
+      "model": "qwen/qwen3.8-27b",
+      "evidence": "provisional",
+      "raw_gap_to_leader": 0.0,
+      "haiku_qwen_paired_documents": 6,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "un",
+      "language": "es",
+      "mode": "practitioners",
+      "model": "qwen/qwen3.8-27b",
+      "evidence": "document_supported",
+      "raw_gap_to_leader": 0.0,
+      "haiku_qwen_paired_documents": 14,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "un",
+      "language": "es",
+      "mode": "lookup",
+      "model": "anthropic/claude-haiku-5.5",
+      "evidence": "provisional",
+      "raw_gap_to_leader": 1.513636363636362,
+      "haiku_qwen_paired_documents": 5,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "un",
+      "language": "es",
+      "mode": "source_finding",
+      "model": null,
+      "evidence": "no_data",
+      "raw_gap_to_leader": null,
+      "haiku_qwen_paired_documents": 0,
+      "changes_with_best_candidate": null
+    },
+    {
+      "corpus": "un",
+      "language": "zh",
+      "mode": "claim_verification",
+      "model": "qwen/qwen3.8-27b",
+      "evidence": "document_supported",
+      "raw_gap_to_leader": 0.0,
+      "haiku_qwen_paired_documents": 12,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "un",
+      "language": "zh",
+      "mode": "comparison",
+      "model": null,
+      "evidence": "no_data",
+      "raw_gap_to_leader": null,
+      "haiku_qwen_paired_documents": 0,
+      "changes_with_best_candidate": null
+    },
+    {
+      "corpus": "un",
+      "language": "zh",
+      "mode": "conceptual",
+      "model": "qwen/qwen3.8-27b",
+      "evidence": "document_supported",
+      "raw_gap_to_leader": 0.08119658119658624,
+      "haiku_qwen_paired_documents": 13,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "un",
+      "language": "zh",
+      "mode": "practitioners",
+      "model": "anthropic/claude-haiku-5.5",
+      "evidence": "document_supported",
+      "raw_gap_to_leader": 0.0,
+      "haiku_qwen_paired_documents": 10,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "un",
+      "language": "zh",
+      "mode": "lookup",
+      "model": "qwen/qwen3.8-27b",
+      "evidence": "document_supported",
+      "raw_gap_to_leader": 0.03333333333333144,
+      "haiku_qwen_paired_documents": 10,
+      "changes_with_best_candidate": true
+    },
+    {
+      "corpus": "un",
+      "language": "zh",
+      "mode": "source_finding",
+      "model": "anthropic/claude-haiku-5.5",
+      "evidence": "provisional",
+      "raw_gap_to_leader": 0.0,
+      "haiku_qwen_paired_documents": 1,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "un",
+      "language": "ar",
+      "mode": "claim_verification",
+      "model": "qwen/qwen3.8-27b",
+      "evidence": "provisional",
+      "raw_gap_to_leader": 0.6875,
+      "haiku_qwen_paired_documents": 8,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "un",
+      "language": "ar",
+      "mode": "comparison",
+      "model": "anthropic/claude-haiku-5.5",
+      "evidence": "provisional",
+      "raw_gap_to_leader": 0.0,
+      "haiku_qwen_paired_documents": 1,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "un",
+      "language": "ar",
+      "mode": "conceptual",
+      "model": "anthropic/claude-haiku-5.5",
+      "evidence": "document_supported",
+      "raw_gap_to_leader": 0.0,
+      "haiku_qwen_paired_documents": 11,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "un",
+      "language": "ar",
+      "mode": "practitioners",
+      "model": "anthropic/claude-haiku-5.5",
+      "evidence": "provisional",
+      "raw_gap_to_leader": 0.0,
+      "haiku_qwen_paired_documents": 8,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "un",
+      "language": "ar",
+      "mode": "lookup",
+      "model": "anthropic/claude-haiku-5.5",
+      "evidence": "document_supported",
+      "raw_gap_to_leader": 0.0,
+      "haiku_qwen_paired_documents": 10,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "un",
+      "language": "ar",
+      "mode": "source_finding",
+      "model": "qwen/qwen3.8-27b",
+      "evidence": "provisional",
+      "raw_gap_to_leader": 0.0,
+      "haiku_qwen_paired_documents": 8,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "un",
+      "language": "ru",
+      "mode": "claim_verification",
+      "model": "qwen/qwen3.8-27b",
+      "evidence": "provisional",
+      "raw_gap_to_leader": 1.3888888888888857,
+      "haiku_qwen_paired_documents": 9,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "un",
+      "language": "ru",
+      "mode": "comparison",
+      "model": "anthropic/claude-haiku-5.5",
+      "evidence": "provisional",
+      "raw_gap_to_leader": 0.0,
+      "haiku_qwen_paired_documents": 2,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "un",
+      "language": "ru",
+      "mode": "conceptual",
+      "model": "anthropic/claude-haiku-5.5",
+      "evidence": "document_supported",
+      "raw_gap_to_leader": 0.4583333333333357,
+      "haiku_qwen_paired_documents": 12,
+      "changes_with_best_candidate": true
+    },
+    {
+      "corpus": "un",
+      "language": "ru",
+      "mode": "practitioners",
+      "model": "qwen/qwen3.8-27b",
+      "evidence": "provisional",
+      "raw_gap_to_leader": 0.018518518518519045,
+      "haiku_qwen_paired_documents": 9,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "un",
+      "language": "ru",
+      "mode": "lookup",
+      "model": "qwen/qwen3.8-27b",
+      "evidence": "provisional",
+      "raw_gap_to_leader": 0.14814814814814525,
+      "haiku_qwen_paired_documents": 9,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "un",
+      "language": "ru",
+      "mode": "source_finding",
+      "model": "qwen/qwen3.8-27b",
+      "evidence": "provisional",
+      "raw_gap_to_leader": 0.0,
+      "haiku_qwen_paired_documents": 8,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "chemistry",
+      "language": "en",
+      "mode": "assertion_verification",
+      "model": "qwen/qwen3.8-27b",
+      "evidence": "provisional",
+      "raw_gap_to_leader": 0.0,
+      "haiku_qwen_paired_documents": 7,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "chemistry",
+      "language": "en",
+      "mode": "comparison",
+      "model": "qwen/qwen3.8-27b",
+      "evidence": "provisional",
+      "raw_gap_to_leader": 0.0,
+      "haiku_qwen_paired_documents": 4,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "chemistry",
+      "language": "en",
+      "mode": "conceptual",
+      "model": "anthropic/claude-haiku-5.5",
+      "evidence": "provisional",
+      "raw_gap_to_leader": 0.0,
+      "haiku_qwen_paired_documents": 7,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "chemistry",
+      "language": "en",
+      "mode": "constraint_search",
+      "model": "qwen/qwen3.8-27b",
+      "evidence": "provisional",
+      "raw_gap_to_leader": 0.1999999999999993,
+      "haiku_qwen_paired_documents": 5,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "chemistry",
+      "language": "en",
+      "mode": "lookup",
+      "model": "qwen/qwen3.8-27b",
+      "evidence": "provisional",
+      "raw_gap_to_leader": 0.0,
+      "haiku_qwen_paired_documents": 9,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "chemistry",
+      "language": "en",
+      "mode": "process_retrieval",
+      "model": "anthropic/claude-haiku-5.5",
+      "evidence": "provisional",
+      "raw_gap_to_leader": 0.8999999999999986,
+      "haiku_qwen_paired_documents": 4,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "chemistry",
+      "language": "en",
+      "mode": "source_finding",
+      "model": "qwen/qwen3.8-27b",
+      "evidence": "provisional",
+      "raw_gap_to_leader": 0.0,
+      "haiku_qwen_paired_documents": 6,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "chemistry",
+      "language": "fr",
+      "mode": "assertion_verification",
+      "model": "qwen/qwen3.8-27b",
+      "evidence": "provisional",
+      "raw_gap_to_leader": 0.0,
+      "haiku_qwen_paired_documents": 8,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "chemistry",
+      "language": "fr",
+      "mode": "comparison",
+      "model": "anthropic/claude-haiku-5.5",
+      "evidence": "provisional",
+      "raw_gap_to_leader": 0.11904761904761685,
+      "haiku_qwen_paired_documents": 9,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "chemistry",
+      "language": "fr",
+      "mode": "conceptual",
+      "model": "anthropic/claude-haiku-5.5",
+      "evidence": "provisional",
+      "raw_gap_to_leader": 0.0,
+      "haiku_qwen_paired_documents": 6,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "chemistry",
+      "language": "fr",
+      "mode": "constraint_search",
+      "model": "qwen/qwen3.8-27b",
+      "evidence": "provisional",
+      "raw_gap_to_leader": 0.0,
+      "haiku_qwen_paired_documents": 6,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "chemistry",
+      "language": "fr",
+      "mode": "lookup",
+      "model": "qwen/qwen3.8-27b",
+      "evidence": "provisional",
+      "raw_gap_to_leader": 0.0,
+      "haiku_qwen_paired_documents": 7,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "chemistry",
+      "language": "fr",
+      "mode": "process_retrieval",
+      "model": "qwen/qwen3.8-27b",
+      "evidence": "provisional",
+      "raw_gap_to_leader": 0.0,
+      "haiku_qwen_paired_documents": 9,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "chemistry",
+      "language": "fr",
+      "mode": "source_finding",
+      "model": "anthropic/claude-haiku-5.5",
+      "evidence": "provisional",
+      "raw_gap_to_leader": 0.0,
+      "haiku_qwen_paired_documents": 6,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "chemistry",
+      "language": "es",
+      "mode": "assertion_verification",
+      "model": "qwen/qwen3.8-27b",
+      "evidence": "provisional",
+      "raw_gap_to_leader": 0.0,
+      "haiku_qwen_paired_documents": 6,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "chemistry",
+      "language": "es",
+      "mode": "comparison",
+      "model": "qwen/qwen3.8-27b",
+      "evidence": "provisional",
+      "raw_gap_to_leader": 0.0,
+      "haiku_qwen_paired_documents": 2,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "chemistry",
+      "language": "es",
+      "mode": "conceptual",
+      "model": "qwen/qwen3.8-27b",
+      "evidence": "provisional",
+      "raw_gap_to_leader": 0.1999999999999993,
+      "haiku_qwen_paired_documents": 4,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "chemistry",
+      "language": "es",
+      "mode": "constraint_search",
+      "model": "qwen/qwen3.8-27b",
+      "evidence": "provisional",
+      "raw_gap_to_leader": 0.25,
+      "haiku_qwen_paired_documents": 6,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "chemistry",
+      "language": "es",
+      "mode": "lookup",
+      "model": "anthropic/claude-haiku-5.5",
+      "evidence": "provisional",
+      "raw_gap_to_leader": 0.0,
+      "haiku_qwen_paired_documents": 2,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "chemistry",
+      "language": "es",
+      "mode": "process_retrieval",
+      "model": "anthropic/claude-haiku-5.5",
+      "evidence": "provisional",
+      "raw_gap_to_leader": 0.0,
+      "haiku_qwen_paired_documents": 3,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "chemistry",
+      "language": "es",
+      "mode": "source_finding",
+      "model": "anthropic/claude-haiku-5.5",
+      "evidence": "provisional",
+      "raw_gap_to_leader": 0.0,
+      "haiku_qwen_paired_documents": 3,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "chemistry",
+      "language": "de",
+      "mode": "assertion_verification",
+      "model": "anthropic/claude-haiku-5.5",
+      "evidence": "provisional",
+      "raw_gap_to_leader": 0.0,
+      "haiku_qwen_paired_documents": 2,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "chemistry",
+      "language": "de",
+      "mode": "comparison",
+      "model": "anthropic/claude-haiku-5.5",
+      "evidence": "provisional",
+      "raw_gap_to_leader": 0.0,
+      "haiku_qwen_paired_documents": 3,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "chemistry",
+      "language": "de",
+      "mode": "conceptual",
+      "model": null,
+      "evidence": "no_data",
+      "raw_gap_to_leader": null,
+      "haiku_qwen_paired_documents": 0,
+      "changes_with_best_candidate": null
+    },
+    {
+      "corpus": "chemistry",
+      "language": "de",
+      "mode": "constraint_search",
+      "model": "qwen/qwen3.8-27b",
+      "evidence": "provisional",
+      "raw_gap_to_leader": 0.0,
+      "haiku_qwen_paired_documents": 2,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "chemistry",
+      "language": "de",
+      "mode": "lookup",
+      "model": "anthropic/claude-haiku-5.5",
+      "evidence": "provisional",
+      "raw_gap_to_leader": 0.0,
+      "haiku_qwen_paired_documents": 2,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "chemistry",
+      "language": "de",
+      "mode": "process_retrieval",
+      "model": "anthropic/claude-haiku-5.5",
+      "evidence": "provisional",
+      "raw_gap_to_leader": 0.3333333333333357,
+      "haiku_qwen_paired_documents": 3,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "chemistry",
+      "language": "de",
+      "mode": "source_finding",
+      "model": "qwen/qwen3.8-27b",
+      "evidence": "provisional",
+      "raw_gap_to_leader": 1.6666666666666643,
+      "haiku_qwen_paired_documents": 3,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "chemistry",
+      "language": "zh",
+      "mode": "assertion_verification",
+      "model": "anthropic/claude-haiku-5.5",
+      "evidence": "provisional",
+      "raw_gap_to_leader": 0.0,
+      "haiku_qwen_paired_documents": 4,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "chemistry",
+      "language": "zh",
+      "mode": "comparison",
+      "model": "qwen/qwen3.8-27b",
+      "evidence": "provisional",
+      "raw_gap_to_leader": 0.0,
+      "haiku_qwen_paired_documents": 3,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "chemistry",
+      "language": "zh",
+      "mode": "conceptual",
+      "model": "qwen/qwen3.8-27b",
+      "evidence": "provisional",
+      "raw_gap_to_leader": 0.0,
+      "haiku_qwen_paired_documents": 5,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "chemistry",
+      "language": "zh",
+      "mode": "constraint_search",
+      "model": "anthropic/claude-haiku-5.5",
+      "evidence": "provisional",
+      "raw_gap_to_leader": 1.0,
+      "haiku_qwen_paired_documents": 6,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "chemistry",
+      "language": "zh",
+      "mode": "lookup",
+      "model": "anthropic/claude-haiku-5.5",
+      "evidence": "provisional",
+      "raw_gap_to_leader": 0.0,
+      "haiku_qwen_paired_documents": 5,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "chemistry",
+      "language": "zh",
+      "mode": "process_retrieval",
+      "model": "qwen/qwen3.8-27b",
+      "evidence": "provisional",
+      "raw_gap_to_leader": 0.25,
+      "haiku_qwen_paired_documents": 3,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "chemistry",
+      "language": "zh",
+      "mode": "source_finding",
+      "model": "anthropic/claude-haiku-5.5",
+      "evidence": "provisional",
+      "raw_gap_to_leader": 0.0,
+      "haiku_qwen_paired_documents": 7,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "chemistry",
+      "language": "ja",
+      "mode": "assertion_verification",
+      "model": "qwen/qwen3.8-27b",
+      "evidence": "provisional",
+      "raw_gap_to_leader": 0.0,
+      "haiku_qwen_paired_documents": 7,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "chemistry",
+      "language": "ja",
+      "mode": "comparison",
+      "model": "qwen/qwen3.8-27b",
+      "evidence": "provisional",
+      "raw_gap_to_leader": 0.0,
+      "haiku_qwen_paired_documents": 4,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "chemistry",
+      "language": "ja",
+      "mode": "conceptual",
+      "model": "qwen/qwen3.8-27b",
+      "evidence": "provisional",
+      "raw_gap_to_leader": 0.0,
+      "haiku_qwen_paired_documents": 6,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "chemistry",
+      "language": "ja",
+      "mode": "constraint_search",
+      "model": "qwen/qwen3.8-27b",
+      "evidence": "provisional",
+      "raw_gap_to_leader": 0.0,
+      "haiku_qwen_paired_documents": 7,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "chemistry",
+      "language": "ja",
+      "mode": "lookup",
+      "model": "anthropic/claude-haiku-5.5",
+      "evidence": "provisional",
+      "raw_gap_to_leader": 0.0,
+      "haiku_qwen_paired_documents": 7,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "chemistry",
+      "language": "ja",
+      "mode": "process_retrieval",
+      "model": "qwen/qwen3.8-27b",
+      "evidence": "provisional",
+      "raw_gap_to_leader": 0.0,
+      "haiku_qwen_paired_documents": 6,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "chemistry",
+      "language": "ja",
+      "mode": "source_finding",
+      "model": "anthropic/claude-haiku-5.5",
+      "evidence": "provisional",
+      "raw_gap_to_leader": 0.0,
+      "haiku_qwen_paired_documents": 8,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "chemistry",
+      "language": "ru",
+      "mode": "assertion_verification",
+      "model": "anthropic/claude-haiku-5.5",
+      "evidence": "provisional",
+      "raw_gap_to_leader": 0.0,
+      "haiku_qwen_paired_documents": 7,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "chemistry",
+      "language": "ru",
+      "mode": "comparison",
+      "model": "anthropic/claude-haiku-5.5",
+      "evidence": "provisional",
+      "raw_gap_to_leader": 0.0,
+      "haiku_qwen_paired_documents": 7,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "chemistry",
+      "language": "ru",
+      "mode": "conceptual",
+      "model": "anthropic/claude-haiku-5.5",
+      "evidence": "provisional",
+      "raw_gap_to_leader": 0.5,
+      "haiku_qwen_paired_documents": 7,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "chemistry",
+      "language": "ru",
+      "mode": "constraint_search",
+      "model": "anthropic/claude-haiku-5.5",
+      "evidence": "provisional",
+      "raw_gap_to_leader": 0.5714285714285694,
+      "haiku_qwen_paired_documents": 7,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "chemistry",
+      "language": "ru",
+      "mode": "lookup",
+      "model": "anthropic/claude-haiku-5.5",
+      "evidence": "provisional",
+      "raw_gap_to_leader": 0.0,
+      "haiku_qwen_paired_documents": 6,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "chemistry",
+      "language": "ru",
+      "mode": "process_retrieval",
+      "model": "qwen/qwen3.8-27b",
+      "evidence": "provisional",
+      "raw_gap_to_leader": 0.0,
+      "haiku_qwen_paired_documents": 8,
+      "changes_with_best_candidate": false
+    },
+    {
+      "corpus": "chemistry",
+      "language": "ru",
+      "mode": "source_finding",
+      "model": "qwen/qwen3.8-27b",
+      "evidence": "provisional",
+      "raw_gap_to_leader": 0.0,
+      "haiku_qwen_paired_documents": 7,
+      "changes_with_best_candidate": false
+    }
+  ]
+}
