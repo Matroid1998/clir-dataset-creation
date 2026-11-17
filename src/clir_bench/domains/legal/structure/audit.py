@@ -47,9 +47,10 @@ def _load(path):
     return [json.loads(line) for line in path.open(encoding="utf-8")]
 
 
-def _article_text() -> dict[tuple[str, str], str]:
+def _article_text(*, profile=None) -> dict[tuple[str, str], str]:
+    profile_paths = profile or paths
     out = {}
-    for row in _load(paths.ARTICLES_JSONL):
+    for row in _load(profile_paths.ARTICLES_JSONL):
         if row["unit_type"] == "article" and row["language"] == "en":
             out[(row["celex_id"], row["article_number"])] = row["text"]
     return out
@@ -57,9 +58,10 @@ def _article_text() -> dict[tuple[str, str], str]:
 
 # -- precision sample ------------------------------------------------------- #
 
-def sample(n: int, seed: int) -> None:
-    edges = _load(paths.INTERNAL_EDGES_JSONL)
-    texts = _article_text()
+def sample(n: int, seed: int, *, profile=None) -> None:
+    profile_paths = profile or paths
+    edges = _load(profile_paths.INTERNAL_EDGES_JSONL)
+    texts = _article_text(profile=profile) if profile else _article_text()
 
     strata: dict[tuple[str, str], list[dict]] = defaultdict(list)
     for edge in edges:
@@ -85,7 +87,7 @@ def sample(n: int, seed: int) -> None:
             break
         depth += 1
 
-    out = paths.REPORTS_DIR / "audit_sample.csv"
+    out = profile_paths.REPORTS_DIR / "audit_sample.csv"
     out.parent.mkdir(parents=True, exist_ok=True)
     with out.open("w", newline="", encoding="utf-8") as fh:
         writer = csv.writer(fh)
@@ -123,10 +125,11 @@ _MISSABLE = {
 }
 
 
-def recall() -> None:
+def recall(*, profile=None) -> None:
+    profile_paths = profile or paths
     from clir_bench.domains.legal.structure import references as refs
 
-    texts = _article_text()
+    texts = _article_text(profile=profile) if profile else _article_text()
     blob = "\n".join(texts.values())
 
     # Account for every "Article <n>" head in the corpus. A head is either the
@@ -159,7 +162,7 @@ def recall() -> None:
     print("resolves at article granularity only. The first four rows are the real")
     print("recall ceiling for article-to-article edges.")
 
-    (paths.REPORTS_DIR / "recall_probe.json").write_text(json.dumps({
+    (profile_paths.REPORTS_DIR / "recall_probe.json").write_text(json.dumps({
         "chars": len(blob), "article_heads": total_heads,
         "enumerations": enumerations, "heads_absorbed": absorbed,
         "unaccounted": total_heads - enumerations - absorbed,
@@ -179,8 +182,9 @@ def act_keys(surface: str) -> set[str]:
     return {f"{m.group(1).lower()}:{m.group(2)}" for m in _ACT_KEY_RE.finditer(surface or "")}
 
 
-def crosscheck(python_bin: str) -> None:
-    ours = _load(paths.EXTERNAL_REFS_JSONL)
+def crosscheck(python_bin: str, *, profile=None) -> None:
+    profile_paths = profile or paths
+    ours = _load(profile_paths.EXTERNAL_REFS_JSONL)
     by_article: dict[tuple[str, str], set[str]] = defaultdict(set)
     for row in ours:
         by_article[(row["source_celex"], row["source_article_number"])] |= \
@@ -210,7 +214,7 @@ print(json.dumps(out))
         raise SystemExit(f"eurlex-parser run failed:\n{proc.stderr[-2000:]}")
     theirs_raw = json.loads(proc.stdout.strip().splitlines()[-1])
 
-    texts = _article_text()
+    texts = _article_text(profile=profile) if profile else _article_text()
     agree = only_ours = only_theirs_bare = only_theirs_qualified = 0
     failed = []
     for celex in celexes:
@@ -252,7 +256,7 @@ print(json.dumps(out))
     print(f"reported only by eurlex-parser        {only_theirs_bare + only_theirs_qualified:,}")
     print(f"  bare act mention, no article given  {only_theirs_bare:,}  (out of scope here)")
     print(f"  article-qualified, missed by us     {only_theirs_qualified:,}  <- real misses")
-    (paths.REPORTS_DIR / "external_crosscheck.json").write_text(json.dumps(
+    (profile_paths.REPORTS_DIR / "external_crosscheck.json").write_text(json.dumps(
         {"corroborated_rate": corroborated, "agree": agree, "only_ours": only_ours,
          "only_theirs_bare": only_theirs_bare,
          "only_theirs_article_qualified": only_theirs_qualified,

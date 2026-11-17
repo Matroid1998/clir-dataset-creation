@@ -193,6 +193,7 @@ def select(index: ctx.ArticleIndex, *, n: int, seed: int, languages: Sequence[st
            modes: Sequence[str], strata=DEFAULT_STRATA,
            include_amending: bool = False,
            max_per_act: int = 2,
+           max_references: int = ctx.DEFAULT_MAX_REFERENCES,
            require_complete: bool = True, excluded_documents: frozenset[str] = frozenset()) -> list[Target]:
     """Stratified, deterministic target selection.
 
@@ -211,7 +212,7 @@ def select(index: ctx.ArticleIndex, *, n: int, seed: int, languages: Sequence[st
     external_refs = getattr(index, "external_references", {}) or {}
     annex_refs = getattr(index, "annex_references", {}) or {}
     amending: set[str] = set()
-    if not include_amending:
+    if not include_amending and not hasattr(index, "is_target_eligible"):
         articles_path = getattr(index, "articles_path", struct_paths.ARTICLES_JSONL)
         with articles_path.open(encoding="utf-8") as fh:
             for line in fh:
@@ -229,6 +230,8 @@ def select(index: ctx.ArticleIndex, *, n: int, seed: int, languages: Sequence[st
 
     pools: dict[str, list[tuple[str, int]]] = defaultdict(list)
     for eli, unit in index.by_eli.items():
+        if hasattr(index, "target_acts") and unit.celex_id not in index.target_acts:
+            continue
         # The index also holds cited ANNEX bodies; a question target is always
         # an article.
         if unit.unit_type != "article":
@@ -242,6 +245,9 @@ def select(index: ctx.ArticleIndex, *, n: int, seed: int, languages: Sequence[st
             continue
         verdict = status.get(eli, {})
         if require_complete and not verdict.get("complete"):
+            continue
+        if hasattr(index, "is_target_eligible") and not index.is_target_eligible(
+                eli, max_references=max_references):
             continue
         internal = len([t for t in index.references.get(eli, []) if t != eli])
         external = len(external_refs.get(eli, []))

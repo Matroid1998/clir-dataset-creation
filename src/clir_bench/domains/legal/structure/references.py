@@ -34,7 +34,6 @@ from __future__ import annotations
 import argparse
 import json
 import re
-import sys
 from collections import Counter, defaultdict
 
 from clir_bench.domains.legal.structure import cellar, paths
@@ -457,7 +456,7 @@ def classify(text: str, enumeration: dict, *,
 
 # -- driver ----------------------------------------------------------------- #
 
-def load_articles(unit_types=("article",)) -> dict[str, list[dict]]:
+def load_articles(unit_types=("article",), *, profile=None) -> dict[str, list[dict]]:
     """English records of the given unit types, grouped by act.
 
     Only English is loaded. References are extracted once from English and
@@ -465,8 +464,9 @@ def load_articles(unit_types=("article",)) -> dict[str, list[dict]]:
     three language versions here would triple the memory for nothing -- which
     matters at corpus scale, where the file runs to millions of records.
     """
+    profile_paths = profile or paths
     english: dict[str, list[dict]] = defaultdict(list)
-    with paths.ARTICLES_JSONL.open(encoding="utf-8") as fh:
+    with profile_paths.ARTICLES_JSONL.open(encoding="utf-8") as fh:
         for line in fh:
             row = json.loads(line)
             if row["unit_type"] in unit_types and row["language"] == "en":
@@ -494,13 +494,14 @@ class _Sink:
         self.handle.close()
 
 
-def extract() -> None:
-    paths.ensure_dirs()
-    units = load_articles(("article", "recital", "annex"))
+def extract(*, profile=None) -> None:
+    profile_paths = profile or paths
+    profile_paths.ensure_dirs()
+    units = load_articles(("article", "recital", "annex"), profile=profile)
 
-    internal = _Sink(paths.INTERNAL_EDGES_JSONL)
-    external = _Sink(paths.EXTERNAL_REFS_JSONL)
-    dropped = _Sink(paths.DROPPED_JSONL)
+    internal = _Sink(profile_paths.INTERNAL_EDGES_JSONL)
+    external = _Sink(profile_paths.EXTERNAL_REFS_JSONL)
+    dropped = _Sink(profile_paths.DROPPED_JSONL)
     stats = Counter()
 
     emitted: set[tuple] = set()
@@ -712,13 +713,13 @@ def extract() -> None:
     for sink in (internal, external, dropped):
         sink.close()
 
-    print(f"internal edges      {internal.count:>7,}  -> {paths.INTERNAL_EDGES_JSONL.name}")
-    print(f"external references {external.count:>7,}  -> {paths.EXTERNAL_REFS_JSONL.name}")
-    print(f"dropped / logged    {dropped.count:>7,}  -> {paths.DROPPED_JSONL.name}")
+    print(f"internal edges      {internal.count:>7,}  -> {profile_paths.INTERNAL_EDGES_JSONL.name}")
+    print(f"external references {external.count:>7,}  -> {profile_paths.EXTERNAL_REFS_JSONL.name}")
+    print(f"dropped / logged    {dropped.count:>7,}  -> {profile_paths.DROPPED_JSONL.name}")
     print("\nrules fired:")
     for key, value in sorted(stats.items()):
         print(f"  {key:<34} {value:>6,}")
-    (paths.STRUCTURE_DIR / "reference_stats.json").write_text(
+    (profile_paths.STRUCTURE_DIR / "reference_stats.json").write_text(
         json.dumps(dict(stats), indent=2))
 
 

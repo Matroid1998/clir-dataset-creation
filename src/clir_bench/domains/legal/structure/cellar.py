@@ -36,20 +36,23 @@ from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
+import io
 import json
+import os
 import re
-import sys
 import threading
 import time
 import urllib.error
 import urllib.request
+import xml.etree.ElementTree as ET
 import zipfile
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from pathlib import Path
 
-from clir_bench.domains.legal.structure import ACT_LANGUAGES
-from clir_bench.domains.legal.structure import paths
+from clir_bench.domains.legal.structure import ACT_LANGUAGES, paths
 
 CELLAR = "http://publications.europa.eu/resource/celex/{celex}"
 
@@ -95,16 +98,17 @@ def set_rate(per_second: float) -> None:
     _limiter = RateLimiter(per_second)
 
 
-def _cache_dir(celex: str) -> Path:
+def _cache_dir(celex: str, *, profile=None) -> Path:
     """Shard by the year embedded in the CELEX id (``32014R0110`` -> ``2014``)."""
+    profile_paths = profile or paths
     year = celex[1:5] if len(celex) >= 5 and celex[1:5].isdigit() else "other"
-    path = paths.CACHE_DIR / year
+    path = profile_paths.CACHE_DIR / year
     path.mkdir(parents=True, exist_ok=True)
     return path
 
 
-def cache_file(celex: str, name: str) -> Path:
-    return _cache_dir(celex) / f"{celex}.{name}"
+def cache_file(celex: str, name: str, *, profile=None) -> Path:
+    return _cache_dir(celex, profile=profile) / f"{celex}.{name}"
 
 
 def _get(url: str, accept: str, *, language: str | None = None,
@@ -137,8 +141,10 @@ def _get(url: str, accept: str, *, language: str | None = None,
 
 # -- ELI ------------------------------------------------------------------- #
 
-def eli_for(celex: str) -> str | None:
+def eli_for(celex: str, *, profile=None, transport=None) -> str | None:
     """Authoritative ELI act URI, e.g. ``eli/reg_impl/2014/680``. Cached."""
+    if profile is not None:
+        return _profile_eli_for(celex, profile, transport or _get)
     cache = cache_file(celex, "identifiers.xml")
     miss = cache_file(celex, "identifiers.miss")
     if miss.exists():
@@ -186,8 +192,10 @@ class ActDocuments:
     error: str = ""
 
 
-def ensure_zip(celex: str, language: str) -> tuple[Path | None, str]:
+def ensure_zip(celex: str, language: str, *, profile=None, transport=None) -> tuple[Path | None, str]:
     """Formex zip for one (act, language), fetching only on a cache miss."""
+    if profile is not None:
+        return _profile_ensure_zip(celex, language, profile, transport or _get)
     zip_path = cache_file(celex, f"{language}.zip")
     miss_path = cache_file(celex, f"{language}.miss")
     if zip_path.exists():
@@ -204,9 +212,10 @@ def ensure_zip(celex: str, language: str) -> tuple[Path | None, str]:
     return zip_path, ""
 
 
-def read_documents(celex: str, language: str) -> ActDocuments:
+def read_documents(celex: str, language: str, *, profile=None, transport=None) -> ActDocuments:
     """Act and annex XML for one (act, language), read straight out of the zip."""
-    zip_path, error = ensure_zip(celex, language)
+    zip_path, error = (ensure_zip(celex, language, profile=profile, transport=transport)
+                       if profile is not None else ensure_zip(celex, language))
     if zip_path is None:
         return ActDocuments(celex, language, None, [], error)
     try:
@@ -238,8 +247,202 @@ def read_documents(celex: str, language: str) -> ActDocuments:
 
 # -- bulk fetch ------------------------------------------------------------- #
 
-def fetch_all(celexes: list[str], *, workers: int = 6) -> dict:
+def _atomic_write(path: Path, data: bytes) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_name(path.name + ".tmp")
+    try:
+        with temporary.open("wb") as handle:
+            handle.write(data)
+            handle.flush()
+            os.fsync(handle.fileno())
+        temporary.replace(path)
+    finally:
+        temporary.unlink(missing_ok=True)
+
+
+def _atomic_json(path: Path, value) -> None:
+    _atomic_write(path, (json.dumps(value, ensure_ascii=False, sort_keys=True) + "\n").encode())
+
+
+def _permanent(error) -> bool:
+    return (isinstance(error, urllib.error.HTTPError) and error.code == 404
+            or isinstance(error, FetchError) and str(error).startswith("404 "))
+
+
+def _fetch_error(path: Path, error) -> None:
+    _atomic_json(path, {"error": str(error), "permanent": _permanent(error),
+                        "recorded_at": datetime.now(timezone.utc).isoformat()})
+
+
+def _cached_missing(path: Path) -> bool:
+    if not path.exists():
+        return False
+    try:
+        return json.loads(path.read_text()).get("permanent") is True
+    except (ValueError, AttributeError):
+        # Old text misses may have recorded temporary DNS/HTTP errors forever.
+        return path.read_text().startswith("404 ")
+
+
+def _record_raw(path: Path, payload: bytes) -> None:
+    _atomic_json(path.with_suffix(path.suffix + ".meta.json"), {
+        "sha256": hashlib.sha256(payload).hexdigest(),
+        "retrieved_at": datetime.now(timezone.utc).isoformat(),
+    })
+
+
+def _read_raw(path: Path) -> bytes | None:
+    if not path.exists():
+        return None
+    payload = path.read_bytes()
+    metadata = path.with_suffix(path.suffix + ".meta.json")
+    if metadata.exists():
+        try:
+            expected = json.loads(metadata.read_text())["sha256"]
+        except (ValueError, KeyError, TypeError) as error:
+            raise FetchError(f"invalid-raw-cache-metadata: {path.name}") from error
+        if hashlib.sha256(payload).hexdigest() != expected:
+            raise FetchError(f"cached-raw-checksum-mismatch: {path.name}")
+    if not metadata.exists():
+        _atomic_json(metadata, {"sha256": hashlib.sha256(payload).hexdigest(),
+                                "retrieved_at": None, "provenance": "recovered-cache"})
+    return payload
+
+
+def _checked_eli(payload: bytes, celex: str) -> str:
+    try:
+        ET.fromstring(payload)
+    except ET.ParseError as error:
+        raise FetchError("invalid-identifiers-xml") from error
+    expected_year, expected_number = celex[1:5], int(celex[6:])
+    prefix = "reg" if celex[5] == "R" else "dir"
+    found = {(kind, year, int(number)) for kind, year, number in
+             _ELI_RE.findall(payload.decode("utf-8"))
+             if kind.startswith(prefix) and year == expected_year and int(number) == expected_number}
+    if len(found) != 1:
+        raise FetchError("missing-or-ambiguous-authoritative-eli")
+    kind, year, number = next(iter(found))
+    return f"http://data.europa.eu/eli/{kind}/{year}/{number}/oj"
+
+
+def _profile_eli_for(celex, profile, transport):
+    cache = cache_file(celex, "identifiers.xml", profile=profile)
+    miss = cache_file(celex, "identifiers.miss", profile=profile)
+    if _cached_missing(miss):
+        return None
+    try:
+        payload = _read_raw(cache)
+        if payload is None:
+            payload = transport(CELLAR.format(celex=celex).replace("http:", "https:", 1),
+                                "application/xml;notice=identifiers")
+            eli = _checked_eli(payload, celex)
+            _atomic_write(cache, payload)
+            _record_raw(cache, payload)
+        else:
+            eli = _checked_eli(payload, celex)
+        miss.unlink(missing_ok=True)
+        return eli
+    except (FetchError, urllib.error.URLError, OSError, ValueError) as error:
+        _fetch_error(miss, error)
+        return None
+
+
+def _child(element, name):
+    return next((node for node in element if node.tag.rsplit("}", 1)[-1] == name), None)
+
+
+def _text(element, name):
+    node = _child(element, name) if element is not None else None
+    return (node.text or "").strip() if node is not None else ""
+
+
+def validate_formex(payload: bytes, celex: str, language: str) -> None:
+    """Verify archive/ACT identity using Formex's own bibliographic metadata."""
+    try:
+        with zipfile.ZipFile(io.BytesIO(payload)) as archive:
+            if archive.testzip() is not None:
+                raise FetchError("corrupt-formex-member")
+            acts = []
+            for name in archive.namelist():
+                if not name.endswith(".xml") or name.endswith((".doc.xml", ".toc.xml")):
+                    continue
+                root = ET.fromstring(archive.read(name))
+                kind = root.tag.rsplit("}", 1)[-1]
+                if kind not in {"ACT", "ANNEX"}:
+                    continue
+                bibliography = _child(root, "BIB.INSTANCE")
+                lang = _text(bibliography, "LG.DOC")
+                if lang and lang.lower() != language:
+                    raise FetchError("formex-language-mismatch")
+                if kind == "ACT":
+                    acts.append(root)
+            if len(acts) != 1:
+                raise FetchError("formex-requires-one-ACT")
+            bibliography = _child(acts[0], "BIB.INSTANCE")
+            if _text(bibliography, "LG.DOC").lower() != language:
+                raise FetchError("missing-or-wrong-formex-language")
+            number = _child(bibliography, "NO.DOC") if bibliography is not None else None
+            year, current = _text(number, "YEAR"), _text(number, "NO.CURRENT")
+            if not year or not current.isdigit():
+                raise FetchError("missing-formex-act-identity")
+            if year != celex[1:5] or int(current) != int(celex[6:]):
+                raise FetchError("formex-act-identity-mismatch")
+    except FetchError:
+        raise
+    except (zipfile.BadZipFile, ET.ParseError, KeyError, RuntimeError) as error:
+        raise FetchError(f"invalid-formex-archive: {error}") from error
+
+
+def _profile_ensure_zip(celex, language, profile, transport):
+    cache = cache_file(celex, f"{language}.zip", profile=profile)
+    miss = cache_file(celex, f"{language}.miss", profile=profile)
+    if _cached_missing(miss):
+        return None, miss.read_text().strip()
+    try:
+        payload = _read_raw(cache)
+        if payload is None:
+            payload = transport(CELLAR.format(celex=celex).replace("http:", "https:", 1),
+                                "application/zip;mtype=fmx4", language=LANG_CODE[language])
+            validate_formex(payload, celex, language)
+            _atomic_write(cache, payload)
+            _record_raw(cache, payload)
+        else:
+            validate_formex(payload, celex, language)
+        miss.unlink(missing_ok=True)
+        return cache, ""
+    except (FetchError, urllib.error.URLError, OSError, ValueError) as error:
+        _fetch_error(miss, error)
+        return None, str(error)
+
+
+def _profile_fetch_all(celexes, workers, profile, transport):
+    profile.ensure_dirs()
+    manifest = profile.FETCH_MANIFEST_JSON
+    try:
+        done = json.loads(manifest.read_text()) if manifest.exists() else {}
+    except ValueError:
+        done = {}
+
+    def one(celex):
+        entry = {"eli": eli_for(celex, profile=profile, transport=transport), "languages": {}}
+        for language in ACT_LANGUAGES:
+            path, error = ensure_zip(celex, language, profile=profile, transport=transport)
+            entry["languages"][language] = {"zip": str(path) if path else None, "error": error}
+        return celex, entry
+
+    # Revisit every selected act: successful slots are cache-only, while an old
+    # partial/transient manifest entry must never suppress its missing slots.
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        for celex, entry in pool.map(one, sorted(set(celexes))):
+            done[celex] = entry
+            _atomic_json(manifest, done)
+    return done
+
+
+def fetch_all(celexes: list[str], *, workers: int = 6, profile=None, transport=None) -> dict:
     """Warm the cache for every act, concurrently. Safe to re-run: cache-first."""
+    if profile is not None:
+        return _profile_fetch_all(celexes, workers, profile, transport or _get)
     paths.ensure_dirs()
     manifest_path = paths.STRUCTURE_DIR / "fetch_manifest.json"
     done: dict[str, dict] = {}

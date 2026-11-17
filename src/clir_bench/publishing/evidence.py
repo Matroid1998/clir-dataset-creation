@@ -76,6 +76,40 @@ def _integer(value, name: str) -> int:
     return value
 
 
+def validate_eurlex_dataset_identity(raw: dict, document: dict) -> None:
+    """Keep all article translations and reference artifacts tied to the generating profile."""
+    value = raw.get("eurlex_dataset_identity")
+    metadata = json.loads(document["metadata_json"])
+    prepared = metadata.get("dataset_identity")
+    marker = raw.get("eurlex_dataset_format")
+    if marker not in (None, "", "eurlex-resources-v1"):
+        raise ValueError("unsupported EUR-Lex generation dataset format")
+    if value in (None, ""):
+        if marker or metadata.get("dataset_target_act"):
+            raise ValueError("EUR-Lex profile generation requires its saved dataset identity")
+        return
+    if isinstance(value, str):
+        value = json.loads(value)
+    if not isinstance(value, dict) or not isinstance(prepared, dict):
+        raise ValueError("EUR-Lex generation requires its original profile source store")  # noqa: TRY004
+    for identity in (value, prepared):
+        if not isinstance(identity.get("manifest_path"), str) or not identity["manifest_path"].strip():
+            raise ValueError("invalid EUR-Lex manifest identity")
+        digest = identity.get("manifest_sha256")
+        if not isinstance(digest, str) or not re.fullmatch(r"[a-f0-9]{64}", digest):
+            raise ValueError("invalid EUR-Lex manifest checksum identity")
+        files = identity.get("files_sha256")
+        if (not isinstance(files, dict) or not files
+                or any(not isinstance(name, str) or not name
+                       or not isinstance(digest, str) or not re.fullmatch(r"[a-f0-9]{64}", digest)
+                       for name, digest in files.items())):
+            raise ValueError("invalid EUR-Lex artifact checksum identity")
+    if value != prepared:
+        raise ValueError("EUR-Lex dataset identity differs from the exported source profile")
+    if metadata.get("dataset_target_act") is not True or document.get("unit_type") != "article":
+        raise ValueError("EUR-Lex profile QA primary source must be a newer target article")
+
+
 def align_spans(corpus: str, raw: dict, index) -> list[dict]:
     """Keep local offsets and add exact offsets in the exported source unit.
 

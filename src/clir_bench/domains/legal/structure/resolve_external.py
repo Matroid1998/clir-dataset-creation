@@ -55,11 +55,14 @@ import sys
 from collections import Counter, defaultdict
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Iterable, Iterator
+from typing import Iterator
 
 from clir_bench.domains.legal.structure import ACT_LANGUAGES, cellar, paths, references
 from clir_bench.domains.legal.structure.act_designation import (
-    is_bare_designator, parse_act_designation, resolve_celex)
+    is_bare_designator,
+    parse_act_designation,
+    resolve_celex,
+)
 
 STATS_JSON = paths.STRUCTURE_DIR / "external_resolution_stats.json"
 AUDIT_JSON = paths.REPORTS_DIR / "external_resolution_audit.json"
@@ -114,10 +117,11 @@ class Corpus:
 
 
 def load_corpus(articles_path: Path | None = None,
-                quarantine_path: Path | None = None) -> Corpus:
+                quarantine_path: Path | None = None, *, profile=None) -> Corpus:
     """One streaming pass over the article records; nothing else is loaded."""
+    profile_paths = profile or paths
     corpus = Corpus()
-    with (articles_path or paths.ARTICLES_JSONL).open(encoding="utf-8") as fh:
+    with (articles_path or profile_paths.ARTICLES_JSONL).open(encoding="utf-8") as fh:
         for line in fh:
             row = json.loads(line)
             unit_type = row.get("unit_type")
@@ -143,7 +147,7 @@ def load_corpus(articles_path: Path | None = None,
             corpus.inventories[celex][language].add(row["article_number"])
             if language == "en":
                 corpus.articles_en[celex].append((row["article_number"], row["eli_id"]))
-    quarantine = quarantine_path or paths.QUARANTINE_JSONL
+    quarantine = quarantine_path or profile_paths.QUARANTINE_JSONL
     if quarantine.exists():
         with quarantine.open(encoding="utf-8") as fh:
             for line in fh:
@@ -337,16 +341,18 @@ def _iter_jsonl(path: Path) -> Iterator[dict]:
 def resolve(*, external_path: Path | None = None, internal_path: Path | None = None,
             dropped_path: Path | None = None, corpus: Corpus | None = None,
             edges_out: Path | None = None, unresolved_out: Path | None = None,
-            status_out: Path | None = None, stats_out: Path | None = None) -> dict:
-    external_path = external_path or paths.EXTERNAL_REFS_JSONL
-    internal_path = internal_path or paths.INTERNAL_EDGES_JSONL
-    dropped_path = dropped_path or paths.DROPPED_JSONL
-    edges_out = edges_out or paths.EXTERNAL_EDGES_JSONL
-    unresolved_out = unresolved_out or paths.UNRESOLVED_EXTERNAL_JSONL
-    status_out = status_out or paths.REFERENCE_STATUS_JSONL
-    stats_out = stats_out or STATS_JSON
+            status_out: Path | None = None, stats_out: Path | None = None,
+            profile=None) -> dict:
+    profile_paths = profile or paths
+    external_path = external_path or profile_paths.EXTERNAL_REFS_JSONL
+    internal_path = internal_path or profile_paths.INTERNAL_EDGES_JSONL
+    dropped_path = dropped_path or profile_paths.DROPPED_JSONL
+    edges_out = edges_out or profile_paths.EXTERNAL_EDGES_JSONL
+    unresolved_out = unresolved_out or profile_paths.UNRESOLVED_EXTERNAL_JSONL
+    status_out = status_out or profile_paths.REFERENCE_STATUS_JSONL
+    stats_out = stats_out or (profile_paths.STRUCTURE_DIR / "external_resolution_stats.json" if profile else STATS_JSON)
 
-    corpus = corpus or load_corpus()
+    corpus = corpus or (load_corpus(profile=profile) if profile else load_corpus())
     stats: Counter = Counter()
     tallies: dict[str, _Tally] = defaultdict(_Tally)
     target_acts: set[str] = set()
@@ -467,23 +473,25 @@ def print_summary(summary: dict) -> None:
 
 # -- audit against an independent parser ------------------------------------ #
 
-def _parsed_path(celex: str) -> Path:
-    return paths.PARSED_DIR / celex[1:5] / f"{celex}.en.json"
+def _parsed_path(celex: str, *, profile=None) -> Path:
+    profile_paths = profile or paths
+    return profile_paths.PARSED_DIR / celex[1:5] / f"{celex}.en.json"
 
 
 def audit(*, edges_path: Path | None = None, unresolved_path: Path | None = None,
-          corpus_celexes: set[str] | None = None) -> dict:
+          corpus_celexes: set[str] | None = None, profile=None) -> dict:
     """Compare our (source article, target act, target article) triples with the
     ``crossReferences`` block of the parse-fmx JSON, produced by a different
     tool. Read-only use of that tool's output; agreement is a sanity check on
     the parser, not ground truth."""
-    edges_path = edges_path or paths.EXTERNAL_EDGES_JSONL
-    unresolved_path = unresolved_path or paths.UNRESOLVED_EXTERNAL_JSONL
+    profile_paths = profile or paths
+    edges_path = edges_path or profile_paths.EXTERNAL_EDGES_JSONL
+    unresolved_path = unresolved_path or profile_paths.UNRESOLVED_EXTERNAL_JSONL
     if corpus_celexes is None:
         # "In the corpus" means the act has article records -- the same test the
         # resolver applies -- not merely a CELEX id in the candidate list.
-        corpus_celexes = {row["celex_id"] for row in _iter_jsonl(paths.REFERENCE_STATUS_JSONL)} \
-            if paths.REFERENCE_STATUS_JSONL.exists() else set()
+        corpus_celexes = {row["celex_id"] for row in _iter_jsonl(profile_paths.REFERENCE_STATUS_JSONL)} \
+            if profile_paths.REFERENCE_STATUS_JSONL.exists() else set()
 
     ours: dict[str, set[tuple[str, str, str]]] = defaultdict(set)      # source celex -> triples
     # (source celex, article) -> {act celex we parsed: surface it came from},
@@ -512,7 +520,7 @@ def audit(*, edges_path: Path | None = None, unresolved_path: Path | None = None
     acts_compared = 0
     celexes = {c for c, _ in ours_acts}
     for celex in sorted(celexes):
-        path = _parsed_path(celex)
+        path = _parsed_path(celex, profile=profile) if profile else _parsed_path(celex)
         if not path.exists():
             continue
         try:
@@ -577,8 +585,9 @@ def audit(*, edges_path: Path | None = None, unresolved_path: Path | None = None
         "only_theirs_in_corpus_samples": only_theirs_samples,
         "act_level_disagree_samples": act_disagree_samples,
     }
-    AUDIT_JSON.parent.mkdir(parents=True, exist_ok=True)
-    AUDIT_JSON.write_text(json.dumps(result, indent=2))
+    destination = profile_paths.REPORTS_DIR / "external_resolution_audit.json" if profile else AUDIT_JSON
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    destination.write_text(json.dumps(result, indent=2))
     return result
 
 
@@ -590,13 +599,14 @@ def _context(text: str, start: int, end: int, width: int = 90) -> str:
     return f"…{before}«{text[start:end]}»{after}…"
 
 
-def write_review_sample(n: int, seed: int, out: Path) -> None:
+def write_review_sample(n: int, seed: int, out: Path, *, profile=None) -> None:
+    profile_paths = profile or paths
     random.seed(seed)
     by_source: dict[str, list[tuple[str, dict]]] = defaultdict(list)
-    for edge in _iter_jsonl(paths.EXTERNAL_EDGES_JSONL):
+    for edge in _iter_jsonl(profile_paths.EXTERNAL_EDGES_JSONL):
         if edge.get("source_unit_type") == "article":
             by_source[edge["source_article_id"]].append(("edge", edge))
-    for row in _iter_jsonl(paths.UNRESOLVED_EXTERNAL_JSONL):
+    for row in _iter_jsonl(profile_paths.UNRESOLVED_EXTERNAL_JSONL):
         if row.get("source_unit_type") == "article":
             by_source[row["source_article_id"]].append(("unresolved", row))
     sources = sorted(by_source)
@@ -604,7 +614,7 @@ def write_review_sample(n: int, seed: int, out: Path) -> None:
     chosen = set(sources[:n])
 
     texts: dict[str, str] = {}
-    with paths.ARTICLES_JSONL.open(encoding="utf-8") as fh:
+    with profile_paths.ARTICLES_JSONL.open(encoding="utf-8") as fh:
         for line in fh:
             row = json.loads(line)
             if row.get("language") == "en" and row.get("eli_id") in chosen:

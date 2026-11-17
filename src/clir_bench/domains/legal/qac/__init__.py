@@ -128,7 +128,29 @@ def _joined_metadata(records):
             if key not in seen:
                 targets.append(entry)
                 seen.add(key)
-    return dict(present[0], targets=targets)
+    config = dict(present[0].get("config", {}))
+    for key in ("eurlex_dataset", "eurlex_dataset_identity"):
+        values = [record["config"][key] for record in present if record.get("config", {}).get(key)]
+        if values:
+            if any(value != values[0] for value in values[1:]):
+                raise ValueError("input runs disagree on the EUR-Lex dataset identity")
+            config[key] = values[0]
+    return dict(present[0], targets=targets, config=config)
+
+
+def _eurlex_csv_identity(rows):
+    rows = [row for row in rows if (row.get("corpus") or "eurlex") == "eurlex"]
+    identities = [json.loads(row["eurlex_dataset_identity"]) for row in rows
+                  if row.get("eurlex_dataset_identity")]
+    if any(row.get("eurlex_dataset_format") and not row.get("eurlex_dataset_identity") for row in rows):
+        raise ValueError("newer EUR-Lex rows require their pinned dataset identity")
+    if identities:
+        if any(value != identities[0] for value in identities[1:]):
+            raise ValueError("input rows disagree on the EUR-Lex dataset identity")
+        if any(not row.get("eurlex_dataset_identity") for row in rows):
+            raise ValueError("cannot mix pinned and unpinned EUR-Lex rows in a replay")
+        return identities[0]
+    return None
 
 
 def _target_metadata(path, sources):
@@ -159,7 +181,13 @@ def _target_metadata(path, sources):
             if hashes:
                 entry["payload_sha256"] = next(iter(hashes))
             targets.append(entry)
-        return dict(record, targets=targets)
+        config = dict(record.get("config", {}))
+        identity = _eurlex_csv_identity(rows)
+        if identity:
+            if config.get("eurlex_dataset_identity") and config["eurlex_dataset_identity"] != identity:
+                raise ValueError("input EUR-Lex dataset differs from its parent run")
+            config.update(eurlex_dataset=identity["manifest_path"], eurlex_dataset_identity=identity)
+        return dict(record, targets=targets, config=config)
 
     path = Path(path)
     if path.is_file() or (path / "run.sqlite").is_file() or (path / "results.csv").is_file():
@@ -196,6 +224,13 @@ def _options(args, context, saved=None, *, operation="generate"):
                 "langs": None, "modes": None, "decider_model": None}
     options = {key: getattr(args, key, None) if getattr(args, key, None) is not None
                else old.get(key, default) for key, default in defaults.items()}
+    dataset = getattr(args, "eurlex_dataset", None) or old.get("eurlex_dataset")
+    if dataset:
+        options["eurlex_dataset"] = str(Path(dataset).expanduser().resolve())
+        if old.get("eurlex_dataset") and options["eurlex_dataset"] != str(Path(old["eurlex_dataset"]).resolve()):
+            raise ValueError("saved EUR-Lex dataset cannot change during resume, regrade or replay")
+        if old.get("eurlex_dataset_identity"):
+            options["eurlex_dataset_identity"] = old["eurlex_dataset_identity"]
     initial_counts = getattr(args, "persona_initial_counts", None)
     if initial_counts is None:
         initial_counts = old.get("persona_initial_counts")
@@ -236,12 +271,15 @@ def _options(args, context, saved=None, *, operation="generate"):
     return options
 
 
-def _indexes(sources, supplied=None, *, context=None):
+def _indexes(sources, supplied=None, *, context=None, eurlex_dataset=None):
     batches = _batches()
     indexes = {}
     for source in sources:
         if (supplied or {}).get(source) is not None:
             indexes[source] = supplied[source]
+        elif source == "eurlex" and eurlex_dataset:
+            from clir_bench.domains.legal.structure.profile import ProfileArticleIndex
+            indexes[source] = ProfileArticleIndex(eurlex_dataset)
         elif source == "eurlex":
             directory = context.workspace.data("eurlex_structure")
             indexes[source] = batches[source].ctx.ArticleIndex(
@@ -253,6 +291,26 @@ def _indexes(sources, supplied=None, *, context=None):
             indexes[source] = batches[source].ctx.BlockIndex(
                 blocks_path=directory / "blocks_en.jsonl", docs_path=directory / "docs_en.jsonl",
                 status_path=directory / "reference_status_en.jsonl", sixway_dir=context.workspace.data("un_parallel"))
+    return indexes
+
+
+def _profile_indexes(sources, supplied, context, options):
+    kwargs = {"context": context}
+    if "eurlex" not in sources:
+        options.pop("eurlex_dataset", None)
+        options.pop("eurlex_dataset_identity", None)
+    if options.get("eurlex_dataset"):
+        if "eurlex" not in sources:
+            raise ValueError("--eurlex-dataset requires --source eurlex")
+        kwargs["eurlex_dataset"] = options["eurlex_dataset"]
+    indexes = _indexes(sources, supplied, **kwargs)
+    identity = getattr(indexes.get("eurlex"), "identity", None)
+    if options.get("eurlex_dataset") and not identity:
+        raise ValueError("--eurlex-dataset requires a manifest-backed article index")
+    if identity:
+        if options.get("eurlex_dataset_identity") and options["eurlex_dataset_identity"] != identity:
+            raise ValueError("EUR-Lex dataset source identity changed")
+        options.update(eurlex_dataset=identity["manifest_path"], eurlex_dataset_identity=identity)
     return indexes
 
 
@@ -273,8 +331,10 @@ def _select(sources, indexes, options):
         count = (options["questions_per_mode"] * len(active_modes) if options.get("questions_per_mode")
                  else options["questions"] // len(sources) + (position < options["questions"] % len(sources)))
         if count:
+            extra = ({"max_references": options["max_references"]}
+                     if source == "eurlex" and getattr(indexes[source], "identity", None) else {})
             targets = batch.select(indexes[source], n=count, seed=options["seed"],
-                                   languages=active_languages, modes=active_modes)
+                                   languages=active_languages, modes=active_modes, **extra)
             selections.extend({"corpus": source, "target": asdict(target)} for target in targets)
     all_modes = set().union(*(set(batches[s].gen.MODES if s == "eurlex" else batches[s].SUPPORTED_MODES) for s in sources))
     all_langs = set().union(*(set(batches[s].ACT_LANGUAGES if s == "eurlex" else batches[s].UN_LANGUAGES) for s in sources))
@@ -310,6 +370,10 @@ def _prepare(selections, indexes, options, operation):
             raise ValueError(f"target cannot be reconstructed: {entry['target']}")
         if hasattr(payload, "target") and not payload.target.texts.get(target.language):
             raise ValueError(f"target has no source text in {target.language}: {entry['target']}")
+        if source == "eurlex" and getattr(indexes[source], "identity", None) and (
+                target.eli_id != payload.target.eli_id or target.celex_id != payload.target.celex_id
+                or str(target.article_number) != payload.target.article_number):
+            raise ValueError("saved EUR-Lex target identity differs from its source article")
         digest = _digest(payload.text.encode())
         if entry.get("payload_sha256") and digest != entry["payload_sha256"]:
             raise ValueError(f"source payload changed: {entry['target']}")
@@ -347,11 +411,14 @@ def generate(args, context, *, selections=None, supplied_indexes=None):
     sources = list(dict.fromkeys(args.source))
     if not sources or set(sources) - {"eurlex", "un"}:
         raise ValueError("legal sources are eurlex and un")
+    if getattr(args, "eurlex_dataset", None) and "eurlex" not in sources:
+        raise ValueError("--eurlex-dataset requires --source eurlex")
     locations = _run_locations(args, context, sources)
     saved = _joined_metadata(location[2] for location in locations.values())
     origin = _target_metadata(args.targets_from, sources) if getattr(args, "targets_from", None) else saved
     inherited = {key: value for key, value in origin.get("config", {}).items()
-                 if key in ("max_references", "context_chars", "reference_chars", "seed")}
+                 if key in ("max_references", "context_chars", "reference_chars", "seed",
+                            "eurlex_dataset", "eurlex_dataset_identity")}
     options = _options(args, context, saved or {"config": inherited})
     if selections is None:
         selections = [entry for entry in origin.get("targets", []) if entry["corpus"] in sources] or None
@@ -372,7 +439,7 @@ def generate(args, context, *, selections=None, supplied_indexes=None):
             requested_count = getattr(args, "questions", None)
             if requested_count is not None and requested_count != len(selections):
                 raise ValueError("--questions differs from the saved target count")
-    indexes = _indexes(sources, supplied_indexes, context=context)
+    indexes = _profile_indexes(sources, supplied_indexes, context, options)
     selections = selections if selections is not None else _select(sources, indexes, options)
     if options.get("decider_model"):
         # A fixed-mode comparison plan can contain the same target several times.
@@ -426,6 +493,8 @@ def regrade(args, context):
                                       for row in rows))
     if set(input_sources) - {"eurlex", "un"}:
         raise ValueError("input needs corpus=eurlex/un, or a single --source")
+    if getattr(args, "eurlex_dataset", None) and "eurlex" not in input_sources:
+        raise ValueError("--eurlex-dataset requires EUR-Lex input rows")
     locations = _run_locations(args, context, input_sources)
     saved = _joined_metadata(location[2] for location in locations.values())
     input_hash = _digest(Path(args.input).read_bytes())
@@ -434,6 +503,11 @@ def regrade(args, context):
     # default. A resumed regrade must retain its own saved verifier instead.
     inherited = {key: value for key, value in parent.get("config", {}).items()
                  if key != "verifier_model"}
+    identity = _eurlex_csv_identity(rows)
+    if identity:
+        if inherited.get("eurlex_dataset_identity") and inherited["eurlex_dataset_identity"] != identity:
+            raise ValueError("input EUR-Lex dataset differs from its parent run")
+        inherited.update(eurlex_dataset=identity["manifest_path"], eurlex_dataset_identity=identity)
     options = _options(args, context, saved or {"config": inherited}, operation="regrade")
     batches, groups = _batches(), defaultdict(list)
     selected_sources = getattr(args, "source", None)
@@ -477,7 +551,7 @@ def regrade(args, context):
             if previous.get("payload_sha256") and previous["payload_sha256"] not in hashes:
                 raise ValueError("different generators received different source payloads")
             previous["payload_sha256"] = next(iter(hashes))
-    indexes = _indexes(sources, context=context)
+    indexes = _profile_indexes(sources, None, context, options)
     prepared, prompts = _prepare(selections, indexes, options, "regrade")
     contexts = {(e["corpus"], t.eli_id if e["corpus"] == "eurlex" else t.block_id, t.language, t.mode): (e,t,p)
                 for e,t,p in prepared}
@@ -494,7 +568,11 @@ def _execute_sources(args, context, operation, locations, options, selections,
         selected = [entry for entry in selections if entry["corpus"] == source]
         if not selected:
             continue
-        parameters = (args, context, operation, directory, output, saved, options, selected,
+        source_options = dict(options)
+        if source != "eurlex":
+            source_options.pop("eurlex_dataset", None)
+            source_options.pop("eurlex_dataset_identity", None)
+        parameters = (args, context, operation, directory, output, saved, source_options, selected,
                       {key: value for key, value in prompts.items() if key.startswith(source + "/")},
                       {source: indexes[source]}, [case for case in cases if case[0]["corpus"] == source])
         keywords = {"original_rows": ([row for row in original_rows if row["corpus"] == source]
@@ -621,6 +699,9 @@ def _execute(args, context, operation, directory, output, saved, options, select
                         row.update(decider.row_metadata(decision))
                     row.setdefault("generator_model_name", model.rsplit("/", 1)[-1])
                     row["source_payload_sha256"] = entry["payload_sha256"]
+                    if source == "eurlex" and options.get("eurlex_dataset_identity"):
+                        row["eurlex_dataset_format"] = "eurlex-resources-v1"
+                        row["eurlex_dataset_identity"] = json.dumps(options["eurlex_dataset_identity"], sort_keys=True)
                     for phase, prompt_key in (("faithfulness", f"{source}/faithfulness"),
                                               ("quality", f"{source}/quality/{target.mode}")):
                         row[f"{phase}_verifier_prompt_sha256"] = config["prompts_sha256"][prompt_key]
@@ -664,6 +745,15 @@ def _execute(args, context, operation, directory, output, saved, options, select
                         row.update(decider.row_metadata(decision))
                     row.update(grading_status="failed", grading_error=diagnostic, regrade_status="failed",
                                regrade_error=diagnostic, total_score="", candidate_rank="", is_best=False)
+                    if source == "eurlex" and options.get("eurlex_dataset_identity"):
+                        row.update(celex_id=target.celex_id, target_article_id=target.eli_id,
+                                   target_article_number=target.article_number, n_refs=target.n_refs,
+                                   stratum=target.stratum, n_external=target.n_external,
+                                   n_annex=target.n_annex, complete=target.complete,
+                                   cites_annex=target.cites_annex,
+                                   source_payload_sha256=entry["payload_sha256"],
+                                   eurlex_dataset_format="eurlex-resources-v1",
+                                   eurlex_dataset_identity=json.dumps(options["eurlex_dataset_identity"], sort_keys=True))
                     result.append(row)
                 state.outcome(task, result, str(exc))
             return task, None if generation_only else len(result)

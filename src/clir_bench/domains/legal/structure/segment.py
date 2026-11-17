@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
 import html
 import json
 import os
@@ -398,8 +399,10 @@ def _annex_row(celex, language, act_eli, meta, identifier, heading, text, *,
     }
 
 
-def segment_act(celex: str, entry: dict, meta: dict) -> tuple[list[dict], dict]:
+def segment_act(celex: str, entry: dict, meta: dict, *, profile=None, transport=None,
+                parser=None) -> tuple[list[dict], dict]:
     """Every stored record for one act, across the languages that have Formex."""
+    profile_paths = profile or paths
     act_eli = entry.get("eli")
     if not act_eli:
         return [], {"celex": celex, "skipped": "no-eli"}
@@ -410,12 +413,14 @@ def segment_act(celex: str, entry: dict, meta: dict) -> tuple[list[dict], dict]:
     per_language: dict[str, list[dict]] = {}
     errors: dict[str, str] = {}
     for language in ("en",) + tuple(l for l in ACT_LANGUAGES if l != "en"):
-        documents = cellar.read_documents(celex, language)
+        documents = (cellar.read_documents(celex, language, profile=profile, transport=transport)
+                     if profile is not None else cellar.read_documents(celex, language))
         if documents.act_xml is None:
             errors[language] = documents.error or "no-act"
             continue
-        parsed = run_parse_fmx(documents.act_xml,
-                               paths.PARSED_DIR / celex[1:5] / f"{celex}.{language}.json")
+        output = profile_paths.PARSED_DIR / celex[1:5] / f"{celex}.{language}.json"
+        parsed = (_profile_parse(documents.act_xml, output, parser or run_parse_fmx)
+                  if profile is not None else (parser or run_parse_fmx)(documents.act_xml, output))
         if parsed is None:
             errors[language] = "parse-failed"
             continue
@@ -440,7 +445,161 @@ def segment_act(celex: str, entry: dict, meta: dict) -> tuple[list[dict], dict]:
     return rows, summary
 
 
-def segment(celexes: list[str], *, workers: int = 12, resume: bool = True) -> None:
+def _file_hash(path):
+    digest = hashlib.sha256()
+    with Path(path).open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _node_version():
+    result = subprocess.run(["node", "--version"], capture_output=True, text=True,
+                            check=False, timeout=15)
+    if result.returncode != 0 or not result.stdout.strip():
+        raise RuntimeError("cannot record the Formex parser's Node version")
+    return result.stdout.strip()
+
+
+def _tool_git(tool_root, *arguments):
+    # Read only this explicit tool checkout. Disabling optional locks and
+    # configured filesystem monitors avoids writes or monitor subprocesses.
+    result = subprocess.run(
+        ["git", "--no-optional-locks", "-c", "core.fsmonitor=false", "-C", str(tool_root),
+         *arguments], capture_output=True, check=False, timeout=30,
+    )
+    if result.returncode != 0:
+        raise RuntimeError("cannot record the Formex parser checkout's provenance")
+    return result.stdout
+
+
+def parser_provenance():
+    """Fingerprint the parser entrypoint, runtime and its tracked dependencies.
+
+    A custom entrypoint outside the expected checkout layout records adjacent
+    package files without searching parent repositories or inspecting their diffs.
+    """
+    entrypoint = parse_fmx_path().resolve()
+    backend = entrypoint.parent.parent if entrypoint.parent.name == "bin" else entrypoint.parent
+    package_files = {name: _file_hash(backend / name) if (backend / name).is_file() else None
+                     for name in ("package.json", "package-lock.json")}
+    result = {"entrypoint_sha256": _file_hash(entrypoint), "node_version": _node_version(),
+              "package_json_sha256": package_files["package.json"],
+              "package_lock_sha256": package_files["package-lock.json"],
+              "git_head": None, "git_dirty": None, "tracked_backend_diff_sha256": None,
+              "dependency_scope": "entrypoint_and_adjacent_packages"}
+    tool_root = backend.parent
+    if (entrypoint.parent.name == "bin" and backend.name == "backend"
+            and (tool_root / ".git").exists() and not (tool_root / ".git").is_symlink()):
+        declared_root = Path(_tool_git(tool_root, "rev-parse", "--show-toplevel").decode().strip()).resolve()
+        if declared_root != tool_root:
+            raise RuntimeError("Formex parser checkout resolved to an unexpected repository")
+        head = _tool_git(tool_root, "rev-parse", "HEAD").decode().strip()
+        diff = _tool_git(tool_root, "diff", "--no-ext-diff", "--no-textconv", "--binary",
+                         "HEAD", "--", "backend")
+        result.update(git_head=head, git_dirty=bool(diff),
+                      tracked_backend_diff_sha256=hashlib.sha256(diff).hexdigest(),
+                      dependency_scope="tracked_backend_and_adjacent_packages")
+    return result
+
+
+def _parser_identity(parser):
+    if parser is run_parse_fmx:
+        return hashlib.sha256(json.dumps(parser_provenance(), sort_keys=True).encode()).hexdigest()
+    code = getattr(parser, "__code__", None)
+    source = Path(code.co_filename) if code is not None else None
+    if source is not None and source.is_file():
+        return _file_hash(source)
+    return f"{getattr(parser, '__module__', '')}:{getattr(parser, '__qualname__', type(parser).__name__)}"
+
+
+def _profile_parse(xml, destination, parser):
+    """Bind a cached parse to its exact source XML before reusing it."""
+    digest = hashlib.sha256(xml).hexdigest()
+    parser_identity = _parser_identity(parser)
+    marker = destination.with_suffix(".source.json")
+    if marker.exists() and destination.exists():
+        try:
+            metadata = json.loads(marker.read_text())
+            if metadata == {"xml_sha256": digest, "parsed_sha256": _file_hash(destination),
+                            "parser_identity": parser_identity}:
+                return json.loads(destination.read_text())
+        except (OSError, ValueError):
+            pass
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    temporary = destination.with_name(destination.name + ".parsing")
+    temporary.unlink(missing_ok=True)
+    try:
+        result = parser(xml, temporary)
+        if not isinstance(result, dict):
+            return None
+        cellar._atomic_json(destination, result)
+        cellar._atomic_json(marker, {"xml_sha256": digest, "parsed_sha256": _file_hash(destination),
+                                     "parser_identity": parser_identity})
+        return result
+    finally:
+        temporary.unlink(missing_ok=True)
+
+
+def _profile_segment(celexes, *, workers, resume, profile, transport, parser):
+    """Resume from complete per-act bundles, never from a partial aggregate."""
+    profile.ensure_dirs()
+    fetched = json.loads(profile.FETCH_MANIFEST_JSON.read_text())
+    metadata = {}
+    if profile.CANDIDATES_CSV.exists():
+        with profile.CANDIDATES_CSV.open(encoding="utf-8") as handle:
+            metadata = {row["celex_id"]: row for row in csv.DictReader(handle)}
+    tool_identity = _parser_identity(parser or run_parse_fmx)
+
+    def one(celex):
+        entry = fetched.get(celex, {})
+        sources = {"eli": entry.get("eli"), "parser": tool_identity,
+                   "segmentation": _file_hash(Path(__file__))}
+        for language in ACT_LANGUAGES:
+            path = entry.get("languages", {}).get(language, {}).get("zip")
+            sources[language] = _file_hash(path) if path and Path(path).exists() else ""
+        fingerprint = hashlib.sha256(json.dumps(sources, sort_keys=True).encode()).hexdigest()
+        output = profile.PARSED_DIR / "acts" / celex[1:5] / f"{celex}.json"
+        if resume and output.exists():
+            try:
+                saved = json.loads(output.read_text())
+                rows = saved["rows"]
+                row_hash = hashlib.sha256(json.dumps(rows, sort_keys=True).encode()).hexdigest()
+                if (saved.get("fingerprint") == fingerprint and saved.get("complete") is True
+                        and saved.get("rows_sha256") == row_hash
+                        and {r["language"] for r in rows if r.get("unit_type") == "article"} == set(ACT_LANGUAGES)):
+                    return rows, saved["summary"]
+            except (OSError, ValueError, KeyError, TypeError):
+                pass
+        rows, summary = segment_act(celex, entry, metadata.get(celex, {}), profile=profile,
+                                    transport=transport, parser=parser)
+        complete = (not summary.get("errors") and not summary.get("skipped")
+                    and {r["language"] for r in rows if r.get("unit_type") == "article"} == set(ACT_LANGUAGES))
+        cellar._atomic_json(output, {"fingerprint": fingerprint, "complete": complete,
+                                     "rows_sha256": hashlib.sha256(json.dumps(rows, sort_keys=True).encode()).hexdigest(),
+                                     "rows": rows, "summary": summary})
+        return rows, summary
+
+    article_tmp = profile.ARTICLES_JSONL.with_suffix(".jsonl.tmp")
+    summary_path = profile.STRUCTURE_DIR / "segment_summary.jsonl"
+    summary_tmp = summary_path.with_suffix(".jsonl.tmp")
+    try:
+        with article_tmp.open("w", encoding="utf-8") as article_handle, \
+                summary_tmp.open("w", encoding="utf-8") as summary_handle, \
+                ThreadPoolExecutor(max_workers=workers) as pool:
+            for rows, summary in pool.map(one, sorted(set(celexes))):
+                for row in rows:
+                    article_handle.write(json.dumps(row, ensure_ascii=False, sort_keys=True) + "\n")
+                summary_handle.write(json.dumps(summary, ensure_ascii=False, sort_keys=True) + "\n")
+        article_tmp.replace(profile.ARTICLES_JSONL)
+        summary_tmp.replace(summary_path)
+    finally:
+        article_tmp.unlink(missing_ok=True)
+        summary_tmp.unlink(missing_ok=True)
+
+
+def segment(celexes: list[str], *, workers: int = 12, resume: bool = True,
+            profile=None, transport=None, parser=None) -> None:
     """Segment every act, streaming records to disk as they are produced.
 
     Output is streamed rather than accumulated: the full corpus is on the order
@@ -448,6 +607,9 @@ def segment(celexes: list[str], *, workers: int = 12, resume: bool = True) -> No
     would be gigabytes for no reason. Streaming also makes the run resumable --
     a re-run skips acts already present in the output.
     """
+    if profile is not None:
+        return _profile_segment(celexes, workers=workers, resume=resume, profile=profile,
+                                transport=transport, parser=parser)
     paths.ensure_dirs()
     manifest = json.loads((paths.STRUCTURE_DIR / "fetch_manifest.json").read_text())
 

@@ -30,10 +30,11 @@ from collections import defaultdict
 from clir_bench.domains.legal.structure import ACT_LANGUAGES, paths
 
 
-def load_inventories() -> dict[str, dict[str, set[str]]]:
+def load_inventories(*, profile=None) -> dict[str, dict[str, set[str]]]:
     """celex -> language -> set of article numbers."""
+    profile_paths = profile or paths
     inventories: dict[str, dict[str, set[str]]] = defaultdict(lambda: defaultdict(set))
-    with paths.ARTICLES_JSONL.open(encoding="utf-8") as fh:
+    with profile_paths.ARTICLES_JSONL.open(encoding="utf-8") as fh:
         for line in fh:
             row = json.loads(line)
             if row["unit_type"] != "article":
@@ -42,7 +43,7 @@ def load_inventories() -> dict[str, dict[str, set[str]]]:
     return inventories
 
 
-def load_unit_ids() -> dict[str, dict[str, set[str]]]:
+def load_unit_ids(*, profile=None) -> dict[str, dict[str, set[str]]]:
     """celex -> language -> set of unit ELI ids.
 
     Edges are no longer article-to-article only: annexes and recitals are both
@@ -50,8 +51,9 @@ def load_unit_ids() -> dict[str, dict[str, set[str]]]:
     the unit itself, which works uniformly for all three unit types, rather than
     against article numbers, which only exist for one of them.
     """
+    profile_paths = profile or paths
     ids: dict[str, dict[str, set[str]]] = defaultdict(lambda: defaultdict(set))
-    with paths.ARTICLES_JSONL.open(encoding="utf-8") as fh:
+    with profile_paths.ARTICLES_JSONL.open(encoding="utf-8") as fh:
         for line in fh:
             row = json.loads(line)
             if row.get("eli_id"):
@@ -83,10 +85,11 @@ def verify(inventories: dict[str, dict[str, set[str]]]) -> tuple[set[str], list[
     return good, quarantine
 
 
-def annotate(good: set[str], inventories, unit_ids) -> tuple[int, int]:
+def annotate(good: set[str], inventories, unit_ids, *, profile=None) -> tuple[int, int]:
     """Add the join result to each edge; drop edges whose act is quarantined."""
+    profile_paths = profile or paths
     counts = [0, 0]
-    for index, path in enumerate((paths.INTERNAL_EDGES_JSONL, paths.EXTERNAL_REFS_JSONL)):
+    for index, path in enumerate((profile_paths.INTERNAL_EDGES_JSONL, profile_paths.EXTERNAL_REFS_JSONL)):
         if not path.exists():
             continue
         # Rewritten through a temporary file rather than read into memory: at
@@ -121,27 +124,39 @@ def annotate(good: set[str], inventories, unit_ids) -> tuple[int, int]:
     return counts[0], counts[1]
 
 
-def main() -> None:
-    argparse.ArgumentParser(description=__doc__).parse_args()
-    paths.ensure_dirs()
-
-    inventories = load_inventories()
-    unit_ids = load_unit_ids()
+def run(*, profile=None, baseline_quarantine=None):
+    """Verify/project one isolated profile and preserve existing quarantines."""
+    profile_paths = profile or paths
+    profile_paths.ensure_dirs()
+    inventories = load_inventories(profile=profile)
+    unit_ids = load_unit_ids(profile=profile)
     good, quarantine = verify(inventories)
-
-    with paths.QUARANTINE_JSONL.open("w", encoding="utf-8") as fh:
+    if baseline_quarantine is not None:
+        if hasattr(baseline_quarantine, "open"):
+            with baseline_quarantine.open(encoding="utf-8") as handle:
+                inherited = [json.loads(line) for line in handle if line.strip()]
+        else:
+            inherited = list(baseline_quarantine)
+        inherited_ids = {row["celex_id"] for row in inherited}
+        good.difference_update(inherited_ids)
+        quarantine = inherited + [row for row in quarantine if row["celex_id"] not in inherited_ids]
+    with profile_paths.QUARANTINE_JSONL.open("w", encoding="utf-8") as handle:
         for row in quarantine:
-            fh.write(json.dumps(row, ensure_ascii=False) + "\n")
-
-    internal, external = annotate(good, inventories, unit_ids)
-
+            handle.write(json.dumps(row, ensure_ascii=False) + "\n")
+    internal, external = annotate(good, inventories, unit_ids, profile=profile)
     print(f"acts with a clean four-language join : {len(good)}")
     print(f"acts quarantined                     : {len(quarantine)}")
     for row in quarantine:
-        print(f"  {row['celex_id']}  {row['reason']}  present={row['languages_present']}")
+        print(f"  {row['celex_id']}  {row['reason']}  present={row.get('languages_present', [])}")
     print(f"\ninternal edges kept  {internal:,}")
     print(f"external refs kept   {external:,}")
-    print(f"quarantine -> {paths.QUARANTINE_JSONL}")
+    print(f"quarantine -> {profile_paths.QUARANTINE_JSONL}")
+    return good, quarantine
+
+
+def main() -> None:
+    argparse.ArgumentParser(description=__doc__).parse_args()
+    run()
 
 
 if __name__ == "__main__":

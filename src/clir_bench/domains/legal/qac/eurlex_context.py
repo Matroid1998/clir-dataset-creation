@@ -235,9 +235,12 @@ class ArticleIndex:
 
     def _load_articles(self, path, annex_whitelist: set[str] | None = None) -> None:
         annex_whitelist = annex_whitelist or set()
+        excluded_acts = getattr(self, "_excluded_acts", frozenset())
         with open(path, encoding="utf-8") as fh:
             for line in fh:
                 row = json.loads(line)
+                if row.get("celex_id") in excluded_acts:
+                    continue
                 unit_type = row.get("unit_type")
                 if not row.get("eli_id"):
                     continue

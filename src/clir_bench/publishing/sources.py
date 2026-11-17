@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 import csv
+import hashlib
 import json
 import sqlite3
+import tempfile
 from pathlib import Path
 
 import pyarrow as pa
@@ -130,6 +132,11 @@ def source_row(corpus, source, parent, language, kind, title, text, metadata, pa
 
 
 def load_eurlex(index: SourceIndex, spec: dict, root: Path, wanted: set[str] | None):
+    if "dataset_manifest" in spec:
+        if "articles" in spec:
+            raise ValueError("EUR-Lex dataset_manifest and articles are mutually exclusive")
+        _load_eurlex_manifest(index, spec, root, wanted)
+        return
     languages = set(spec["languages"])
     unit_types = set(spec.get("unit_types", []))
     with (root / spec["articles"]).open(encoding="utf-8") as handle:
@@ -156,6 +163,74 @@ def load_eurlex(index: SourceIndex, spec: dict, root: Path, wanted: set[str] | N
                 ),
                 article_key=key,
             )
+
+
+def _load_eurlex_manifest(index, spec, root, wanted):
+    """Read complete source articles from a pinned profile, including baseline references."""
+    from clir_bench.domains.legal.structure import ACT_LANGUAGES
+    from clir_bench.domains.legal.structure.profile import load_profile
+
+    languages = spec["languages"]
+    if (not isinstance(languages, list) or not languages
+            or not all(isinstance(language, str) for language in languages)
+            or len(set(languages)) != len(languages)
+            or not set(languages) <= set(ACT_LANGUAGES)):
+        raise ValueError("EUR-Lex languages must be distinct supported language codes")
+    profile = load_profile(root / spec["dataset_manifest"])
+    with profile.file("quarantine.jsonl").open(encoding="utf-8") as handle:
+        quarantined = {json.loads(line)["celex_id"] for line in handle if line.strip()}
+    unit_types = set(spec.get("unit_types", []))
+    # Conflicts must be detected even outside the publication's language/scope
+    # filters. Keep their fingerprints on disk when exporting a large corpus.
+    with tempfile.TemporaryDirectory(prefix="eurlex-source-identities-") as directory:
+        connection = sqlite3.connect(Path(directory) / "identities.sqlite")
+        try:
+            connection.execute("CREATE TABLE seen(source TEXT, language TEXT, digest TEXT, "
+                               "PRIMARY KEY(source,language))")
+            connection.execute("CREATE TABLE identities(source TEXT PRIMARY KEY, signature TEXT)")
+            with profile.file("articles.jsonl").open(encoding="utf-8") as handle:
+                for line in handle:
+                    raw = json.loads(line)
+                    if raw.get("celex_id") in quarantined:
+                        continue
+                    source, language = raw.get("eli_id"), raw.get("language")
+                    if not isinstance(source, str) or not source.strip():
+                        raise ValueError("profile article requires an ELI identifier")
+                    if language not in ACT_LANGUAGES:
+                        raise ValueError("profile article has an unsupported language")
+                    signature = dumps([raw["celex_id"], raw["unit_type"], raw.get("article_number", "")])
+                    prior_identity = connection.execute(
+                        "SELECT signature FROM identities WHERE source=?", (source,)
+                    ).fetchone()
+                    if prior_identity and prior_identity[0] != signature:
+                        raise ValueError(f"conflicting EUR-Lex article identity: {source}")
+                    connection.execute("INSERT OR IGNORE INTO identities VALUES (?,?)", (source, signature))
+                    digest = hashlib.sha256(dumps(raw).encode("utf-8")).hexdigest()
+                    prior = connection.execute(
+                        "SELECT digest FROM seen WHERE source=? AND language=?", (source, language)
+                    ).fetchone()
+                    if prior:
+                        if prior[0] != digest:
+                            raise ValueError(f"conflicting EUR-Lex article versions: {source} ({language})")
+                        continue
+                    connection.execute("INSERT INTO seen VALUES (?,?,?)", (source, language, digest))
+                    key = f"{raw['celex_id']}:{raw['article_number']}"
+                    if language not in languages or (unit_types and raw["unit_type"] not in unit_types):
+                        continue
+                    if wanted is not None and source not in wanted and key not in wanted:
+                        continue
+                    if not isinstance(raw.get("text"), str) or not raw["text"].strip():
+                        raise ValueError(f"profile article has no original text: {source} ({language})")
+                    metadata = {key: value for key, value in raw.items() if key != "text"}
+                    metadata.update(dataset_identity=profile.identity,
+                                    dataset_target_act=raw["celex_id"] in profile.target_acts)
+                    index.add(source_row(
+                        "eurlex", source, raw["celex_id"], language, raw["unit_type"],
+                        raw.get("heading", ""), raw["text"], metadata,
+                    ), article_key=key)
+            profile.assert_unchanged()
+        finally:
+            connection.close()
 
 
 def load_chemistry(index: SourceIndex, spec: dict, root: Path, wanted: set[str] | None):
