@@ -3,8 +3,8 @@
 Run with:
     .venv/bin/python reports/qa_generation_model_comparison/plot_chemistry_questions_by_mode_and_corpus.py
 
-Every canonical candidate CSV row is one output. Best-question copies,
-retry files, failures, and archived/completion files are not added.
+Every candidate in the shared original/supplemental snapshot is one output.
+Best-question copies and failed supplemental task outcomes are not added.
 """
 
 from __future__ import annotations
@@ -21,6 +21,7 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.patches import FancyBboxPatch, Rectangle
+from plot_data import MANIFEST, chemistry_by_model, snapshot_note
 
 ROOT = Path(__file__).resolve().parents[2]
 DATA = ROOT / "data/chemistry/ai4chem_abstract_pairs/qac/chemistry_google_patents_model_comparison_generator"
@@ -37,6 +38,7 @@ MODES = {
 }
 LANGUAGES = {
     "en": "English", "fr": "French", "es": "Spanish", "de": "German", "zh": "Chinese",
+    "ja": "Japanese", "ru": "Russian",
 }
 WRAPPED_MODES = [
     "Assertion\nverification", "Comparison", "Conceptual", "Constraint\nsearch",
@@ -55,21 +57,20 @@ def load_counts():
     by_mode = Counter()
     by_language_mode = Counter()
     sources = []
-    paths = sorted(DATA.glob("generator_compare_200_*_gemini38.csv"))
-    if not paths:
+    groups = chemistry_by_model()
+    if not groups:
         raise FileNotFoundError(f"No canonical candidate CSVs in {DATA}")
-    for path in paths:
-        with path.open(newline="", encoding="utf-8") as handle:
-            rows = list(csv.DictReader(handle))
+    for model, rows in sorted(groups.items()):
         for line_number, row in enumerate(rows, start=2):
             mode, language = row["mode"], row["question_language"]
             if mode not in MODES or language not in LANGUAGES:
-                raise ValueError(f"{path.name}:{line_number}: unexpected mode/language {mode}/{language}")
+                raise ValueError(f"{model}:{line_number}: unexpected mode/language {mode}/{language}")
             if not row["question"].strip():
-                raise ValueError(f"{path.name}:{line_number}: empty question")
+                raise ValueError(f"{model}:{line_number}: empty question")
             by_mode[mode] += 1
             by_language_mode[language, mode] += 1
-        sources.append({"file": str(path.relative_to(ROOT)), "candidate_rows": len(rows)})
+        sources.append({"model": model, "candidate_rows": len(rows),
+                        "files": sorted({row['plot_source'] for row in rows})})
     for mode in MODES:
         if by_mode[mode] != sum(by_language_mode[lang, mode] for lang in LANGUAGES):
             raise ValueError(f"Counts do not reconcile for {mode}")
@@ -93,6 +94,7 @@ def slide(title, n_models):
     ax.text(44, 627,
             "Counts include every candidate row; identical question text from different models is counted separately.",
             fontsize=8.1, color=MUTED, va="center")
+    ax.text(44, 645, snapshot_note(), fontsize=7.5, color=MUTED)
     return fig, ax
 
 
@@ -127,7 +129,7 @@ def table(ax, row_labels, column_labels, values, *, x, y, width, row_height):
 
 def write_csv(stem, headers, rows):
     with (OUT / f"{stem}.csv").open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.writer(handle)
+        writer = csv.writer(handle, lineterminator="\n")
         writer.writerow(headers)
         writer.writerows(rows)
 
@@ -166,13 +168,14 @@ def main():
         save_figure(fig, corpus_stem, combined_pdf)
         fig, ax = slide("Generated questions by language and mode", n_models)
         table(ax, language_labels, WRAPPED_MODES, language_values,
-              x=246, y=286, width=890, row_height=52)
+              x=246, y=286, width=890, row_height=min(52, 315 / len(language_values)))
         save_figure(fig, language_stem, combined_pdf)
 
     manifest = {
         "domain": "chemistry", "corpus": CORPUS,
         "source_directory": str(DATA.relative_to(ROOT)),
-        "input_pattern": "generator_compare_200_*_gemini38.csv (top level only)",
+        "input_pattern": "Original model comparison plus validated supplemental checkpoints",
+        "snapshot_manifest": str(MANIFEST.relative_to(ROOT)),
         "counting_unit": "Every candidate row; question text is not deduplicated across models or candidates.",
         "model_count": n_models, "total_candidate_rows": grand_total,
         "counts_by_mode": {mode: by_mode[mode] for mode in MODES},
@@ -185,7 +188,7 @@ def main():
         json.dumps(manifest, indent=2) + "\n", encoding="utf-8"
     )
     print(f"Created both chemistry count slides: {grand_total:,} candidate outputs, {n_models} models.")
-    print(f"Source: {DATA.relative_to(ROOT)}")
+    print(f"Source snapshot: {MANIFEST.relative_to(ROOT)}")
 
 
 if __name__ == "__main__":

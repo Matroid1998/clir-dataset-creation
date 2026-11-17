@@ -17,10 +17,18 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.patches import FancyBboxPatch, Rectangle
-
 from plot_chemistry_questions_by_mode_and_corpus import (
-    DATA, INK, LABEL, LANGUAGES, MODES, MUTED, OUT, ROOT, WRAPPED_MODES,
+    DATA,
+    INK,
+    LABEL,
+    LANGUAGES,
+    MODES,
+    MUTED,
+    OUT,
+    ROOT,
+    WRAPPED_MODES,
 )
+from plot_data import MANIFEST, chemistry_by_model, snapshot_note
 
 MODELS = {
     "anthropic_claude-haiku-5.5": "Claude Haiku",
@@ -47,30 +55,28 @@ def load_grades():
     seen_models = set()
     rubric_versions = set()
     ungraded = 0
-    for path in sorted(DATA.glob("generator_compare_200_*_gemini38.csv")):
-        model = path.name.removeprefix("generator_compare_200_").removesuffix("_gemini38.csv")
+    for model, rows in sorted(chemistry_by_model().items()):
         if model not in MODELS:
             raise ValueError(f"Add a display label for model {model}")
         seen_models.add(model)
-        with path.open(newline="", encoding="utf-8") as handle:
-            rows = list(csv.DictReader(handle))
         n_graded = 0
         for line, row in enumerate(rows, start=2):
             language, mode = row["question_language"], row["mode"]
             if language not in LANGUAGES or mode not in MODES:
-                raise ValueError(f"{path.name}:{line}: unknown language/mode")
+                raise ValueError(f"{model}:{line}: unknown language/mode")
             if not row["total_score"].strip():
                 ungraded += 1
                 continue
             score = Fraction(row["total_score"])
             if not 0 <= score <= 40:
-                raise ValueError(f"{path.name}:{line}: score outside [0, 40]")
+                raise ValueError(f"{model}:{line}: score outside [0, 40]")
             if score != Fraction(row["faith_overall"]) + Fraction(row["qual_overall"]):
-                raise ValueError(f"{path.name}:{line}: total_score disagrees with its components")
+                raise ValueError(f"{model}:{line}: total_score disagrees with its components")
             rubric_versions.add((row["faithfulness_rubric_version"], row["quality_rubric_version"]))
             groups[language, mode, model].append(score)
             n_graded += 1
-        sources.append({"file": str(path.relative_to(ROOT)), "rows": len(rows), "graded_rows": n_graded})
+        sources.append({"model": model, "rows": len(rows), "graded_rows": n_graded,
+                        "files": sorted({row['plot_source'] for row in rows})})
     if seen_models != set(MODELS):
         raise ValueError(f"Missing model CSVs: {sorted(set(MODELS) - seen_models)}")
     if len(rubric_versions) != 1:
@@ -90,7 +96,7 @@ def load_grades():
 
 def write_data(groups, means, winners, sources, rubric_versions, ungraded):
     with (OUT / f"{STEM}.csv").open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.writer(handle)
+        writer = csv.writer(handle, lineterminator="\n")
         writer.writerow(["language", "mode", "status", "winner_models", "mean_total_score",
                          "score_out_of", "winner_sample_counts", "models_with_grades"])
         for (language, mode), models in winners.items():
@@ -102,7 +108,7 @@ def write_data(groups, means, winners, sources, rubric_versions, ungraded):
                 sum((language, mode, model) in means for model in MODELS),
             ])
     with (OUT / f"{STEM}_all_model_scores.csv").open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.writer(handle)
+        writer = csv.writer(handle, lineterminator="\n")
         writer.writerow(["language", "mode", "model", "graded_outputs", "sum_total_score",
                          "mean_total_score", "exact_mean", "is_winner"])
         for language in LANGUAGES:
@@ -121,7 +127,8 @@ def write_data(groups, means, winners, sources, rubric_versions, ungraded):
         "source_directory": str(DATA.relative_to(ROOT)),
         "metric": "Arithmetic mean of total_score over all graded candidate rows per model/language/mode",
         "score_out_of": 40, "ties": "Exact unrounded means, compared as rational numbers",
-        "selection": "Top-level generator_compare_200_*_gemini38.csv; excludes best, retry, failure, and archive copies",
+        "selection": "Original comparison and latest validated supplemental task outcomes",
+        "snapshot_manifest": str(MANIFEST.relative_to(ROOT)),
         "graded_outputs": sum(map(len, groups.values())), "ungraded_outputs": ungraded,
         "rubric_versions": sorted(rubric_versions), "model_labels": MODELS, "sources": sources,
     }
@@ -129,10 +136,11 @@ def write_data(groups, means, winners, sources, rubric_versions, ungraded):
 
 
 def plot(groups, means, winners):
-    fig = plt.figure(figsize=(18, 10.3), dpi=100, facecolor="#fbfcfe")
+    extra_height = max(0, len(LANGUAGES) - 5) * 140
+    fig = plt.figure(figsize=(18, 10.3 + extra_height / 100), dpi=100, facecolor="#fbfcfe")
     ax = fig.add_axes((0, 0, 1, 1))
     ax.set_xlim(0, 1800)
-    ax.set_ylim(1030, 0)
+    ax.set_ylim(1030 + extra_height, 0)
     ax.axis("off")
     ax.plot([0, 1800], [11, 11], color="#c9ced1", linewidth=0.5)
     ax.add_patch(Rectangle((0, 12), 16, 20, facecolor="#218d8f", edgecolor="none"))
@@ -183,13 +191,14 @@ def plot(groups, means, winners):
 
     notes = [
         "Blue = one winner · amber = exact tie · gray = no graded samples. Ties are determined before rounding scores.",
-        "n = graded candidate rows per winner; tie counts follow the displayed model order. "
-        f"All {sum(map(len, groups.values())):,} graded outputs are included.",
+        ("n = graded candidate rows per winner; tie counts follow the displayed model order. "
+         f"All {sum(map(len, groups.values())):,} graded outputs are included."),
         "Some winning averages use only 1–3 outputs; sample sizes differ across models and language–mode pairs.",
         "Short labels: Claude Haiku 5.5 · DeepSeek v4.1 Flash · GLM-5.3 FlashX · Ternary Bonsai 2 27B. Full model IDs are in the CSV.",
     ]
     for k, note in enumerate(notes):
-        ax.text(40, 936 + k * 22, note, fontsize=9.8, color=MUTED, va="top")
+        ax.text(40, 936 + extra_height + k * 22, note, fontsize=9.8, color=MUTED, va="top")
+    ax.text(40, 1025 + extra_height, snapshot_note(), fontsize=8, color=MUTED, va="bottom")
     fig.savefig(OUT / f"{STEM}.png", dpi=200, facecolor=fig.get_facecolor())
     fig.savefig(OUT / f"{STEM}.pdf", facecolor=fig.get_facecolor())
     plt.close(fig)

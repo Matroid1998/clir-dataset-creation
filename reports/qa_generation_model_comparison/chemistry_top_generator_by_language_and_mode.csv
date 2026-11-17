@@ -34,3 +34,17 @@ zh,constraint_search,winner,z-ai_glm-5.3-flashx,30.714285714285715,40,7,10
 zh,lookup,winner,anthropic_claude-haiku-5.5,31.4,40,5,10
 zh,process_retrieval,winner,z-ai_glm-5.3-flashx,32.0,40,3,10
 zh,source_finding,tie,anthropic_claude-haiku-5.5 | qwen_qwen3.8-27b | z-ai_glm-5.3-flashx,32.0,40,7 | 7 | 7,10
+ja,assertion_verification,winner,qwen_qwen3.8-27b,32.0,40,7,10
+ja,comparison,winner,qwen_qwen3.8-27b,32.0,40,4,10
+ja,conceptual,winner,qwen_qwen3.8-27b,31.285714285714285,40,7,10
+ja,constraint_search,winner,qwen_qwen3.8-27b,30.142857142857142,40,7,10
+ja,lookup,winner,anthropic_claude-haiku-5.5,31.375,40,8,10
+ja,process_retrieval,winner,qwen_qwen3.8-27b,31.666666666666668,40,6,10
+ja,source_finding,tie,anthropic_claude-haiku-5.5 | gpt-5.6-luna,32.0,40,8 | 8,10
+ru,assertion_verification,tie,anthropic_claude-haiku-5.5 | deepseek_deepseek-v4.1-flash | qwen_qwen3.8-27b | z-ai_glm-5.3-flashx,32.0,40,9 | 7 | 7 | 8,10
+ru,comparison,winner,anthropic_claude-haiku-5.5,32.0,40,7,10
+ru,conceptual,winner,deepseek_deepseek-v4.1-flash,31.142857142857142,40,7,10
+ru,constraint_search,winner,z-ai_glm-5.3-flashx,30.285714285714285,40,7,10
+ru,lookup,winner,anthropic_claude-haiku-5.5,31.77777777777778,40,9,10
+ru,process_retrieval,winner,qwen_qwen3.8-27b,32.0,40,8,10
+ru,source_finding,winner,qwen_qwen3.8-27b,32.285714285714285,40,7,10
