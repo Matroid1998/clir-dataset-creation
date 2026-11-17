@@ -37,26 +37,32 @@ retain their existing contracts.
 
 ## Layout
 
-    generation/lookup/{en,de,fr,es,zh}.txt                 missing technical specification
-    generation/process_retrieval/{en,de,fr,es,zh}.txt      connected route or workflow
-    generation/conceptual/{en,de,fr,es,zh}.txt             explicit functional relationship
-    generation/constraint_search/{en,de,fr,es,zh}.txt      solution meeting requirements
-    generation/comparison/{en,de,fr,es,zh}.txt             two sides on a common dimension
-    generation/assertion_verification/{en,de,fr,es,zh}.txt scoped assertion check
-    generation/source_finding/{en,de,fr,es,zh}.txt         publication identity from a technical clue
+    generation/lookup/{en,de,fr,es,zh,ja,ru}.txt                 missing technical specification
+    generation/process_retrieval/{en,de,fr,es,zh,ja,ru}.txt      connected route or workflow
+    generation/conceptual/{en,de,fr,es,zh,ja,ru}.txt             explicit functional relationship
+    generation/constraint_search/{en,de,fr,es,zh,ja,ru}.txt      solution meeting requirements
+    generation/comparison/{en,de,fr,es,zh,ja,ru}.txt             two sides on a common dimension
+    generation/assertion_verification/{en,de,fr,es,zh,ja,ru}.txt scoped assertion check
+    generation/source_finding/{en,de,fr,es,zh,ja,ru}.txt         publication identity from a technical clue
     decider/jev_eligibility.json              independent suitability instructions for all seven personas
     decider/eligibility_cases.json            bounded examples merged into the Jev instructions
     verifiers/faithfulness_{batch,single}.txt   is the answer grounded in the passage?
     verifiers/<persona>_batch.txt              quality and contract checks for each new persona
     verifiers/technical_{batch,single}.txt     legacy grading and single concept queries
     verifiers/semantic_batch.txt               legacy semantic grading
-    concept_query/{en,de,fr,es,zh}.txt          alias-graph: question whose answer IS the concept
-    concept_query_with_term/{en,de,fr,es,zh}.txt alias-graph: same, but must use a given surface form verbatim
+    concept_query/{en,de,fr,es,zh,ja,ru}.txt          alias-graph: question whose answer IS the concept
+    concept_query_with_term/{en,de,fr,es,zh,ja,ru}.txt alias-graph: same, but must use a given surface form verbatim
     code_switch/nonchem_swap.txt                picks a non-chemistry word to swap (robustness control)
 
 `PromptPack.generation(mode, lang)` reads `generation/<mode>/<lang>.txt`;
 `.faithfulness(arity)` and `.quality(mode, arity)` read from `verifiers/`;
 everything else is reached with `.custom(...)`.
+
+Japanese and Russian variants retain the English contract instructions, with
+native output-language instructions and localized teaching outputs. Teaching
+source packets and evidence quotations remain unchanged; translated example
+answers carry `answer_is_translation=true`. Actual same-language source answers
+are copied verbatim, as required by the existing evidence contract.
 
 ## Generation contract
 
@@ -77,7 +83,7 @@ produces no candidate rows and does not call the graders. Malformed output
 raises an error and is retried under the configured generation retry policy.
 
 The `balanced`, `uniform` and `coverage` plans select existing source documents
-in `en`, `de`, `fr`, `es` or `zh`. The selected document's language determines
+in `en`, `de`, `fr`, `es`, `zh`, `ja` or `ru`. The selected document's language determines
 the generation prompt and question language. `--langs` restricts which source
 documents may be selected. Generation, both graders and the eligibility decider
 receive only the selected document's text and publication identifier.

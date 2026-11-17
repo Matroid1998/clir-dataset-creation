@@ -26,9 +26,12 @@ def local_prompts(monkeypatch):
 def test_all_generation_variants_are_packaged_and_registered(source):
     _, generator, _, _, _ = case(source)
     inventory = prompt_registry.local_legal_prompts()
+    languages = ("ar", "de", "en", "es", "fr", "ru", "zh") if source == "un" else (
+        "de", "en", "es", "fr", "zh",
+    )
     for mode in annotations.NEW_MODES:
-        assert generator.PROMPTS.available_languages(mode) == ("de", "en", "es", "fr", "zh")
-        for language in ("en", "de", "fr", "es", "zh"):
+        assert generator.PROMPTS.available_languages(mode) == languages
+        for language in languages:
             prompt = generator.PROMPTS.generation(mode, language)
             key = f"{source}/generation/{mode}" + (f"/{language}" if language != "en" else "")
             assert prompt and inventory[key] == prompt

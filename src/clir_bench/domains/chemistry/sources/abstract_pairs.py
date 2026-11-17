@@ -17,10 +17,11 @@ from typing import Any
 from clir_bench.core import corpus as corpus_io
 from clir_bench.core.context import AppContext
 from clir_bench.core.domain import CorpusSchema
+from clir_bench.domains.chemistry.vocabulary import WORKING_LANGUAGES
 
 DATASET_REPO = "BASF-AI/ai4chem-clir-google-patents-within-document-abstract-pairs"
 SOURCE_VALUE = "ai4chem_abstract_pairs"
-SUPPORTED_LANGUAGES = ("en", "de", "fr", "es", "zh")
+SUPPORTED_LANGUAGES = WORKING_LANGUAGES
 CORPUS_FILENAME = "multilingual_corpus.csv"
 PAIRS_FILENAME = "accepted_pairs.csv"
 MANIFEST_FILENAME = "manifest.json"

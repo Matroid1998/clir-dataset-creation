@@ -4,8 +4,9 @@ from __future__ import annotations
 
 import json
 
+import pytest
+
 from clir_bench.domains.legal.qac import un_context as ctx
-from clir_bench.domains.legal.qac import un_references as refs
 
 
 def _unit(i, text, part_id="", part_label=""):
@@ -103,18 +104,69 @@ def test_custom_paths_do_not_gate_against_the_production_status(tmp_path):
     assert index.incomplete is None
 
 
-def test_translation_lookup_keeps_the_standalone_path_hook(tmp_path, monkeypatch):
+@pytest.mark.parametrize("language,text", [
+    ("fr", "La traduction."),
+    ("ar", "الترجمة العربية."),
+    ("ru", "Русский перевод."),
+])
+def test_translation_lookup_keeps_the_standalone_path_hook(tmp_path, monkeypatch, language, text):
     docs_path = tmp_path / "docs.jsonl"
     docs_path.write_text(json.dumps({
         "doc_id": "d", "symbol": "S/RES/1(1999)", "n_blocks": 0,
         "offset": 0, "line_start": 1, "line_end": 1,
     }) + "\n")
-    translated = tmp_path / "translation.fr"
-    translated.write_text("La traduction.\n")
+    translated = tmp_path / f"translation.{language}"
+    translated.write_text(text + "\n")
     monkeypatch.setattr(ctx.paths, "text_file", lambda language: translated)
     index = ctx.BlockIndex(blocks_path=tmp_path / "blocks.jsonl", docs_path=docs_path)
-    index.preload_translations(["fr"], ["d"])
-    assert index._translations["fr"]["d"] == ["La traduction."]
+    index.preload_translations([language], ["d"])
+    assert index._translations[language]["d"] == [text]
+
+
+@pytest.mark.parametrize("language,text,question", [
+    ("ar", "يطلب المجلس تقديم تقارير سنوية.", "ماذا يطلب المجلس بشأن التقارير؟"),
+    ("ru", "Совет запрашивает ежегодные доклады.", "Какие доклады запрашивает Совет?"),
+])
+def test_arabic_and_russian_payloads_preserve_original_evidence(
+    tmp_path, monkeypatch, language, text, question,
+):
+    from clir_bench.domains.legal.qac import un_generate
+
+    monkeypatch.delenv("CLIR_PROMPT_MANIFEST", raising=False)
+    monkeypatch.setenv("CLIR_PROMPT_SOURCE", "local")
+    docs = {"d": {"doc_id": "d", "symbol": "S/RES/1(1999)", "n_blocks": 1,
+                  "title": "Reporting", "line_start": 1, "line_end": 1,
+                  "target_idxs": [0], "annexes": [], "offset": 0}}
+    row = _row("d", 0, "The Council requests annual reports.")
+    row.update(line_start=1, line_end=1)
+    index = _MiniIndex(docs, {"d": [row]}, tmp_path)
+    index._translations[language] = {"d": [text]}
+    payload = index.build("d", 0, languages=ctx.payload_languages(language))
+    prompt, body = un_generate.build_messages(payload, "lookup", language)
+    assert f"[{language.upper()}]" in body["content"]
+    assert text in body["content"]
+    assert "legal_evidence_spans_v1" in prompt["content"]
+    candidates = un_generate.parse_candidates([{
+        "question": question, "answer": text, "question_type": "operative_action",
+        "question_cited": question, "anchor": "المجلس" if language == "ar" else "Совет",
+        "answer_is_translation": False,
+        "evidence_spans": [{"source_ref": "target", "language": language, "text": text}],
+    }], "lookup", payload=payload, require_evidence=True)
+    rows = un_generate.rows_for(payload, candidates, mode="lookup", language=language)
+    assert rows[0]["question_language"] == language
+    assert rows[0]["answer"] == rows[0]["evidence"] == text
+    assert rows[0]["evidence_language"] == language
+
+
+def test_default_un_modes_have_prompts_for_every_corpus_language(monkeypatch):
+    from clir_bench.domains.legal.qac import un_batch
+    from clir_bench.domains.legal.un import UN_LANGUAGES
+
+    monkeypatch.delenv("CLIR_PROMPT_MANIFEST", raising=False)
+    monkeypatch.setenv("CLIR_PROMPT_SOURCE", "local")
+    for mode in un_batch.DEFAULT_MODES:
+        for language in UN_LANGUAGES:
+            assert un_batch.gen.PROMPTS.generation(mode, language)
 
 
 def test_references_travel_in_every_payload_language(tmp_path):

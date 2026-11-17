@@ -105,7 +105,7 @@ def test_manifest_path_switch_is_not_hidden_by_prompt_cache(client, tmp_path, mo
 
 def test_sync_inventory_covers_current_modes_and_retained_legacy_verifiers():
     prompts = registry.local_legal_prompts()
-    assert len(prompts) == 82
+    assert len(prompts) == 94
     for source in registry.MODES:
         assert prompts[f"{source}/decider/jev"] == decider.prompt_text(source, "jev")
         assert (prompts[f"{source}/decider/jev_eligibility"]
@@ -114,6 +114,9 @@ def test_sync_inventory_covers_current_modes_and_retained_legacy_verifiers():
         assert f"eurlex/generation/fact_pattern/{language}" in prompts
         assert f"eurlex/generation/conceptual/{language}" in prompts
         assert f"un/generation/practitioner/{language}" in prompts
+    for language in ("ar", "ru"):
+        for mode in registry.MODES["un"]:
+            assert f"un/generation/{mode}/{language}" in prompts
     assert "un/quality/technical" in prompts
     assert "un/quality/descriptive" in prompts
     assert len({registry.prompt_name(key) for key in prompts}) == len(prompts)
@@ -172,7 +175,7 @@ def test_conceptual_alias_preserves_exact_historical_snapshots(client, tmp_path,
 def test_local_conceptual_alias_and_language_inventory(monkeypatch):
     monkeypatch.setenv("CLIR_PROMPT_SOURCE", "local")
     pack = PromptPack(registry.PREFIX + "un")
-    assert pack.available_languages("conceptual") == ("de", "en", "es", "fr", "zh")
+    assert pack.available_languages("conceptual") == ("ar", "de", "en", "es", "fr", "ru", "zh")
     assert pack.available_languages("semantic") == pack.available_languages("conceptual")
     for language in pack.available_languages("conceptual"):
         assert pack.generation("conceptual", language) == pack.generation("semantic", language)

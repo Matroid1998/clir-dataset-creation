@@ -50,8 +50,8 @@ def context(tmp_path):
 
 def test_filter_requires_acceptance_verdict_and_both_supported_languages():
     rows = [pair(), pair("EP-2", verdict="high"), pair("EP-3", accepted=False),
-            pair("EP-4", verdict="medium"), pair("EP-5", source="ja", target="en"),
-            pair("EP-6", source="en", target="ru")]
+            pair("EP-4", verdict="medium"), pair("EP-5", source="ar", target="en"),
+            pair("EP-6", source="en", target="ko")]
     documents, accepted, counts = build(rows)
     assert [row["doc_id"] for row in accepted] == ["EP-1234567-A1", "EP-2"]
     assert len(documents) == 4
@@ -84,6 +84,21 @@ def test_exact_endpoint_text_and_direct_edges_survive_deduplication():
     assert accepted[0]["target_document_id"] == by_lang["de"]["id"]
 
 
+def test_japanese_and_russian_are_imported_with_exact_text_and_direct_partners():
+    first = pair(source="en", target="ja")
+    second = pair(source="ja", target="ru", verdict="high")
+    first["target_text"] = second["source_text"] = "日本語の要約：Fe<sub>2</sub>O3。\nα & β"
+    second["target_text"] = "Русский реферат: Fe<sub>2</sub>O3.\nα & β"
+    documents, accepted, counts = build([first, second])
+    by_language = {row["language"]: row for row in documents}
+    assert set(by_language) == {"en", "ja", "ru"}
+    assert by_language["ja"]["abstract"] == first["target_text"]
+    assert by_language["ru"]["abstract"] == second["target_text"]
+    assert counts["selected_pairs"] == len(accepted) == 2
+    assert json.loads(by_language["en"]["paired_document_ids"]) == [by_language["ja"]["id"]]
+    assert json.loads(by_language["ru"]["paired_document_ids"]) == [by_language["ja"]["id"]]
+
+
 def test_language_subset_and_limit_apply_to_pairs_not_individual_documents():
     rows = [pair("EP-1", source="en", target="zh"), pair("EP-2"), pair("EP-3")]
     documents, accepted, counts = build(rows, languages=["en", "de"], limit=1)
@@ -93,7 +108,7 @@ def test_language_subset_and_limit_apply_to_pairs_not_individual_documents():
     assert counts["selected_pairs"] == 1
 
 
-@pytest.mark.parametrize("kwargs", [{"languages": ["en", "ja"]}, {"languages": []},
+@pytest.mark.parametrize("kwargs", [{"languages": ["en", "ar"]}, {"languages": []},
                                     {"limit": 0}, {"limit": -1}, {"limit": True}])
 def test_invalid_selection_arguments_fail(kwargs):
     with pytest.raises(ValueError):
@@ -236,7 +251,7 @@ def test_artifact_publish_failure_rolls_back_previous_bundle(tmp_path, monkeypat
 
 @pytest.mark.parametrize("changes", [
     {"source": "google_patents"}, {"source": "epo"}, {"upstream_dataset": "other/repo"},
-    {"upstream_revision": ""}, {"language": "ja"}, {"id": ""}, {"id": "arbitrary-id"},
+    {"upstream_revision": ""}, {"language": "ar"}, {"id": ""}, {"id": "arbitrary-id"},
     {"abstract": ""}, {"context": "different text"}, {"abstract": None},
     {"accepted_pair_ids": "[]"}, {"accepted_pair_ids": '"pair-id"'},
     {"accepted_pair_ids": '["duplicate", "duplicate"]'},

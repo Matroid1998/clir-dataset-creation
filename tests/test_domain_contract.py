@@ -42,7 +42,7 @@ def test_only_ai4chem_source_is_active_with_its_own_attribution(spec: DomainSpec
 
 
 def test_chemistry_input_source_and_supported_languages_are_explicit(spec: DomainSpec) -> None:
-    assert set(spec.languages.inventory) == {"en", "de", "fr", "es", "zh"}
+    assert set(spec.languages.inventory) == {"en", "de", "fr", "es", "zh", "ja", "ru"}
     assert spec.languages.inventory == spec.languages.working == spec.source("gp").languages
     assert spec.defaults["input_dataset_repo"] == (
         "BASF-AI/ai4chem-clir-google-patents-within-document-abstract-pairs"
@@ -511,6 +511,18 @@ def test_legal_generation_defaults_to_its_source_run_directory(legal_run, monkey
     rows, _ = run.qac._read_csv(directory / "results.csv")
     assert {row["corpus"] for row in rows} == {source}
     assert not (run.tmp_path / "data/legal/qac").exists()
+
+
+def test_un_generation_defaults_include_arabic_and_russian(legal_run, monkeypatch):
+    from clir_bench.domains.legal.un import UN_LANGUAGES
+
+    run = legal_run
+    monkeypatch.setattr(run.qac._batches()["un"], "UN_LANGUAGES", UN_LANGUAGES)
+    selections = run.qac._select(["un"], run.qac._indexes(["un"]), {
+        "langs": None, "modes": None, "questions": 6, "seed": 42,
+    })
+    assert run.state.selections[0][2] == UN_LANGUAGES
+    assert {entry["target"]["language"] for entry in selections} == set(UN_LANGUAGES)
 
 
 @pytest.mark.parametrize("source,subdirectory", [("eurlex", "eurlex"), ("un", "un_parallel")])

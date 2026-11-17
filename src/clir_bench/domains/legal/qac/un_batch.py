@@ -79,7 +79,7 @@ MIN_GROUNDING_FOR_BEST = 3
 # whole text of every referenced document stays inside the context budget --
 # then nothing the model sees is ever truncated or windowed.
 FIT_BUDGET = ctx.DEFAULT_CONTEXT_CHARS
-DEFAULT_MODES = (gen.MODE_TECHNICAL, gen.MODE_CONCEPTUAL, gen.MODE_DESCRIPTIVE)
+DEFAULT_MODES = (gen.MODE_LOOKUP, gen.MODE_CONCEPTUAL, gen.MODE_PRACTITIONERS)
 SUPPORTED_MODES = gen.MODES
 
 
@@ -630,11 +630,9 @@ def main(argv: Sequence[str] | None = None, *, index: ctx.BlockIndex | None = No
                         help="target blocks (= queries when keep=1)")
     parser.add_argument("--keep", type=int, default=3,
                         help="candidates written to the all-candidates file")
-    # The production configuration: the four question languages the corpus can
-    # carry (de is skipped on purpose -- German is not a UN language, so we do
-    # not ask in it), all three prompt modes, gpt-5.4-mini generating and
-    # Sonnet grading.
-    parser.add_argument("--languages", default="en,fr,es,zh")
+    # All six corpus languages are available for generation; German is absent
+    # from the UN corpus and is never included in the default language set.
+    parser.add_argument("--languages", default=",".join(UN_LANGUAGES))
     parser.add_argument("--modes", default=None,
                         help=f"comma-separated modes (default: {','.join(DEFAULT_MODES)})")
     parser.add_argument("--targets-in", type=Path,

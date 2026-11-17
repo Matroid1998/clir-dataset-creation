@@ -109,17 +109,25 @@ def test_supplied_worked_examples_and_abstentions_obey_the_parser(mode, language
 
 @pytest.mark.parametrize("mode", MODES)
 @pytest.mark.parametrize("count", [1, 2, 3])
+@pytest.mark.parametrize("language", ["en", "ja", "ru"])
 def test_generate_grade_and_csv_round_trip_keeps_persona_evidence(
-    monkeypatch, tmp_path, mode, count,
+    monkeypatch, tmp_path, mode, count, language,
 ):
-    candidate = examples(mode)[0][0]
+    candidate = examples(mode, language)[0][0]
+    if language != "en":
+        candidate["evidence"] = candidate["answer"] if mode != "source_finding" else {
+            "ja": "PDZドメイン相互作用によって膜タンパク質をウイルス様粒子上に提示する。",
+            "ru": "Мембранные белки представлены на вирусоподобных частицах посредством взаимодействия PDZ-доменов.",
+        }[language]
+        candidate["evidence_language"] = language
+        candidate["answer_is_translation"] = False
     candidates = [dict(candidate) for _ in range(count)]
     row = document(candidate)
-    item = qagen.PlanItem(row["publication_number"], "en", mode)
+    item = qagen.PlanItem(row["publication_number"], language, mode)
     calls = []
 
     def generate(client, model, messages, **kwargs):
-        assert messages[0]["content"] == PACK.generation(mode, "en")
+        assert messages[0]["content"] == PACK.generation(mode, language)
         assert f"publication_number: {item.family}" in messages[1]["content"]
         assert candidate["evidence"] in messages[1]["content"]
         return json.dumps(candidates)
@@ -130,7 +138,7 @@ def test_generate_grade_and_csv_round_trip_keeps_persona_evidence(
         assert f"publication_number: {item.family}" in payload["passages"]
         assert candidate["evidence"] in payload["passages"]
         assert payload["candidates"] == [
-            dict(candidate, mode=mode, question_language="en") for _ in range(count)
+            dict(candidate, mode=mode, question_language=language) for _ in range(count)
         ]
         return verifier_response(prompt, payload["candidates"])
 
@@ -147,7 +155,7 @@ def test_generate_grade_and_csv_round_trip_keeps_persona_evidence(
     corpus.write_rows(path, [qagen.normalize_row(row, fields) for row in generated], fields)
     for saved in corpus.read_rows(path):
         restored = qagen.candidate_from_row(saved)
-        assert restored == dict(candidate, mode=mode, question_language="en")
+        assert restored == dict(candidate, mode=mode, question_language=language)
         assert saved["total_score"] == "32"
         assert saved["faith_overall"] == "12"
         assert saved["qual_overall"] == "20"

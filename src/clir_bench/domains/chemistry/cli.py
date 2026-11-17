@@ -36,7 +36,7 @@ def _register_ingest(registrar) -> None:
     gp.add_argument("--limit", type=int, help="Limit accepted pairs for a small local import")
     gp.add_argument(
         "--languages", nargs="+", choices=WORKING_LANGUAGES,
-        help="Keep pairs with both sides in these languages (default: en de fr es zh)",
+        help=f"Keep pairs with both sides in these languages (default: {' '.join(WORKING_LANGUAGES)})",
     )
     gp.add_argument("--input", type=Path, help="Read a local export in Parquet or JSONL format")
     gp.set_defaults(handler=_ingest_gp)

@@ -20,7 +20,7 @@ SPEC = DomainSpec(
     ),
     languages=LanguageSpec(
         inventory=("ar", "de", "en", "es", "fr", "ru", "zh"),
-        working=("en", "fr", "de", "es", "zh"),
+        working=("en", "fr", "de", "es", "zh", "ar", "ru"),
         names={
             "ar": "Arabic",
             "de": "German",
@@ -30,7 +30,7 @@ SPEC = DomainSpec(
             "ru": "Russian",
             "zh": "Chinese",
         },
-        priority=("en", "fr", "de", "es", "zh"),
+        priority=("en", "fr", "de", "es", "zh", "ar", "ru"),
     ),
     sources=(
         SourceSpec(

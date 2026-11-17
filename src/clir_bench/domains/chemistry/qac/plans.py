@@ -1,7 +1,7 @@
 """Select chemistry source documents and ask in each selected document's language.
 
 The existing plan names control sampling order and pool size. Every plan keeps
-an explicit source document identity and restricts generation to the five
+an explicit source document identity and restricts generation to the supported
 languages with chemistry prompts; no plan invents a missing-language target.
 """
 

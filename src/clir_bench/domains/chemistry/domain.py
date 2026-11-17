@@ -112,8 +112,8 @@ SPEC = DomainSpec(
     description=(
         "Multilingual chemistry-patent retrieval built only from BASF-AI's "
         "AI4Chem within-document Google Patents abstract pairs. Accepted exact "
-        "and high-equivalence pairs in English, German, French, Spanish and "
-        "Chinese provide the explicit cross-language relevance links."
+        "and high-equivalence pairs in English, German, French, Spanish, "
+        "Chinese, Japanese and Russian provide the explicit cross-language relevance links."
     ),
     schema=SCHEMA,
     languages=LANGUAGES,

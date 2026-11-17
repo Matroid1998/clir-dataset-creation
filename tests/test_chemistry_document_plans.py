@@ -19,7 +19,7 @@ def documents():
          "context": f"Abstract for {identity}"}
         for identity, language in (("fr-a", "fr"), ("fr-b", "fr"), ("en-a", "en"),
                                    ("de-a", "de"), ("es-a", "es"), ("zh-a", "zh"),
-                                   ("ja-a", "ja"))
+                                   ("ja-a", "ja"), ("ru-a", "ru"), ("ar-a", "ar"))
     ]
     rows.append(dict(rows[0], id="empty-fr", context=""))
     return {"EP-1234567-A1": rows}
@@ -39,12 +39,14 @@ def build(name, grouped, **options):
 def test_plans_preserve_distinct_same_language_documents_and_derive_language(name, documents):
     plan = build(name, documents)
     by_id = {row["id"]: row for rows in documents.values() for row in rows}
-    assert len(plan) == 6 * len(MODES)
+    assert len(plan) == 8 * len(MODES)
     assert len({(item.document_id, item.mode) for item in plan}) == len(plan)
-    assert {item.document_id for item in plan} == {"en-a", "fr-a", "fr-b", "de-a", "es-a", "zh-a"}
+    assert {item.document_id for item in plan} == {
+        "en-a", "fr-a", "fr-b", "de-a", "es-a", "zh-a", "ja-a", "ru-a",
+    }
     assert all(item.language == by_id[item.document_id]["language"] for item in plan)
     assert all(item.strategy == 3 for item in plan)
-    assert Counter(item.mode for item in plan) == dict.fromkeys(MODES, 6)
+    assert Counter(item.mode for item in plan) == dict.fromkeys(MODES, 8)
     assert build(name, {key: list(reversed(rows)) for key, rows in documents.items()}) == plan
 
 
@@ -59,10 +61,17 @@ def test_language_filters_select_existing_documents_without_language_expansion(n
 
 
 @pytest.mark.parametrize("name", PLANS)
+def test_japanese_and_russian_language_filters_select_their_source_documents(name, documents):
+    plan = build(name, documents, langs=["ja", "ru"])
+    assert {item.document_id for item in plan} == {"ja-a", "ru-a"}
+    assert {item.language for item in plan} == {"ja", "ru"}
+
+
+@pytest.mark.parametrize("name", PLANS)
 @pytest.mark.parametrize("option", ["langs", "priority_langs"])
 def test_unsupported_language_filters_are_rejected_even_with_no_documents(name, option):
     with pytest.raises(ValueError, match="Unsupported chemistry"):
-        build(name, {}, **{option: ["fr", "ja"]})
+        build(name, {}, **{option: ["fr", "ar"]})
 
 
 @pytest.mark.parametrize("name", PLANS)

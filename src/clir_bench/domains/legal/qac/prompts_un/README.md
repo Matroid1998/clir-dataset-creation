@@ -14,16 +14,19 @@ does not have.
 Loaded with `PromptPack("clir_bench.domains.legal.qac.prompts_un")`. Nothing in
 `core/` knows about any of this.
 
-    generation/technical/{en,de,fr,es,zh}.txt
-    generation/descriptive/{en,de,fr,es,zh}.txt
-    generation/conceptual/{en,de,fr,es,zh}.txt
+    generation/lookup/{ar,en,de,fr,es,ru,zh}.txt
+    generation/practitioners/{ar,en,de,fr,es,ru,zh}.txt
+    generation/conceptual/{ar,en,de,fr,es,ru,zh}.txt
+    generation/{comparison,claim_verification,source_finding}/{ar,en,de,fr,es,ru,zh}.txt
     verifiers/{faithfulness,technical,descriptive,conceptual}_batch.txt
 
-Each language file is a full-file translation with the same convention as
-`prompts_eurlex`: the literal markers, JSON keys, and enum values stay in
-English verbatim; only the explanatory text is translated. The production
-question languages are en, fr, es, zh (the batch driver's default): for
-fr/es/zh the payload carries the question-language text of the target and
+Language files preserve literal markers, JSON keys and enum values verbatim.
+Arabic and Russian variants retain the English contract instructions, with
+native output-language instructions and localized teaching outputs. Evidence in
+these teaching cases remains in the language of the supplied source; illustrative
+translated answers are marked with `answer_is_translation=true`.
+The production question languages are ar, en, es, fr, ru, zh (the batch driver's
+default): for ar/es/fr/ru/zh the payload carries the question-language text of the target and
 context blocks (read from the 6-way files by line range) alongside English.
 German is not a UN language and is not generated; its prompt files exist as
 complete translations should a cross-language run ever be wanted, but no
@@ -166,7 +169,7 @@ The question contract and grading criteria are unchanged by this rename.
 ## Additional retrieval modes
 
 `comparison`, `claim_verification`, and `source_finding` each have standalone
-`generation/<mode>/{en,de,fr,es,zh}.txt` prompts and matching
+`generation/<mode>/{ar,en,de,fr,es,ru,zh}.txt` prompts and matching
 `verifiers/<mode>_batch.txt` quality rubrics. The six quality rubrics are extracted
 verbatim from `ALL_VERIFIERS_EN.md`. They assess multilingual candidates while
 writing grading explanations in English.

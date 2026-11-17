@@ -70,8 +70,8 @@ Chemistry uses only
 [`BASF-AI/ai4chem-clir-google-patents-within-document-abstract-pairs`](https://huggingface.co/datasets/BASF-AI/ai4chem-clir-google-patents-within-document-abstract-pairs).
 The existing `gp` command key now names this source. Import keeps records with
 `pair_ok=true` and `judge_verdict` equal to `exact` or `high`, with **both**
-endpoint languages in `en`, `de`, `fr`, `es` or `zh`. It preserves each endpoint's
-full cleaned abstract. `--languages` can further restrict that set;
+endpoint languages in `en`, `de`, `fr`, `es`, `zh`, `ja` or `ru`. It preserves
+each endpoint's full cleaned abstract. `--languages` can further restrict that set;
 `--revision` resolves and records an immutable upstream commit.
 
 The corpus, accepted pair records and import manifest are stored under
@@ -79,6 +79,23 @@ The corpus, accepted pair records and import manifest are stored under
 remain on disk but are not active chemistry sources. `input_dataset_repo`
 identifies the fixed upstream dataset; `corpus_repo` remains a separate destination
 for publishing the derived retrieval corpus.
+
+The working patent languages are English, German, French, Spanish, Chinese,
+Japanese and Russian. UN generation defaults to all six available languages:
+Arabic, English, Spanish, French, Russian and Chinese. EUR-Lex uses English,
+French, German and Spanish. Use `--langs` to restrict generation per source:
+
+```bash
+clir --domain legal qac generate --source un --langs ar ru --modes lookup --questions 30
+clir --domain chemistry qac generate --source gp --langs ja ru --questions 30
+```
+
+After expanding the patent language set, re-import the same pinned upstream
+revision to include its Japanese and Russian abstract pairs:
+
+```bash
+clir --domain chemistry ingest gp --revision 24c1f894591a5aa6f745ac233d5091fdbc30ad3c
+```
 
 Retrieval positives are the selected document and its directly accepted paired
 documents. Sharing a publication number or being linked through a third language

@@ -24,7 +24,7 @@ EXTRACTION_LANGUAGES = (
 
 # Languages the benchmark actually generates questions in: those with genuine
 # human-translated parallel patent text and a full prompt set.
-WORKING_LANGUAGES = ("en", "de", "fr", "es", "zh")
+WORKING_LANGUAGES = ("en", "de", "fr", "es", "zh", "ja", "ru")
 
 # The EPO publishes in its three official languages only.
 EPO_LANGUAGES = ("en", "fr", "de")
@@ -39,12 +39,12 @@ LANGUAGE_NAMES = {
 # Order used when picking "the best available language version" of a document.
 # Distinct from WORKING_LANGUAGES because the ordering is load-bearing: it
 # decides which passage a generator reads when several are available.
-LANGUAGE_PRIORITY = ("en", "de", "fr", "es", "zh")
+LANGUAGE_PRIORITY = ("en", "de", "fr", "es", "zh", "ja", "ru")
 
 # Order used when choosing the surface form of a concept in an answer. The
 # ``chebi`` entry is not a language: it is the ontology's own canonical name,
 # used when no Wikipedia title exists for the query language.
-ANSWER_LANGUAGE_ORDER = ("en", "de", "fr", "es", "zh", "chebi")
+ANSWER_LANGUAGE_ORDER = ("en", "de", "fr", "es", "zh", "ja", "ru", "chebi")
 
 # ISO code -> the language tags MTEB expects.
 MTEB_LANGUAGE_CODES = {
@@ -156,7 +156,7 @@ STRATEGY_NUMBERS = {
 }
 
 # Languages shown in the same-language retrieval-bias diagnostic.
-DIAGNOSTIC_LANGUAGES = ("de", "en", "es", "fr", "pt", "zh")
+DIAGNOSTIC_LANGUAGES = ("de", "en", "es", "fr", "ja", "pt", "ru", "zh")
 
 # --------------------------------------------------------------------------- #
 # Text limits (quality gates applied at corpus build time)
