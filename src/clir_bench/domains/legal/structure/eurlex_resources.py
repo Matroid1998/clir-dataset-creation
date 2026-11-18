@@ -45,6 +45,8 @@ FORMAT = "eurlex-resources-v1"
 VERSION = 1
 SEED = 42
 FROM_YEAR, TO_YEAR = 2017, 2022
+CELLAR_SPARQL = "https://publications.europa.eu/webapi/rdf/sparql"
+CELLAR_DISCOVERY = "cellar_sparql"
 CELEX_RE = re.compile(r"^3(?P<year>\d{4})(?P<kind>[RL])(?P<number>\d{4,5})$")
 REQUIRED_FILES = (
     "articles.jsonl",
@@ -125,18 +127,31 @@ def _check_files(path: Path, manifest: dict) -> None:
             raise ValidationError(f"Bundle checksum mismatch: {name}")
 
 
-def _canonical(celex: Any) -> re.Match | None:
+def _canonical(celex: Any, *, to_year: int = TO_YEAR) -> re.Match | None:
     if not isinstance(celex, str):
         return None
     match = CELEX_RE.fullmatch(celex)
     if (
         not match
-        or not FROM_YEAR <= int(match["year"]) <= TO_YEAR
+        or not FROM_YEAR <= int(match["year"]) <= to_year
         or not int(match["number"])
         or f"{int(match['number']):04d}" != match["number"]
     ):
         return None
     return match
+
+
+def discovery_year(manifest: dict) -> int:
+    """The pinned HF inventory keeps its historical scope; official snapshots declare theirs."""
+    source = manifest.get("source", {})
+    if source.get("mode") != CELLAR_DISCOVERY:
+        return TO_YEAR
+    year = manifest.get("config", {}).get("to_year")
+    if (source.get("repository") != CELLAR_SPARQL or type(year) is not int
+            or not TO_YEAR <= year <= 2099
+            or not re.fullmatch(r"[0-9a-f]{64}", source.get("revision", ""))):
+        raise ValidationError("Invalid official EUR-Lex discovery scope")
+    return year
 
 
 def _inventory_row(row: dict) -> dict:
@@ -493,7 +508,8 @@ def _csv(path: Path, rows: list[dict]) -> None:
         writer.writerows(rows)
 
 
-def _new_validation(path: Path, selected: set[str], *, ignore_other: bool = False) -> list[dict]:
+def _new_validation(path: Path, selected: set[str], *, ignore_other: bool = False,
+                    to_year: int = TO_YEAR) -> list[dict]:
     per_act: dict[str, dict[str, dict[str, dict]]] = defaultdict(lambda: defaultdict(dict))
     bad: dict[str, set[str]] = defaultdict(set)
     for row in _rows(path):
@@ -518,7 +534,7 @@ def _new_validation(path: Path, selected: set[str], *, ignore_other: bool = Fals
             bad[celex].add("article-text-count-mismatch")
         act_eli = row.get("act_eli", "")
         match = re.fullmatch(r"https?://data\.europa\.eu/eli/([a-z_]+)/(\d{4})/(\d+)/oj", act_eli)
-        canonical = _canonical(celex)
+        canonical = _canonical(celex, to_year=to_year)
         if (
             not match
             or not canonical
@@ -732,7 +748,8 @@ def _parser_provenance(parser=None) -> dict:
     }
 
 
-def _audit_official_provenance(root: Path, *, cache_dir: Path | None = None) -> None:
+def _audit_official_provenance(root: Path, *, cache_dir: Path | None = None,
+                               to_year: int = TO_YEAR) -> None:
     """Verify recorded retrieval metadata, and its raw bytes when cache remains."""
     if cache_dir is None:
         candidates = (
@@ -744,7 +761,7 @@ def _audit_official_provenance(root: Path, *, cache_dir: Path | None = None) -> 
         raise ValidationError("Explicit official-source cache directory does not exist")
     for act in json.loads((root / "official_sources.json").read_text(encoding="utf-8")):
         celex = act.get("celex_id")
-        if _canonical(celex) is None:
+        if _canonical(celex, to_year=to_year) is None:
             raise ValidationError("Invalid official-source act identity")
         for entry in act.get("files", []):
             name, digest = entry.get("name"), entry.get("sha256")
@@ -1041,6 +1058,7 @@ def _prepare_acts(
     if inventory_manifest.get("format") != INVENTORY_FORMAT:
         raise ValidationError("Expected a EUR-Lex resources inventory manifest")
     audit(inventory_path)
+    to_year = discovery_year(inventory_manifest)
     baseline_structure = Path(baseline_structure).expanduser().resolve()
     baseline, baseline_acts, baseline_quarantine = _baseline_info(baseline_structure)
     candidates = [
@@ -1101,7 +1119,7 @@ def _prepare_acts(
         )
     else:
         new_profile.ARTICLES_JSONL.touch()
-    strict_quarantine = _new_validation(new_profile.ARTICLES_JSONL, chosen)
+    strict_quarantine = _new_validation(new_profile.ARTICLES_JSONL, chosen, to_year=to_year)
     bundle = work / "bundle"
     if bundle.exists():
         shutil.rmtree(bundle)
@@ -1200,10 +1218,10 @@ def _prepare_acts(
         "version": VERSION,
         "files": _hashes(bundle, names),
         "source": {
-            "repository": REPOSITORY,
+            "repository": inventory_manifest["source"]["repository"],
             "revision": inventory_manifest["source"]["revision"],
             "date_field": "date",
-            "date_semantics": "upstream dataset date; not verified as OJ publication",
+            "date_semantics": inventory_manifest["source"]["date_semantics"],
             "inventory_sha256": identity["inventory_sha256"],
             "baseline": baseline,
             "article_source": "official_CELLAR_Formex",
@@ -1219,7 +1237,7 @@ def _prepare_acts(
         },
         "config": {
             "from_year": FROM_YEAR,
-            "to_year": TO_YEAR,
+            "to_year": to_year,
             "pilot_size": pilot_size,
             "seed": seed,
             "required_languages": list(ACT_LANGUAGES),
@@ -1228,6 +1246,8 @@ def _prepare_acts(
         },
         "counts": counts,
     }
+    if inventory_manifest["source"].get("mode") == CELLAR_DISCOVERY:
+        manifest["source"]["mode"] = CELLAR_DISCOVERY
     _write_json(bundle / "manifest.json", manifest)
     audit(bundle / "manifest.json")
     # Detect concurrent edits to either immutable input before publication.
@@ -1247,12 +1267,18 @@ def audit(manifest_path: Path, *, cache_dir: Path | None = None) -> dict:
     manifest_path = _manifest_path(manifest_path)
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     _check_files(manifest_path, manifest)
-    if not re.fullmatch(r"[0-9a-f]{40}", manifest.get("source", {}).get("revision", "")):
+    to_year = discovery_year(manifest)
+    source = manifest.get("source", {})
+    official = source.get("mode") == CELLAR_DISCOVERY
+    if not official and not re.fullmatch(r"[0-9a-f]{40}", source.get("revision", "")):
         raise ValidationError("Source revision must be an immutable commit")
     root = manifest_path.parent
     if manifest.get("format") == INVENTORY_FORMAT:
+        if official and manifest["files"].get("cellar-discovery.json") != source["revision"]:
+            raise ValidationError("Official EUR-Lex discovery snapshot checksum mismatch")
         records = list(_rows(root / "inventory.jsonl"))
-        if any(not _canonical(row.get("celex_id")) or not row.get("eligible") for row in records):
+        if any(not _canonical(row.get("celex_id"), to_year=to_year) or not row.get("eligible")
+               for row in records):
             raise ValidationError("Invalid canonical inventory act")
         if len({row["celex_id"] for row in records}) != len(records):
             raise ValidationError("Duplicate inventory act")
@@ -1268,7 +1294,7 @@ def audit(manifest_path: Path, *, cache_dir: Path | None = None) -> dict:
         name not in manifest["files"] for name in REQUIRED_FILES
     ):
         raise ValidationError("Unsupported or incomplete EUR-Lex resources bundle")
-    _audit_official_provenance(root, cache_dir=cache_dir)
+    _audit_official_provenance(root, cache_dir=cache_dir, to_year=to_year)
     parser = manifest.get("source", {}).get("parser")
     if not isinstance(parser, dict) or parser.get("kind") not in (
         "parse_fmx",
@@ -1284,7 +1310,7 @@ def audit(manifest_path: Path, *, cache_dir: Path | None = None) -> dict:
     selected_ids = {row["celex_id"] for row in selected}
     if (
         targets != sorted(set(targets))
-        or any(not _canonical(celex) for celex in targets)
+        or any(not _canonical(celex, to_year=to_year) for celex in targets)
         or not set(targets) <= selected_ids
     ):
         raise ValidationError("Invalid new-act target allowlist")
@@ -1305,7 +1331,8 @@ def audit(manifest_path: Path, *, cache_dir: Path | None = None) -> dict:
         map(_json, _rows(root / "quarantine.jsonl"))
     ):
         raise ValidationError("Baseline quarantine records were not carried into the union")
-    strict = _new_validation(root / "articles.jsonl", selected_ids, ignore_other=True)
+    strict = _new_validation(root / "articles.jsonl", selected_ids, ignore_other=True,
+                             to_year=to_year)
     if any(row["celex_id"] in targets for row in strict):
         raise ValidationError("Target act lacks clean four-language article identities")
     units: dict[str, dict[str, dict]] = defaultdict(dict)

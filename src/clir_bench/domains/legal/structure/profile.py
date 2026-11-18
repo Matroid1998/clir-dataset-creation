@@ -10,6 +10,11 @@ from pathlib import Path, PurePosixPath
 
 from clir_bench.domains.legal.qac.eurlex_context import ArticleIndex
 from clir_bench.domains.legal.structure import ACT_LANGUAGES
+from clir_bench.domains.legal.structure.eurlex_resources import (
+    FROM_YEAR,
+    _canonical,
+    discovery_year,
+)
 
 FORMAT = "eurlex-resources-v1"
 REQUIRED_FILES = frozenset({"articles.jsonl", "internal_edges.jsonl", "external_edges.jsonl",
@@ -78,8 +83,8 @@ def load_profile(manifest_path: str | Path) -> PreparedProfile:
             raise ValueError(f"EUR-Lex dataset artifact changed while reading: {name}")
         stats[name] = stamp(after)
     targets = json.loads((path.parent / "target_acts.json").read_text(encoding="utf-8"))
-    if (not isinstance(targets, list) or any(not isinstance(c, str) or not
-            re.fullmatch(r"3(?:201[7-9]|202[0-2])[RL]\d{4,5}", c) for c in targets)
+    to_year = discovery_year(manifest)
+    if (not isinstance(targets, list) or any(not _canonical(c, to_year=to_year) for c in targets)
             or len(set(targets)) != len(targets)):
         raise ValueError("invalid newer EUR-Lex target act whitelist")
     article_targets = None
@@ -87,10 +92,11 @@ def load_profile(manifest_path: str | Path) -> PreparedProfile:
     requested = manifest.get("config", {}).get("target_articles")
     if article_file in files:
         entries = json.loads((path.parent / article_file).read_text(encoding="utf-8"))
+        years = "|".join(map(str, range(FROM_YEAR, to_year + 1)))
         if (not isinstance(entries, list) or not entries
                 or any(not isinstance(eli, str) or not re.fullmatch(
                     r"https?://data\.europa\.eu/eli/(?:reg|dir)(?:_impl|_del)?/"
-                    r"20(?:1[7-9]|2[0-2])/[1-9]\d*/art_[^/?#\s]+/oj", eli)
+                    rf"(?:{years})/[1-9]\d*/art_[^/?#\s]+/oj", eli)
                     for eli in entries)
                 or entries != sorted(set(entries))):
             raise ValueError("invalid newer EUR-Lex target article whitelist")

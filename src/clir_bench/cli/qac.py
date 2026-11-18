@@ -223,6 +223,10 @@ def register(subparsers: argparse._SubParsersAction, context: AppContext | None)
     best.add_argument("--output", type=Path, help="Default: <input>_best.csv")
     best.set_defaults(handler=_domain_command if run_workflow else _best)
 
+    from . import qac_batch
+
+    qac_batch.register(sub, context)
+
 
 def _run_arguments(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(

@@ -192,7 +192,7 @@ def _quarantined(path: Path | None = None) -> set[str]:
 def select(index: ctx.ArticleIndex, *, n: int, seed: int, languages: Sequence[str],
            modes: Sequence[str], strata=DEFAULT_STRATA,
            include_amending: bool = False,
-           max_per_act: int = 2,
+           max_per_act: int | None = 2,
            max_references: int = ctx.DEFAULT_MAX_REFERENCES,
            require_complete: bool = True, excluded_documents: frozenset[str] = frozenset()) -> list[Target]:
     """Stratified, deterministic target selection.
@@ -279,7 +279,7 @@ def select(index: ctx.ArticleIndex, *, n: int, seed: int, languages: Sequence[st
             if taken >= want:
                 break
             unit = index.by_eli[eli]
-            if per_act[unit.celex_id] >= max_per_act:
+            if max_per_act is not None and per_act[unit.celex_id] >= max_per_act:
                 continue
             per_act[unit.celex_id] += 1
             taken += 1
@@ -304,7 +304,7 @@ def run_one(target: Target, index: ctx.ArticleIndex, *, gen_model: str,
             generation_only: bool = False,
             deduplicate_exact_questions: bool = False,
             checkpoint: Any = None, retries: int = 3,
-            payload: ctx.GenerationPayload | None = None) -> list[dict[str, Any]]:
+            payload: ctx.GenerationPayload | None = None, batch_calls=None) -> list[dict[str, Any]]:
     from clir_bench.core.grading import (
         GraderConfig,
         grade_columns,
@@ -314,7 +314,7 @@ def run_one(target: Target, index: ctx.ArticleIndex, *, gen_model: str,
     )
     from clir_bench.core.llm import call_with_retries, client_for
 
-    enhanced = checkpoint is not None or existing_candidates is not None
+    enhanced = checkpoint is not None or existing_candidates is not None or batch_calls is not None
     payload = payload or prepare_payload(target, index, max_references=max_references)
     if payload is None:
         return []
@@ -329,11 +329,15 @@ def run_one(target: Target, index: ctx.ArticleIndex, *, gen_model: str,
     grader = GraderConfig(model=grade_model, reasoning_effort="low",
                           thinking_budget_tokens=16000, thinking_max_tokens=32000)
     def stage(name, fn):
+        if batch_calls is not None:
+            return batch_calls.run(name, fn)
         if checkpoint is not None:
             return checkpoint.run(name, fn)
         return call_with_retries(fn, retries=retries, label=name)
 
     def client(stage_name, model):
+        if batch_calls is not None:
+            return batch_calls.client(stage_name, model)
         transport = client_for(model)
         return checkpoint.client(stage_name, model, transport) if checkpoint else transport
 

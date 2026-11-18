@@ -248,7 +248,8 @@ def select(index: ctx.BlockIndex, *, n: int, seed: int, languages: Sequence[str]
            modes: Sequence[str], strata=GENRE_STRATA,
            max_per_doc: int = 0, genre_filter: bool = True,
            fit_filter: bool = True, require_complete: bool = True,
-           excluded_documents: frozenset[str] = frozenset()) -> list[Target]:
+           excluded_documents: frozenset[str] = frozenset(),
+           excluded_blocks: frozenset[str] = frozenset()) -> list[Target]:
     """Stratified, deterministic, block-level target selection.
 
     The pool is enumerated from the docs index alone (``target_idxs``) and
@@ -297,7 +298,8 @@ def select(index: ctx.BlockIndex, *, n: int, seed: int, languages: Sequence[str]
         if require_complete:
             idxs = [idx for idx in idxs
                     if f"{doc_id}#{idx}" not in incomplete]
-        pools[stratum].extend((doc_id, idx) for idx in idxs)
+        pools[stratum].extend((doc_id, idx) for idx in idxs
+                              if f"{doc_id}#{idx}" not in excluded_blocks)
     if missing_idxs and not any(pools.values()):
         raise SystemExit(
             "docs index has no target_idxs -- rebuild the blocks "
@@ -351,7 +353,7 @@ def run_one(target: Target, index: ctx.BlockIndex, *, gen_model: str,
             generation_only: bool = False,
             deduplicate_exact_questions: bool = False,
             checkpoint: Any = None, retries: int = 3,
-            payload: ctx.GenerationPayload | None = None) -> list[dict[str, Any]]:
+            payload: ctx.GenerationPayload | None = None, batch_calls=None) -> list[dict[str, Any]]:
     from clir_bench.core.grading import (
         GraderConfig,
         grade_columns,
@@ -363,7 +365,7 @@ def run_one(target: Target, index: ctx.BlockIndex, *, gen_model: str,
 
     # reference_chars=None renders each referenced document WHOLE -- safe
     # because the fit filter guaranteed doc + references fit the budget.
-    enhanced = checkpoint is not None or existing_candidates is not None
+    enhanced = checkpoint is not None or existing_candidates is not None or batch_calls is not None
     payload = payload or prepare_payload(target, index, context_chars=context_chars,
                                           reference_chars=reference_chars)
     if payload is None:
@@ -376,11 +378,15 @@ def run_one(target: Target, index: ctx.BlockIndex, *, gen_model: str,
     grader = GraderConfig(model=grade_model, reasoning_effort="low",
                           thinking_budget_tokens=16000, thinking_max_tokens=32000)
     def stage(name, fn):
+        if batch_calls is not None:
+            return batch_calls.run(name, fn)
         if checkpoint is not None:
             return checkpoint.run(name, fn)
         return call_with_retries(fn, retries=retries, label=name)
 
     def client(stage_name, model):
+        if batch_calls is not None:
+            return batch_calls.client(stage_name, model)
         transport = client_for(model)
         return checkpoint.client(stage_name, model, transport) if checkpoint else transport
 
